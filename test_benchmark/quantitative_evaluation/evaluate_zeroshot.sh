@@ -13,7 +13,7 @@
 PRED="./../../results/mistral_cmd_webwid_videoInstruction_no_subtitles_msvd_no_subtitles.json"
 OUTPUT_DIR="./../output/msvd/mistral_all"
 rm -rf $OUTPUT_DIR
-API_KEY="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"
+API_KEY="api_key"
 NUM_TASKS=128
 
 
