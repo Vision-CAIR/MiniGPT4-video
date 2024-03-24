@@ -1,0 +1,37 @@
+model:
+  arch: mini_gpt4_llama_v2
+  model_type: pretrain_vicuna
+  freeze_vit: True
+  freeze_qformer: True
+  max_txt_len: 512
+  low_resource: True
+  image_size: 224
+  end_sym: "</s>"
+  llama_model: "mistralai/Mistral-7B-Instruct-v0.2"
+  ckpt: "checkpoints/video_mistral_all_checkpoint_last.pth"
+  use_grad_checkpoint: True
+  chat_template: True
+  lora_r: 64
+  lora_alpha: 16
+  length: 50
+  use_grad_checkpoint_llm: True
+  max_context_len: 7200
+
+
+datasets:
+  video_chatgpt: #99378 row  - 13224 video
+    batch_size: 1
+    vis_processor:
+      train:
+        name: "blip2_image_train"
+        image_size: 224
+    text_processor:
+      train:
+        name: "blip_caption"
+    sample_ratio: 200
+
+
+run:
+  task: image_text_pretrain
+  seed: 42
+  amp: True
