@@ -1,0 +1,5 @@
+datasets:
+  cc_sbu:
+    data_type: images
+    build_info:
+      storage: /ibex/project/c2133/blip_dataset/cc3m_256/cc3m_cc12m_sbu/{00000..01255}.tar
