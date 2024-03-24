@@ -14,8 +14,10 @@ git clone https://github.com/Vision-CAIR/MiniGPT4-video.git
 ```bash
 conda env create -f environment.yml
 ```
-**3. download the checkpoints**
+**3. Download the checkpoints**
+
 [checkpoints](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/tree/main/checkpoints)  <br>
+
 **4. Run the demo** <br>
 ```bash
 python minigpt4_video_demo.py --ckpt path_to_video_checkpoint
