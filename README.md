@@ -14,21 +14,18 @@ git clone https://github.com/Vision-CAIR/MiniGPT4-video.git
 ```bash
 conda env create -f environment.yml
 ```
-3- download the checkpoints <br>
-```bash
-gdown  
-```  
+3- download the checkpoints from huggingface [checkpoints](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/tree/main/checkpoints)  <br>
 4- run the demo <br>
 ```bash
-python minigpt4_video_demo.py --ckpt path_to_checkpoint
+python minigpt4_video_demo.py --ckpt path_to_video_checkpoint
 ```
 ## How to use the model for inference:
 Do the previous steps and replace step 4 with this step 
 ```bash
-python minigpt4_video_inference.py --ckpt path_to_checkpoint --video_path path_to_video --question "Your question here" 
+python minigpt4_video_inference.py --ckpt path_to_video_checkpoint --video_path path_to_video --question "Your question here" 
 ```
 ## Training datasets :
-You can find the datasets annotation files in the datasets folder <br>:
+You can find the datasets annotation files [datasets](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/tree/main/datasets) <br>:
 We trained the MiniGPT4-video model on the following datasets:
 We used the minigpt v2 architecture and train it with the following datasets:
 For image text training we used the following datasets (these are the datasets used for Minigpt-4 v1): <br>
