@@ -16,7 +16,7 @@ conda env create -f environment.yml
 ```
 **3. Download the checkpoints**
 
-[checkpoints](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/tree/main/checkpoints)  <br>
+[Download](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/tree/main/checkpoints)  <br>
 
 **4. Run the demo** <br>
 ```bash
