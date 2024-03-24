@@ -1,4 +1,4 @@
-# Minigpt4-Video : Video question answering
+# MiniGPT-Video
 <!-- technical report link  -->
 <!-- demo link  -->
 ## Overview
