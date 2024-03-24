@@ -30,16 +30,16 @@ python minigpt4_video_inference.py --ckpt path_to_video_checkpoint --video_path 
 ## Training datasets :
 You can find the datasets annotation files [datasets](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/tree/main/datasets) <br>:
 We trained the MiniGPT4-video model on the following datasets:
-We used the minigpt v2 architecture and train it with the following datasets:
+We used the MiniGPT-v2 architecture and train it with the following datasets:
 For image text training we used the following datasets (these are the datasets used for Minigpt-4 v1): <br>
--LAION <br>
--Conceptual Captions <br>
--SBU <br>
++ LAION <br>
++ Conceptual Captions <br>
++ SBU <br>
 For video text training we extend the architecture to accept mutiple frames then trained  we used the following datasets:<br>
 You can find the datasets annotation files in the datasets folder and can download the videos from the following links: <br>
--[CMD](https://www.robots.ox.ac.uk/~vgg/data/condensed-movies/) <br>
--Webvid <br> <!-- -[Webvid](https://huggingface.co/datasets/TempoFunk/webvid-10M?row=2)  -->
--[Video Instructional Dataset 100K](https://huggingface.co/datasets/MBZUAI/VideoInstruct-100K) <br>
++ [CMD](https://www.robots.ox.ac.uk/~vgg/data/condensed-movies/) <br>
++ Webvid <br> <!-- -[Webvid](https://huggingface.co/datasets/TempoFunk/webvid-10M?row=2)  -->
++ [Video Instructional Dataset 100K](https://huggingface.co/datasets/MBZUAI/VideoInstruct-100K) <br>
 
 ## Model training
 Prepare the configrations in the train_configs then run the training script <br>
