@@ -55,15 +55,16 @@ torchrun --master-port port number --nproc-per-node number_of_gpus train.py --jo
 ```
 
 ## Model evaluation
+We used the same evaluation as [VideoChatGPT](https://mbzuai-oryx.github.io/Video-ChatGPT/) evaluation<br>
 ![short_results](repo_imgs/short_results.PNG)
-we used the same evaluation as videochatgpt evaluation [here](https://mbzuai-oryx.github.io/Video-ChatGPT/)<br>
+
 ### Download datasets for evaluation
-1- [MSVD](https://www.cs.utexas.edu/users/ml/clamp/videoDescription/) <br>
-2- [MSRVTT](https://cove.thecvf.com/datasets/839) <br>
-3- [TGIF](https://github.com/YunseokJANG/tgif-qa/blob/master/dataset/README.md) <br>
-4- [ActivityNet](https://mbzuaiac-my.sharepoint.com/:u:/g/personal/hanoona_bangalath_mbzuai_ac_ae/ESa302OCJMNHsMk7wuBbQc8BZH5CqlcdCWiSpXynQZDfAQ?e=CrOPbm) <br>
-5- [TVQA](https://tvqa.cs.unc.edu/) <br>
-6-[Videochatgpt benchmark](https://mbzuai-oryx.github.io/Video-ChatGPT/) <br>
++ [MSVD](https://www.cs.utexas.edu/users/ml/clamp/videoDescription/) <br>
++ [MSRVTT](https://cove.thecvf.com/datasets/839) <br>
++ [TGIF](https://github.com/YunseokJANG/tgif-qa/blob/master/dataset/README.md) <br>
++ [ActivityNet](https://mbzuaiac-my.sharepoint.com/:u:/g/personal/hanoona_bangalath_mbzuai_ac_ae/ESa302OCJMNHsMk7wuBbQc8BZH5CqlcdCWiSpXynQZDfAQ?e=CrOPbm) <br>
++ [TVQA](https://tvqa.cs.unc.edu/) <br>
++ [Videochatgpt benchmark](https://mbzuai-oryx.github.io/Video-ChatGPT/) <br>
 
 ### Run evaluation script
 Edit the evaluation script to include the path to the checkpoints and the dataset name 
