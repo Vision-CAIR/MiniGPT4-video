@@ -220,11 +220,11 @@ def gradio_demo_youtube(youtube_url,has_sub,instruction):
     return pred
     
 
-title = """<h1 align="center">VideoLLM 🎞️ Mistral</h1>"""
-description = """<h5>This is the demo of VideoLLM Model.</h5>"""
+title = """<h1 align="center">MiniGPT4-video 🎞️</h1>"""
+description = """<h5>This is the demo of MiniGPT4-video Model.</h5>"""
 # article = """<p><a href='https://minigpt-4.github.io'><img src='https://img.shields.io/badge/Project-Page-Green'></a></p><p><a href='https://github.com/Vision-CAIR/MiniGPT-4'><img src='https://img.shields.io/badge/Github-Code-blue'></a></p><p><a href='https://raw.githubusercontent.com/Vision-CAIR/MiniGPT-4/main/MiniGPT_4.pdf'><img src='https://img.shields.io/badge/Paper-PDF-red'></a></p>"""
 
-with gr.Blocks(title="🎬 VideoLLM 🎞️",css=text_css ) as demo :
+with gr.Blocks(title="MiniGPT4-video 🎞️",css=text_css ) as demo :
     gr.Markdown(title)
     gr.Markdown(description)
     # gr.Markdown(article)
