@@ -1,0 +1,5 @@
+datasets:
+  laion:
+    data_type: images
+    build_info:
+      storage: /ibex/project/c2133/blip_dataset/laion_1b/laion_gpu/{00000..10488}.tar
