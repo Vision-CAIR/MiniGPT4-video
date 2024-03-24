@@ -6,16 +6,17 @@ MiniGPT4-Video is an innovative model designed for video question answering, ade
 ![methodology](repo_imgs/short_video_figure_new.jpg)
 
 ## How to run the demo: 
-==1. Clone the repository== <br>
+**1. Clone the repository** <br>
 ```bash
 git clone https://github.com/Vision-CAIR/MiniGPT4-video.git
 ```
-==2. set up the environment== <br>
+**2. Set up the environment** <br>
 ```bash
 conda env create -f environment.yml
 ```
-3- download the checkpoints from huggingface [checkpoints](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/tree/main/checkpoints)  <br>
-4- run the demo <br>
+**3. download the checkpoints**
+[checkpoints](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/tree/main/checkpoints)  <br>
+**4. Run the demo** <br>
 ```bash
 python minigpt4_video_demo.py --ckpt path_to_video_checkpoint
 ```
