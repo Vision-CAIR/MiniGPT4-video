@@ -27,7 +27,8 @@ Do the previous steps and replace step 4 with this step
 ```bash
 python minigpt4_video_inference.py --ckpt path_to_video_checkpoint --video_path path_to_video --question "Your question here" 
 ```
-## Training datasets :
+## Training datasets
+
 You can find the datasets annotation files [datasets](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/tree/main/datasets) <br>:
 We trained the MiniGPT4-video model on the following datasets:
 We used the MiniGPT-v2 architecture and train it with the following datasets:
@@ -35,6 +36,7 @@ For image text training we used the following datasets (these are the datasets u
 + LAION <br>
 + Conceptual Captions <br>
 + SBU <br>
+
 For video text training we extend the architecture to accept mutiple frames then trained  we used the following datasets:<br>
 You can find the datasets annotation files in the datasets folder and can download the videos from the following links: <br>
 + [CMD](https://www.robots.ox.ac.uk/~vgg/data/condensed-movies/) <br>
