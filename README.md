@@ -133,3 +133,5 @@ bash test_benchmark/quantitative_evaluation/evaluate_zeroshot.sh
 [Video-ChatGPT](https://mbzuai-oryx.github.io/Video-ChatGPT)
 
 ## License
+This repository is under [BSD 3-Clause License](LICENSE.md).
+Many codes are based on [MiniGPT4](https://github.com/Vision-CAIR/MiniGPT-4).
