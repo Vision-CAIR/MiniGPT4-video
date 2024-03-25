@@ -64,7 +64,7 @@ torchrun --master-port port number --nproc-per-node number_of_gpus train.py --jo
 ```
 
 ## Model evaluation
-We used the same evaluation as [VideoChatGPT](https://mbzuai-oryx.github.io/Video-ChatGPT/)<br>
+We used the same evaluation as [Video-ChatGPT](https://mbzuai-oryx.github.io/Video-ChatGPT/)<br>
 ![short_results](repo_imgs/short_results.PNG)
 
 ### Download datasets for evaluation
@@ -73,7 +73,7 @@ We used the same evaluation as [VideoChatGPT](https://mbzuai-oryx.github.io/Vide
 + [TGIF](https://github.com/YunseokJANG/tgif-qa/blob/master/dataset/README.md) <br>
 + [ActivityNet](https://mbzuaiac-my.sharepoint.com/:u:/g/personal/hanoona_bangalath_mbzuai_ac_ae/ESa302OCJMNHsMk7wuBbQc8BZH5CqlcdCWiSpXynQZDfAQ?e=CrOPbm) <br>
 + [TVQA](https://tvqa.cs.unc.edu/) <br>
-+ [Videochatgpt benchmark](https://mbzuai-oryx.github.io/Video-ChatGPT/) <br>
++ [Video-ChatGPT benchmark](https://mbzuai-oryx.github.io/Video-ChatGPT/) <br>
 
 ### Run evaluation script
 Edit the evaluation script to include the path to the checkpoints and the dataset name 
