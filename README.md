@@ -58,6 +58,8 @@ You can find the datasets annotation files [download](https://huggingface.co/Vis
 You can edit the number of gpus in the script.sh below<br>
 #### Stage 1 (image text pretraining)
 
+Same as [MiniGPT4](https://github.com/Vision-CAIR/MiniGPT-4), you can directly download the pretrained [checkpoint](https://drive.google.com/file/d/11nAPjEok8eAGGEG1N2vXo3kBLCg0WgUk/view?usp=sharing) aligned with Llama2.
+
 ```bash
 # Llama2
 torchrun --nproc-per-node NUM_GPU train.py --cfg-path 224_minigpt4_llama2_image.yaml
