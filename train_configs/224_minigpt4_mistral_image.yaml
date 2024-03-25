@@ -1,6 +1,7 @@
 model:
   arch: minigpt4
   model_type: mini_gpt4_llama_v2
+  llama_model: "mistralai/Mistral-7B-Instruct-v0.2"
 
 
 datasets:
