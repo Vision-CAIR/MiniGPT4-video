@@ -8,9 +8,9 @@
 #SBATCH --gres=gpu:a100:4
 #SBATCH --cpus-per-task=16
 ## run the application:
-job_name=test
-cfg_path="train_configs/224_v2_llama2_video_pretrained_video_instruct.yaml"
-number_of_gpus=1
+job_name="test" # Name of the experiment
+cfg_path="train_configs/224_v2_llama2_video_stage_3.yaml" # path to the config file
+number_of_gpus=1 # number of gpus
 # cd ../../
 
 read LOWERPORT UPPERPORT < /proc/sys/net/ipv4/ip_local_port_range
@@ -20,5 +20,4 @@ do
         ss -lpn | grep -q ":$PORT " || break
 done
 echo "Port is $PORT"
-# export PL_RECONCILE_PROCESS=1
 torchrun --master-port ${PORT} --nproc-per-node $number_of_gpus train.py --job_name ${job_name} --cfg-path ${cfg_path}

@@ -53,18 +53,18 @@ def extract_audio(video_path, audio_path):
     
 def generate_subtitles(video_path,existed_subtitles):
     video_id=video_path.split('/')[-1].split('.')[0]
-    audio_path = f"./../../../inference_subtitles/mp3/{video_id}"+'.mp3'
+    audio_path = f"workspace/misssing_eval_subtitles/mp3/{video_id}"+'.mp3'
     if existed_subtitles.get(video_id,False):
         print("subtitle already generated")
-        return f"./../../../inference_subtitles/{video_id}"+'.vtt'
+        return f"workspace/misssing_eval_subtitles/{video_id}"+'.vtt'
     try:
         extract_audio(video_path,audio_path)
         print("successfully extracted")
-        os.system(f"whisper {audio_path}  --language English --model large --output_format vtt --output_dir ./../../../inference_subtitles")
+        os.system(f"whisper {audio_path}  --language English --model large --output_format vtt --output_dir workspace/misssing_eval_subtitles")
         # remove the audio file
         os.system(f"rm {audio_path}")
         print("subtitle successfully generated")  
-        return f"./../../../inference_subtitles/{video_id}"+'.vtt'
+        return f"workspace/misssing_eval_subtitles/{video_id}"+'.vtt'
     except Exception as e:
         print("error",video_path ,e)
         return None
@@ -291,7 +291,7 @@ class WebVidDataset(BaseDataset, __DisplMixin):
         }
 
 class VideoChatGPTDataset(BaseDataset, __DisplMixin):
-    def __init__(self, vis_processor, text_processor, vis_root, ann_paths,add_subtitles=True):
+    def __init__(self, vis_processor, text_processor, vis_root, ann_paths,add_subtitles=True,llm_name="llama2"):
         """
         vis_root (string): Root directory of images (e.g. coco/images/)
         ann_root (string): directory to store the annotation file
@@ -558,9 +558,13 @@ class WebVidEvalDataset(torch.utils.data.Dataset):
 
 
 class VideoChatGPTEvalDataset(torch.utils.data.Dataset):
-    def __init__(self, vis_processor, videos_path, ann_path,subtitles_path,annotations_keys,videos_features_path,add_subtitles=True):
-        self.length = 90
-        self.max_sub_len = 800
+    def __init__(self, vis_processor, videos_path, ann_path,subtitles_path,annotations_keys,videos_features_path,add_subtitles=True,llm_name="llama2"):
+        if llm_name=="llama2":
+            self.length = 45
+            self.max_sub_len = 400
+        else:
+            self.length = 90
+            self.max_sub_len = 800
         self.add_subtitles = add_subtitles
         self.vis_processor=vis_processor
         self.videos_path=videos_path
@@ -649,9 +653,13 @@ class VideoChatGPTEvalDataset(torch.utils.data.Dataset):
         return images,instruction,answer,self.length,video_id
 
 class Video_validation_Dataset(torch.utils.data.Dataset):
-    def __init__(self, vis_processor, videos_path, ann_path,subtitles_path,annotations_keys,add_subtitles=True):
-        self.length = 90
-        self.max_sub_len = 800
+    def __init__(self, vis_processor, videos_path, ann_path,subtitles_path,annotations_keys,add_subtitles=True,llm_name="llama2"):
+        if llm_name=="llama2":
+            self.length = 45
+            self.max_sub_len = 400
+        else:
+            self.length = 90
+            self.max_sub_len = 800
         self.add_subtitles = add_subtitles
         self.vis_processor=vis_processor
         self.videos_path=videos_path
@@ -741,9 +749,13 @@ class Video_validation_Dataset(torch.utils.data.Dataset):
 
 
 class VideoChatGPTEval_consistancy(torch.utils.data.Dataset):
-    def __init__(self, vis_processor, videos_path, ann_path,subtitles_path,annotations_keys,add_subtitles=True):
-        self.length = 90
-        self.max_sub_len = 800
+    def __init__(self, vis_processor, videos_path, ann_path,subtitles_path,annotations_keys,add_subtitles=True,llm_name="llama2"):
+        if llm_name=="llama2":
+            self.length = 45
+            self.max_sub_len = 400
+        else:
+            self.length = 90
+            self.max_sub_len = 800
         self.add_subtitles = add_subtitles
         self.vis_processor=vis_processor
         self.videos_path=videos_path
@@ -836,11 +848,15 @@ class VideoChatGPTEval_consistancy(torch.utils.data.Dataset):
 
                         
 class TVQAEVAL (torch.utils.data.Dataset):
-    def __init__(self, vis_processor, videos_path, ann_path,subtitles_path,videos_features_path,add_subtitles=True):
+    def __init__(self, vis_processor, videos_path, ann_path,subtitles_path,videos_features_path,add_subtitles=True,llm_name="llama2"):
         self.tv_shows_mapping={"Grey's Anatomy":"grey_frames", 'How I Met You Mother':"met_frames", 'Friends':"friends_frames", 'The Big Bang Theory':"bbt_frames", 'House M.D.':"house_frames", 'Castle':"castle_frames"} 
         self.fps=3
-        self.length = 90
-        self.max_sub_len = 800
+        if llm_name=="llama2":
+            self.length = 45
+            self.max_sub_len = 400
+        else:
+            self.length = 90
+            self.max_sub_len = 800
         self.add_subtitles = add_subtitles
         self.vis_processor=vis_processor
         self.videos_path=videos_path
@@ -919,11 +935,15 @@ class TVQAEVAL (torch.utils.data.Dataset):
 
 
 class TVQAEVAL_Long (torch.utils.data.Dataset):
-    def __init__(self, vis_processor, videos_path, ann_path,subtitles_path,videos_features_path,add_subtitles=False):
+    def __init__(self, vis_processor, videos_path, ann_path,subtitles_path,videos_features_path,add_subtitles=False,llm_name="llama2"):
         self.tv_shows_mapping={"Grey's Anatomy":"grey_frames", 'How I Met You Mother':"met_frames", 'Friends':"friends_frames", 'The Big Bang Theory':"bbt_frames", 'House M.D.':"house_frames", 'Castle':"castle_frames"} 
         self.fps=3
-        self.length = 90
-        self.max_sub_len = 800
+        if llm_name=="llama2":
+            self.length = 45
+            self.max_sub_len = 400
+        else:
+            self.length = 90
+            self.max_sub_len = 800
         self.add_subtitles = add_subtitles
         self.vis_processor=vis_processor
         self.videos_path=videos_path

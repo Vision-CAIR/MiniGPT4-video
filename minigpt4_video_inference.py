@@ -130,7 +130,7 @@ def run (video_path,instruction,model,vis_processor,gen_subtitles=True):
   
 def get_arguments():
     parser = argparse.ArgumentParser(description="Inference parameters")
-    parser.add_argument("--cfg-path", help="path to configuration file.",default="test_configs/224_v2_llama2_video.yaml")
+    parser.add_argument("--cfg-path", help="path to configuration file.",default="test_configs/llama2_test_config.yaml")
     parser.add_argument("--ckpt", type=str,default='checkpoints/video_llama_checkpoint_last.pth', help="path to checkpoint")
     parser.add_argument("--add_subtitles",action= 'store_true',help="whether to add subtitles")
     parser.add_argument("--question", type=str, help="question to ask")
@@ -156,7 +156,7 @@ def setup_seeds(seed):
     cudnn.deterministic = True
 
 import yaml 
-with open('test_configs/224_v2_llama2_video.yaml') as file:
+with open('test_configs/llama2_test_config.yaml') as file:
     config = yaml.load(file, Loader=yaml.FullLoader)
 seed=config['run']['seed']
 print("seed",seed)

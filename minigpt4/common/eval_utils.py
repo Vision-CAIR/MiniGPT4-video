@@ -22,7 +22,7 @@ import time
 
 def eval_parser():
     parser = argparse.ArgumentParser(description="Demo")
-    parser.add_argument("--cfg-path", help="path to configuration file.",default="test_configs/224_v2_llama2_video.yaml")
+    parser.add_argument("--cfg-path", help="path to configuration file.",default="test_configs/llama2_test_config.yaml")
     parser.add_argument("--ckpt", type=str,default='checkpoints/video_llama_checkpoint_last.pth', help="path to checkpoint")
     parser.add_argument("--eval_opt", type=str, default='all', help="path to configuration file.")
     parser.add_argument("--max_new_tokens", type=int, default=512, help="max number of generated tokens")

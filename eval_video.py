@@ -9,7 +9,6 @@ from minigpt4.datasets.datasets.video_datasets import VideoChatGPTEvalDataset,Vi
 
 parser = eval_parser()
 parser.add_argument("--dataset", type=str, default='msvd', help="dataset to evaluate")
-parser.add_argument("--num_frames", type=int, default=50, help="path to configuration file.")
 parser.add_argument("--add_subtitles",action='store_true',help="whether to add subtitles to the video")
 parser.add_argument("--name", type=str, default='3_datasets', help="evaluation name")
 parser.add_argument("--batch_size", type=int, default=1, help="batch size")
@@ -19,6 +18,11 @@ args = parser.parse_args()
 
 print(args.ckpt)
 print(args.name)
+print(args.cfg_path)
+if "test_configs/mistral_test_config.yaml" == args.cfg_path: 
+    llm_name="mistral"
+else:   
+    llm_name="llama2"
 print("using captions",args.add_subtitles)
 
 model, vis_processor = init_model(args)
@@ -30,20 +34,20 @@ if args.dataset == 'video_chatgpt_generic':
     subtitles_path="/home/ataallka/minigpt_video/minigpt_multi_img/inference_subtitles"
     videos_features_path="/ibex/project/c2106/kirolos/videos_features/evaluation/benchmark/generic"
     annotations_keys=['Q','A','video_name']
-    data = VideoChatGPTEvalDataset(vis_processor, videos_path, ann_path,subtitles_path,annotations_keys,videos_features_path, add_subtitles=args.add_subtitles)
+    data = VideoChatGPTEvalDataset(vis_processor, videos_path, ann_path,subtitles_path,annotations_keys,videos_features_path, add_subtitles=args.add_subtitles,llm_name=llm_name)
 elif args.dataset == 'video_chatgpt_temporal':
     ann_path="datasets/evaluation_datasets/videochatgpt_benchmark/temporal_qa.json"
     videos_path="/ibex/project/c2090/datasets/VideoInstruct100K/test_videos/Test_Videos"
     subtitles_path="/home/ataallka/minigpt_video/minigpt_multi_img/inference_subtitles"
     videos_features_path="/ibex/project/c2106/kirolos/videos_features/evaluation/benchmark/temporal"
     annotations_keys=['Q','A','video_name']
-    data = VideoChatGPTEvalDataset(vis_processor, videos_path, ann_path,subtitles_path,annotations_keys,videos_features_path, add_subtitles=args.add_subtitles)
+    data = VideoChatGPTEvalDataset(vis_processor, videos_path, ann_path,subtitles_path,annotations_keys,videos_features_path, add_subtitles=args.add_subtitles,llm_name=llm_name)
 elif args.dataset == 'video_chatgpt_consistency':
     ann_path="datasets/evaluation_datasets/videochatgpt_benchmark/consistency_qa.json"
     videos_path="/ibex/project/c2090/datasets/VideoInstruct100K/test_videos/Test_Videos"
     subtitles_path="/home/ataallka/minigpt_video/minigpt_multi_img/inference_subtitles"
     annotations_keys=[['Q1','Q2'],'A','video_name']
-    data = VideoChatGPTEval_consistancy(vis_processor, videos_path, ann_path,subtitles_path,annotations_keys, add_subtitles=args.add_subtitles)
+    data = VideoChatGPTEval_consistancy(vis_processor, videos_path, ann_path,subtitles_path,annotations_keys, add_subtitles=args.add_subtitles,llm_name=llm_name)
     
 elif args.dataset == 'msrvtt':
     ann_path="datasets/evaluation_datasets/msrvtt/val_qa_edited.json"
@@ -51,7 +55,7 @@ elif args.dataset == 'msrvtt':
     subtitles_path="/home/ataallka/minigpt_video/minigpt_multi_img/inference_subtitles"
     videos_features_path="/ibex/project/c2106/kirolos/videos_features/evaluation/msrvtt"
     annotations_keys=['question','answer','video_id']
-    data = VideoChatGPTEvalDataset(vis_processor, videos_path, ann_path,subtitles_path,annotations_keys,videos_features_path, add_subtitles=args.add_subtitles)
+    data = VideoChatGPTEvalDataset(vis_processor, videos_path, ann_path,subtitles_path,annotations_keys,videos_features_path, add_subtitles=args.add_subtitles,llm_name=llm_name)
 
 elif args.dataset == 'msvd':
     ann_path="datasets/evaluation_datasets/msvd/val_qa_edited.json"
@@ -59,14 +63,14 @@ elif args.dataset == 'msvd':
     subtitles_path="/home/ataallka/minigpt_video/minigpt_multi_img/inference_subtitles"
     videos_features_path="/ibex/project/c2106/kirolos/videos_features/evaluation/msvd"
     annotations_keys=['question','answer','video_id']
-    data = VideoChatGPTEvalDataset(vis_processor, videos_path, ann_path,subtitles_path,annotations_keys,videos_features_path, add_subtitles=args.add_subtitles)
+    data = VideoChatGPTEvalDataset(vis_processor, videos_path, ann_path,subtitles_path,annotations_keys,videos_features_path, add_subtitles=args.add_subtitles,llm_name=llm_name)
 elif args.dataset == 'activitynet':
     ann_path="datasets/evaluation_datasets/activityNet/test_qa.json"
     videos_path="/ibex/project/c2090/datasets/VideoInstruct100K/test_videos/Activity_net/Activity_net_videos"
     subtitles_path="/home/ataallka/minigpt_video/minigpt_multi_img/inference_subtitles/"
     videos_features_path="/ibex/project/c2106/kirolos/videos_features/evaluation/activity_net"
     annotations_keys=['question','answer','video_id']
-    data = VideoChatGPTEvalDataset(vis_processor, videos_path, ann_path,subtitles_path,annotations_keys,videos_features_path, add_subtitles=args.add_subtitles)
+    data = VideoChatGPTEvalDataset(vis_processor, videos_path, ann_path,subtitles_path,annotations_keys,videos_features_path, add_subtitles=args.add_subtitles,llm_name=llm_name)
 elif args.dataset == 'tgif':
     ann_path="datasets/evaluation_datasets/tgif/Test_frameqa_question.json"
     videos_path="/ibex/project/c2090/datasets/VideoInstruct100K/test_videos/TGIF/mp4s"
@@ -74,21 +78,21 @@ elif args.dataset == 'tgif':
     videos_features_path="/ibex/project/c2106/kirolos/videos_features/evaluation/tgif"
     annotations_keys=['question','answer','gif_name']
     # annotations_keys=['question','description','gif_name']
-    data = VideoChatGPTEvalDataset(vis_processor, videos_path, ann_path,subtitles_path,annotations_keys,videos_features_path, add_subtitles=False)
+    data = VideoChatGPTEvalDataset(vis_processor, videos_path, ann_path,subtitles_path,annotations_keys,videos_features_path, add_subtitles=False,llm_name=llm_name)
 elif args.dataset == 'Video_validation_Dataset':
     ann_path= "/ibex/project/c2090/datasets/VideoInstruct100K/test_videos/all_datasets_samples_val_qa.json"
     videos_path= "/ibex/project/c2090/datasets/VideoInstruct100K/test_videos/all_datasets_samples_val"
     subtitles_path= "/home/ataallka/minigpt_video/minigpt_multi_img/inference_subtitles"
     annotations_keys= ['question','answer','video_id']
     vis_processor=Blip2ImageTrainProcessor()
-    data = Video_validation_Dataset(vis_processor, videos_path, ann_path,subtitles_path,annotations_keys,args.add_subtitles)
+    data = Video_validation_Dataset(vis_processor, videos_path, ann_path,subtitles_path,annotations_keys,args.add_subtitles,llm_name=llm_name)
 elif args.dataset == 'tvqa':
     # TVQA dataset
     ann_path="datasets/evaluation_datasets/tvqa_short/tvqa_val.json"
     videos_path= "/ibex/project/c2090/datasets/TVR_dataset/videos/video_files/frames_hq/"
     subtitles_path="/ibex/project/c2090/datasets/TVR_dataset/TVRetrieval/data/tvqa_preprocessed_subtitles.json"
     videos_features_path="/ibex/project/c2106/kirolos/videos_features/evaluation/tvqa"
-    data = TVQAEVAL(vis_processor, videos_path, ann_path,subtitles_path,videos_features_path,add_subtitles=args.add_subtitles)
+    data = TVQAEVAL(vis_processor, videos_path, ann_path,subtitles_path,videos_features_path,add_subtitles=args.add_subtitles,llm_name=llm_name)
     
 elif args.dataset == 'tvqa_long_videos':
     # TVQA dataset
@@ -96,7 +100,7 @@ elif args.dataset == 'tvqa_long_videos':
     videos_path= "/ibex/project/c2106/kirolos/Long_TVQA/videos"
     subtitles_path="/ibex/project/c2106/kirolos/Long_TVQA/tvqa_subtitles"
     videos_features_path="/ibex/project/c2106/kirolos/videos_features/evaluation/tvqa_long"
-    data = TVQAEVAL_Long(vis_processor, videos_path, ann_path,subtitles_path,videos_features_path,add_subtitles=True)
+    data = TVQAEVAL_Long(vis_processor, videos_path, ann_path,subtitles_path,videos_features_path,add_subtitles=True,llm_name=llm_name)
 
 eval_dataloader = DataLoader(data, batch_size=args.batch_size, shuffle=False)
 
@@ -115,28 +119,30 @@ pred_result = {}
 gt_result = {}
 if args.dataset == 'video_chatgpt_consistency':
     for images, texts_1,texts_2, gt_answers, lengths,videos_ids in tqdm(eval_dataloader,desc=f"Eval {args.dataset}"):
-        texts_q1 = prepare_texts(texts_1, conv_temp, template='', lengths=lengths)  # warp the texts with conversation template
-        texts_q2 = prepare_texts(texts_2, conv_temp, template='', lengths=lengths)  # warp the texts with conversation template
-        models_answers_q1 = model.generate(images, texts_q1, max_new_tokens=args.max_new_tokens, do_sample=False, lengths=lengths,num_beams=1)
-        models_answers_q2 = model.generate(images, texts_q2, max_new_tokens=args.max_new_tokens, do_sample=False, lengths=lengths,num_beams=1)
-        for video_id,model_answer_q1,model_answer_q2, gt_answer,text_q1,text_q2 in zip(videos_ids,models_answers_q1,models_answers_q2, gt_answers,texts_q1,texts_q2):
-            result = dict()
-            result['video_name'] = video_id
-            result['Q1'] = text_q1.split('\n')[-1].replace('[/INST]','')
-            result['Q2'] = text_q2.split('\n')[-1].replace('[/INST]','')
-            result['A'] = gt_answer
-            result['pred1'] = model_answer_q1
-            result['pred2'] = model_answer_q2
-            pred_result[video_id] = [model_answer_q1,model_answer_q2]
-            gt_result[video_id] = [gt_answer]
-            minigpt4_predict.append(result)
-        # save results every 100 videos to avoid losing results
-        if c%100==0:
-            with open(save_path, 'w') as f:
-                json.dump(minigpt4_predict, f)
-        c+=args.batch_size
-        # if c > 10 :
-        #     break
+        if args.start<= c <args.end :
+            texts_q1 = prepare_texts(texts_1, conv_temp, template='', lengths=lengths)  # warp the texts with conversation template
+            texts_q2 = prepare_texts(texts_2, conv_temp, template='', lengths=lengths)  # warp the texts with conversation template
+            models_answers_q1 = model.generate(images, texts_q1, max_new_tokens=args.max_new_tokens, do_sample=False, lengths=lengths,num_beams=1)
+            models_answers_q2 = model.generate(images, texts_q2, max_new_tokens=args.max_new_tokens, do_sample=False, lengths=lengths,num_beams=1)
+            for video_id,model_answer_q1,model_answer_q2, gt_answer,text_q1,text_q2 in zip(videos_ids,models_answers_q1,models_answers_q2, gt_answers,texts_q1,texts_q2):
+                result = dict()
+                result['video_name'] = video_id
+                result['Q1'] = text_q1.split('\n')[-1].replace('[/INST]','')
+                result['Q2'] = text_q2.split('\n')[-1].replace('[/INST]','')
+                result['A'] = gt_answer
+                result['pred1'] = model_answer_q1
+                result['pred2'] = model_answer_q2
+                pred_result[video_id] = [model_answer_q1,model_answer_q2]
+                gt_result[video_id] = [gt_answer]
+                minigpt4_predict.append(result)
+            # save results every 100 videos to avoid losing results
+            if c%100==0:
+                with open(save_path, 'w') as f:
+                    json.dump(minigpt4_predict, f)
+        if c >= args.end :
+            break
+        c+=1
+
 elif args.dataset == 'tvr':
     for images, texts, gt_answers, lengths,videos_ids in tqdm(eval_dataloader,desc=f"Eval {args.dataset}"):
         if args.start<= c <args.end :
