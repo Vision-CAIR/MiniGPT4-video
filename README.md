@@ -39,12 +39,11 @@ python minigpt4_video_demo.py --ckpt path_to_video_checkpoint --cfg-path test_co
 ```
 ### Inference
 Do the previous steps and replace step 4 with this step 
-#### Llama2
+
 ```bash
+# Llama 2
 python minigpt4_video_inference.py --ckpt path_to_video_checkpoint --cfg-path test_configs/llama2_test_config.yaml --video_path path_to_video --question "Your question here" 
-```
-#### Mistral
-```bash
+# Mistral
 python minigpt4_video_inference.py --ckpt path_to_video_checkpoint --cfg-path test_configs/mistral_test_config.yaml --video_path path_to_video --question "Your question here" 
 ```
 ## :fire: Training
