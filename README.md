@@ -29,21 +29,21 @@ conda env create -f environment.yml
 | [Download](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/blob/main/checkpoints/video_llama_checkpoint_best.pth) | [Download](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/blob/main/checkpoints/video_mistral_all_checkpoint_last.pth) |
 
 **4. Run the demo** <br>
-### Llama2
+#### Llama2
 ```bash
 python minigpt4_video_demo.py --ckpt path_to_video_checkpoint --cfg-path test_configs/llama2_test_config.yaml
 ```
-### Mistral
+#### Mistral
 ```bash
 python minigpt4_video_demo.py --ckpt path_to_video_checkpoint --cfg-path test_configs/mistral_test_config.yaml
 ```
 ### Inference
 Do the previous steps and replace step 4 with this step 
-### Llama2
+#### Llama2
 ```bash
 python minigpt4_video_inference.py --ckpt path_to_video_checkpoint --cfg-path test_configs/llama2_test_config.yaml --video_path path_to_video --question "Your question here" 
 ```
-### Mistral
+#### Mistral
 ```bash
 python minigpt4_video_inference.py --ckpt path_to_video_checkpoint --cfg-path test_configs/mistral_test_config.yaml --video_path path_to_video --question "Your question here" 
 ```
@@ -64,18 +64,31 @@ Video text training:<br>
 
 You can find the datasets annotation files [download](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/tree/main/datasets/training_datasets) <br>
 
-## Model training: 
+### Model training: 
 You can edit the number of gpus in the script.sh below<br>
-
-### Stage 1 (image text pretraining)
+#### Stage 1 (image text pretraining)
+#### For Mistral
+Set the cfg-path in the script to ---- <br>
+#### For Llama2
+Set the cfg-path in the script to ---- <br>
 ```bash
 ```
-### Stage 2 (video captioning pretraining)
+#### Stage 2 (video captioning pretraining)
+
+#### For Mistral
+Set the cfg-path in the script to train_configs/224_v2_mistral_video_stage_2.yaml <br>
+#### For Llama2
+Set the cfg-path in the script to train_configs/224_v2_llama2_video_stage_2.yaml <br>
+
 ```bash
 bash jobs_video/train/stage_2.sh
 ```
+#### Stage 3 (video Instruction finetuning)
+#### For Mistral
+Set the cfg-path in the script to train_configs/224_v2_mistral_video_stage_3.yaml <br>
+#### For Llama2
+Set the cfg-path in the script to train_configs/224_v2_llama2_video_stage_3.yaml <br>
 
-### Stage 3 (video Instruction finetuning)
 ```bash
 bash jobs_video/train/stage_3.sh
 ```
@@ -96,11 +109,11 @@ You can find the datasets annotation files [download](https://huggingface.co/Vis
 
 ### Run evaluation script
 Edit the evaluation script to include the path to the checkpoints, the dataset name and whether to use subtitles or not <br> 
-For Mistral
+#### For Mistral
 ```bash
 bash jobs_video/eval/mistral_evalualtion.sh
 ```
-For Llama 2 
+#### For Llama 2 
 ```bash
 bash jobs_video/eval/llama2_evaluation.sh
 ```
