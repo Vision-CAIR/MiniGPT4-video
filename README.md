@@ -16,17 +16,18 @@ conda env create -f environment.yml
 ```
 **3. Download the checkpoints**
 
-+ prepare pretrained LLM weights
++ Prepare pretrained LLM weights
+You can download the pretrained LLM weights from the following links and change the path of llama_model in the all config files to the downloaded weights path or you can skip this step and the weights will be downloaded automatically
 
 |                            Llama 2 Chat 7B                             |                                           Mistral 7B Instruct v0.2                  |
 :------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------:
 | [Download](https://huggingface.co/meta-llama/Llama-2-7b-chat-hf/tree/main) | [Downlad](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2) |
 
-+ download pretrained checkpoints
++ Download pretrained checkpoints
 
 | MiniGPT-Video (Llama2 Chat 7B) | MiniGPT-Video (Mistral 7B) |
 :------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------:
-| [Download](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/blob/main/checkpoints/video_llama_checkpoint_best.pth) | [Download](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/blob/main/checkpoints/video_mistral_all_checkpoint_last.pth) |
+| [Download](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/blob/main/checkpoints/video_llama_checkpoint_last.pth) | [Download](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/blob/main/checkpoints/video_mistral_checkpoint_best.pth) |
 
 **4. Run the demo** <br>
 #### Llama2
@@ -67,22 +68,25 @@ You can find the datasets annotation files [download](https://huggingface.co/Vis
 ### Model training: 
 You can edit the number of gpus in the script.sh below<br>
 #### Stage 1 (image text pretraining)
-#### For Mistral
+##### For Mistral
 Set the cfg-path in the script to ---- <br>
-#### For Llama2
+##### For Llama2
 Set the cfg-path in the script to ---- <br>
 ```bash
 ```
+You can download our trained weights for this stage from here [Llama2](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/blob/main/checkpoints/image_llama2_checkpoint.pth) [Mistral](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/blob/main/checkpoints/image_mistral_checkpoint.pth)<br>
 #### Stage 2 (video captioning pretraining)
 
-#### For Mistral
+##### For Mistral
 Set the cfg-path in the script to train_configs/224_v2_mistral_video_stage_2.yaml <br>
-#### For Llama2
+##### For Llama2
 Set the cfg-path in the script to train_configs/224_v2_llama2_video_stage_2.yaml <br>
 
 ```bash
 bash jobs_video/train/stage_2.sh
 ```
+You can download our trained weights for this stage from here [Llama2](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/blob/main/checkpoints/video_captioning_llama_checkpoint_last.pth) [Mistral](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/blob/main/checkpoints/video_captioning_mistral_checkpoint_last.pth)<br>
+
 #### Stage 3 (video Instruction finetuning)
 #### For Mistral
 Set the cfg-path in the script to train_configs/224_v2_mistral_video_stage_3.yaml <br>
@@ -92,6 +96,7 @@ Set the cfg-path in the script to train_configs/224_v2_llama2_video_stage_3.yaml
 ```bash
 bash jobs_video/train/stage_3.sh
 ```
+You can download our trained weights for this stage from here [Llama2](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/blob/main/checkpoints/video_llama_checkpoint_best.pth) [Mistral](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/blob/main/checkpoints/video_mistral_checkpoint_best.pth)<br>
 
 ## :zap: Evaluation
 We used the same evaluation as [Video-ChatGPT](https://mbzuai-oryx.github.io/Video-ChatGPT/)<br>
@@ -118,7 +123,12 @@ bash jobs_video/eval/mistral_evalualtion.sh
 bash jobs_video/eval/llama2_evaluation.sh
 ```
 Then Use GPT3.5 turbo to compare the predictions with the ground truth and generate the accuracy and scores <br>
-To evaluate [videochatgpt benchmark] run the following script <br>
+Set these variables in the script <br>
+PRED="path_to_predictions"<br>
+OUTPUT_DIR="path_to_output_dir"<br>
+API_KEY="openAI_key"<br>
+NUM_TASKS=128<br>
+Then to evaluate videochatgpt benchmark run the following script <br>
 ```bash
 bash test_benchmark/quantitative_evaluation/evaluate_benchmark.sh
 ```
@@ -126,3 +136,8 @@ To evaluate open ended questions run the following script <br>
 ```bash
 bash test_benchmark/quantitative_evaluation/evaluate_zeroshot.sh
 ```
+## Acknowledgements
+[MiniGPT4](https://github.com/Vision-CAIR/MiniGPT-4/tree/main?tab=readme-ov-file)
+[Video-ChatGPT](https://mbzuai-oryx.github.io/Video-ChatGPT/)
+
+## License
