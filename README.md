@@ -19,13 +19,23 @@ conda env create -f environment.yml
 [Download](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/tree/main/checkpoints)  <br>
 
 **4. Run the demo** <br>
+### Llama2
 ```bash
-python minigpt4_video_demo.py --ckpt path_to_video_checkpoint
+python minigpt4_video_demo.py --ckpt path_to_video_checkpoint --cfg-path test_configs/llama2_test_config.yaml
+```
+### Mistral
+```bash
+python minigpt4_video_demo.py --ckpt path_to_video_checkpoint --cfg-path test_configs/mistral_test_config.yaml
 ```
 ## How to use the model for inference:
 Do the previous steps and replace step 4 with this step 
+### Llama2
 ```bash
-python minigpt4_video_inference.py --ckpt path_to_video_checkpoint --video_path path_to_video --question "Your question here" 
+python minigpt4_video_inference.py --ckpt path_to_video_checkpoint --cfg-path test_configs/llama2_test_config.yaml --video_path path_to_video --question "Your question here" 
+```
+### Mistral
+```bash
+python minigpt4_video_inference.py --ckpt path_to_video_checkpoint --cfg-path test_configs/mistral_test_config.yaml --video_path path_to_video --question "Your question here" 
 ```
 ## Training datasets
 
@@ -42,15 +52,20 @@ Video text training:<br>
 
 You can find the datasets annotation files [download](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/tree/main/datasets) <br>
 
-## Model training
-Prepare the configrations in the train_configs then run the training script <br>
-You should Edit the number of gpus in the parallel_training.sh script
+## Model training: 
+You can edit the number of gpus in the script.sh below<br>
+
+### Stage 1 (image text pretraining)
 ```bash
-bash jobs_video/train/parallel_training.sh 
 ```
-or 
-``` bash
-torchrun --master-port port number --nproc-per-node number_of_gpus train.py --job_name "job_name" --cfg-path "train cfg_path"
+### Stage 2 (video captioning pretraining)
+```bash
+bash jobs_video/train/stage_2.sh
+```
+
+### Stage 3 (video Instruction finetuning)
+```bash
+bash jobs_video/train/stage_3.sh
 ```
 
 ## Model evaluation
@@ -66,11 +81,16 @@ We used the same evaluation as [VideoChatGPT](https://mbzuai-oryx.github.io/Vide
 + [Videochatgpt benchmark](https://mbzuai-oryx.github.io/Video-ChatGPT/) <br>
 
 ### Run evaluation script
-Edit the evaluation script to include the path to the checkpoints and the dataset name 
+Edit the evaluation script to include the path to the checkpoints, the dataset name and whether to use subtitles or not <br> 
+For Mistral
 ```bash
-bash jobs_video/eval/evalualtion.sh
+bash jobs_video/eval/mistral_evalualtion.sh
 ```
-then Use GPT3.5 turbo to compare the predictions with the ground truth and generate the accuracy and scores <br>
+For Llama 2 
+```bash
+bash jobs_video/eval/llama2_evaluation.sh
+```
+Then Use GPT3.5 turbo to compare the predictions with the ground truth and generate the accuracy and scores <br>
 To evaluate [videochatgpt benchmark] run the following script <br>
 ```bash
 bash test_benchmark/quantitative_evaluation/evaluate_benchmark.sh
