@@ -16,15 +16,6 @@ conda env create -f environment.yml
 ```
 **3. Download the checkpoints**
 
-+ Prepare pretrained LLM weights
-You can download the pretrained LLM weights from the following links and change the path of llama_model in the all config files to the downloaded weights path or you can skip this step and the weights will be downloaded automatically
-
-|                            Llama 2 Chat 7B                             |                                           Mistral 7B Instruct v0.2                  |
-:------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------:
-| [Download](https://huggingface.co/meta-llama/Llama-2-7b-chat-hf/tree/main) | [Downlad](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2) |
-
-+ Download pretrained checkpoints
-
 | MiniGPT-Video (Llama2 Chat 7B) | MiniGPT-Video (Mistral 7B) |
 :------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------:
 | [Download](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/blob/main/checkpoints/video_llama_checkpoint_last.pth) | [Download](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/blob/main/checkpoints/video_mistral_checkpoint_best.pth) |
@@ -66,11 +57,12 @@ You can find the datasets annotation files [download](https://huggingface.co/Vis
 ### Model training: 
 You can edit the number of gpus in the script.sh below<br>
 #### Stage 1 (image text pretraining)
-##### For Mistral
-Set the cfg-path in the script to ---- <br>
-##### For Llama2
-Set the cfg-path in the script to ---- <br>
+
 ```bash
+# Llama2
+torchrun --nproc-per-node NUM_GPU train.py --cfg-path 224_minigpt4_llama2_image.yaml
+# Mistral
+torchrun --nproc-per-node NUM_GPU train.py --cfg-path 224_minigpt4_mistral_image.yaml
 ```
 You can download our trained weights for this stage from here [Llama2](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/blob/main/checkpoints/image_llama2_checkpoint.pth) [Mistral](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/blob/main/checkpoints/image_mistral_checkpoint.pth)<br>
 #### Stage 2 (video captioning pretraining)
