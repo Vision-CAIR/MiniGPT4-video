@@ -114,10 +114,12 @@ bash jobs_video/eval/mistral_evalualtion.sh
 ```
 Then Use GPT3.5 turbo to compare the predictions with the ground truth and generate the accuracy and scores <br>
 Set these variables in the script <br>
+```bash
 PRED="path_to_predictions"<br>
 OUTPUT_DIR="path_to_output_dir"<br>
 API_KEY="openAI_key"<br>
 NUM_TASKS=128<br>
+```
 Then to evaluate [Video-ChatGPT benchmark] run the following script <br>
 ```bash
 bash test_benchmark/quantitative_evaluation/evaluate_benchmark.sh
