@@ -5,7 +5,7 @@
 MiniGPT4-Video is an innovative model designed for video question answering, adept at comprehending both visual stimuli and conversational content within the video domain. This model undergoes training on extensive video-text and image-text corpora. The architectural framework of MiniGPT4-Video is visually depicted in the accompanying figure. During the frame encoding phase, EVA-CLIP is employed, incorporating a projection layer to facilitate the mapping of visual features onto the textual domain of the Large Language Model (LLM). Similar to MiniGPT-v2, we condense each group of four adjacent visual tokens into a singular token, resulting in a 75% reduction in token count per image, from 256 to 64. Throughout the training process, the LLM assimilates the fusion of video frame features with subtitles, thereby comprehending the temporal dynamics inherent within the video content. During inference, the Whisper model is utilized to generate subtitles for the video. Then, both the video and the subtitle are input to the MiniGPT4-Video model.
 ![methodology](repo_imgs/short_video_figure_new.jpg)
 
-## :fire:Demo
+## :rocket: Demo
 **1. Clone the repository** <br>
 ```bash
 git clone https://github.com/Vision-CAIR/MiniGPT4-video.git
@@ -32,12 +32,12 @@ conda env create -f environment.yml
 ```bash
 python minigpt4_video_demo.py --ckpt path_to_video_checkpoint
 ```
-## How to use the model for inference:
+## Inference:
 Do the previous steps and replace step 4 with this step 
 ```bash
 python minigpt4_video_inference.py --ckpt path_to_video_checkpoint --video_path path_to_video --question "Your question here" 
 ```
-## Training datasets
+## Datasets
 
 Image text datasets<br>
 + LAION <br>
@@ -52,7 +52,7 @@ Video text training:<br>
 
 You can find the datasets annotation files [download](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/tree/main/datasets) <br>
 
-## Model training
+## :fire: Training
 Prepare the configrations in the train_configs then run the training script <br>
 You should Edit the number of gpus in the parallel_training.sh script
 ```bash
@@ -63,7 +63,7 @@ or
 torchrun --master-port port number --nproc-per-node number_of_gpus train.py --job_name "job_name" --cfg-path "train cfg_path"
 ```
 
-## Model evaluation
+## :zap: Evaluation
 We used the same evaluation as [Video-ChatGPT](https://mbzuai-oryx.github.io/Video-ChatGPT/)<br>
 ![short_results](repo_imgs/short_results.PNG)
 
