@@ -64,7 +64,7 @@ torchrun --master-port port number --nproc-per-node number_of_gpus train.py --jo
 ```
 
 ## Model evaluation
-We used the same evaluation as [VideoChatGPT](https://mbzuai-oryx.github.io/Video-ChatGPT/) evaluation<br>
+We used the same evaluation as [VideoChatGPT](https://mbzuai-oryx.github.io/Video-ChatGPT/)<br>
 ![short_results](repo_imgs/short_results.PNG)
 
 ### Download datasets for evaluation
