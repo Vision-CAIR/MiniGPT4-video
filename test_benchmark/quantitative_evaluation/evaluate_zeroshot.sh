@@ -10,10 +10,17 @@
 #SBATCH --nodes=1
 ## run the application:
 
-PRED="./../../results/video_instruct_checkpoint_3_Video_validation_Dataset_no_subtitles.json"
-OUTPUT_DIR="./../output/Video_validation_Dataset/video_instruct_checkpoint_3_Video_validation_Dataset_no_subtitles"
-rm -rf $OUTPUT_DIR
-API_KEY="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"
+# PRED="./../../results/cmd_webvid_video_instruct_checkpoint_0_Video_validation_Dataset_subtitles.json"
+# OUTPUT_DIR="./../output/Video_validation_Dataset/cmd_webvid_video_instruct_checkpoint_0_Video_validation_Dataset_subtitles"
+# # rm -rf $OUTPUT_DIR
+# API_KEY="api_key"
+# NUM_TASKS=128
+
+
+
+PRED="pred_path"
+OUTPUT_DIR="output_dir"
+API_KEY="api_key"
 NUM_TASKS=128
 
 

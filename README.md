@@ -30,22 +30,20 @@ You can download the pretrained LLM weights from the following links and change 
 | [Download](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/blob/main/checkpoints/video_llama_checkpoint_last.pth) | [Download](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/blob/main/checkpoints/video_mistral_checkpoint_best.pth) |
 
 **4. Run the demo** <br>
-#### Llama2
+
 ```bash
+# Llama2
 python minigpt4_video_demo.py --ckpt path_to_video_checkpoint --cfg-path test_configs/llama2_test_config.yaml
-```
-#### Mistral
-```bash
+# Mistral
 python minigpt4_video_demo.py --ckpt path_to_video_checkpoint --cfg-path test_configs/mistral_test_config.yaml
 ```
 ### Inference
 Do the previous steps and replace step 4 with this step 
-#### Llama2
+
 ```bash
+# Llama2
 python minigpt4_video_inference.py --ckpt path_to_video_checkpoint --cfg-path test_configs/llama2_test_config.yaml --video_path path_to_video --question "Your question here" 
-```
-#### Mistral
-```bash
+# Mistral
 python minigpt4_video_inference.py --ckpt path_to_video_checkpoint --cfg-path test_configs/mistral_test_config.yaml --video_path path_to_video --question "Your question here" 
 ```
 ## :fire: Training
@@ -77,10 +75,9 @@ Set the cfg-path in the script to ---- <br>
 You can download our trained weights for this stage from here [Llama2](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/blob/main/checkpoints/image_llama2_checkpoint.pth) [Mistral](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/blob/main/checkpoints/image_mistral_checkpoint.pth)<br>
 #### Stage 2 (video captioning pretraining)
 
-##### For Mistral
-Set the cfg-path in the script to train_configs/224_v2_mistral_video_stage_2.yaml <br>
-##### For Llama2
-Set the cfg-path in the script to train_configs/224_v2_llama2_video_stage_2.yaml <br>
+For **Llama2**, set the cfg-path in the script to train_configs/224_v2_llama2_video_stage_2.yaml <br>
+
+For **Mistral**, set the cfg-path in the script to train_configs/224_v2_mistral_video_stage_2.yaml <br>
 
 ```bash
 bash jobs_video/train/stage_2.sh
@@ -88,10 +85,10 @@ bash jobs_video/train/stage_2.sh
 You can download our trained weights for this stage from here [Llama2](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/blob/main/checkpoints/video_captioning_llama_checkpoint_last.pth) [Mistral](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/blob/main/checkpoints/video_captioning_mistral_checkpoint_last.pth)<br>
 
 #### Stage 3 (video Instruction finetuning)
-#### For Mistral
-Set the cfg-path in the script to train_configs/224_v2_mistral_video_stage_3.yaml <br>
-#### For Llama2
-Set the cfg-path in the script to train_configs/224_v2_llama2_video_stage_3.yaml <br>
+
+For **Llama2**, set the cfg-path in the script to train_configs/224_v2_llama2_video_stage_3.yaml <br>
+
+For **Mistral**, set the cfg-path in the script to train_configs/224_v2_mistral_video_stage_3.yaml <br>
 
 ```bash
 bash jobs_video/train/stage_3.sh
@@ -114,13 +111,12 @@ You can find the datasets annotation files [download](https://huggingface.co/Vis
 
 ### Run evaluation script
 Edit the evaluation script to include the path to the checkpoints, the dataset name and whether to use subtitles or not <br> 
-#### For Mistral
+
 ```bash
-bash jobs_video/eval/mistral_evalualtion.sh
-```
-#### For Llama 2 
-```bash
+# Llama2
 bash jobs_video/eval/llama2_evaluation.sh
+# Mistral
+bash jobs_video/eval/mistral_evalualtion.sh
 ```
 Then Use GPT3.5 turbo to compare the predictions with the ground truth and generate the accuracy and scores <br>
 Set these variables in the script <br>
@@ -128,7 +124,7 @@ PRED="path_to_predictions"<br>
 OUTPUT_DIR="path_to_output_dir"<br>
 API_KEY="openAI_key"<br>
 NUM_TASKS=128<br>
-Then to evaluate videochatgpt benchmark run the following script <br>
+Then to evaluate [Video-ChatGPT benchmark] run the following script <br>
 ```bash
 bash test_benchmark/quantitative_evaluation/evaluate_benchmark.sh
 ```
