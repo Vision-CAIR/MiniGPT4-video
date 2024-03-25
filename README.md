@@ -20,12 +20,12 @@ conda env create -f environment.yml
 
 |                            Llama 2 Chat 7B                             |                                           Mistral 7B Instruct v0.2                  |
 :------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------:
-| [Download](https://huggingface.co/meta-llama/Llama-2-7b-chat-hf/tree/main) | [Downlad]([https://huggingface.co/Vision-CAIR/vicuna/tree/main](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2)) |
+| [Download](https://huggingface.co/meta-llama/Llama-2-7b-chat-hf/tree/main) | [Downlad](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2) |
 
 + download pretrained checkpoints
 
 | MiniGPT-Video (Llama2 Chat 7B) | MiniGPT-Video (Mistral 7B) |
-|----------------------------|---------------------------|
+:------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------:
 | [Download](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/blob/main/checkpoints/video_llama_checkpoint_best.pth) | [Download](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/blob/main/checkpoints/video_mistral_all_checkpoint_last.pth) |
 
 **4. Run the demo** <br>
