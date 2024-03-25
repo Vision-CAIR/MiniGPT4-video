@@ -51,7 +51,7 @@ python minigpt4_video_inference.py --ckpt path_to_video_checkpoint --cfg-path te
 
 ### Training datasets
 
-Image text datasets<br>
+Image text training<br>
 + LAION <br>
 + Conceptual Captions <br>
 + SBU <br>
@@ -62,7 +62,7 @@ Video text training:<br>
 + Webvid <br> <!-- -[Webvid](https://huggingface.co/datasets/TempoFunk/webvid-10M?row=2)  -->
 + [Video Instructional Dataset 100K](https://huggingface.co/datasets/MBZUAI/VideoInstruct-100K) <br>
 
-You can find the datasets annotation files [download](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/tree/main/datasets) <br>
+You can find the datasets annotation files [download](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/tree/main/datasets/training_datasets) <br>
 
 ## Model training: 
 You can edit the number of gpus in the script.sh below<br>
@@ -91,6 +91,8 @@ We used the same evaluation as [Video-ChatGPT](https://mbzuai-oryx.github.io/Vid
 + [ActivityNet](https://mbzuaiac-my.sharepoint.com/:u:/g/personal/hanoona_bangalath_mbzuai_ac_ae/ESa302OCJMNHsMk7wuBbQc8BZH5CqlcdCWiSpXynQZDfAQ?e=CrOPbm) <br>
 + [TVQA](https://tvqa.cs.unc.edu/) <br>
 + [Video-ChatGPT benchmark](https://mbzuai-oryx.github.io/Video-ChatGPT/) <br>
+
+You can find the datasets annotation files [download](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/tree/main/datasets/evaluation_datasets) <br>
 
 ### Run evaluation script
 Edit the evaluation script to include the path to the checkpoints, the dataset name and whether to use subtitles or not <br> 
