@@ -10,10 +10,10 @@
 #SBATCH --nodes=1
 ## run the application:
 
-PRED="./../../results/mistral_cmd_webwid_videoInstruction_no_subtitles_msvd_no_subtitles.json"
-OUTPUT_DIR="./../output/msvd/mistral_all"
+PRED="./../../results/video_instruct_checkpoint_3_Video_validation_Dataset_no_subtitles.json"
+OUTPUT_DIR="./../output/Video_validation_Dataset/video_instruct_checkpoint_3_Video_validation_Dataset_no_subtitles"
 rm -rf $OUTPUT_DIR
-API_KEY="api_key"
+API_KEY="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"
 NUM_TASKS=128
 
 
