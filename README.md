@@ -32,12 +32,14 @@ conda env create -f environment.yml
 ```bash
 python minigpt4_video_demo.py --ckpt path_to_video_checkpoint
 ```
-## Inference:
+## Inference
 Do the previous steps and replace step 4 with this step 
 ```bash
 python minigpt4_video_inference.py --ckpt path_to_video_checkpoint --video_path path_to_video --question "Your question here" 
 ```
-## Datasets
+## :fire: Training
+
+### Training datasets
 
 Image text datasets<br>
 + LAION <br>
@@ -52,7 +54,7 @@ Video text training:<br>
 
 You can find the datasets annotation files [download](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/tree/main/datasets) <br>
 
-## :fire: Training
+### Training
 Prepare the configrations in the train_configs then run the training script <br>
 You should Edit the number of gpus in the parallel_training.sh script
 ```bash
