@@ -115,10 +115,10 @@ bash jobs_video/eval/mistral_evalualtion.sh
 Then Use GPT3.5 turbo to compare the predictions with the ground truth and generate the accuracy and scores <br>
 Set these variables in the script <br>
 ```bash
-PRED="path_to_predictions"<br>
-OUTPUT_DIR="path_to_output_dir"<br>
-API_KEY="openAI_key"<br>
-NUM_TASKS=128<br>
+PRED="path_to_predictions"
+OUTPUT_DIR="path_to_output_dir"
+API_KEY="openAI_key"
+NUM_TASKS=128
 ```
 Then to evaluate [Video-ChatGPT benchmark] run the following script <br>
 ```bash
@@ -129,7 +129,7 @@ To evaluate open ended questions run the following script <br>
 bash test_benchmark/quantitative_evaluation/evaluate_zeroshot.sh
 ```
 ## Acknowledgements
-[MiniGPT4](https://github.com/Vision-CAIR/MiniGPT-4/tree/main?tab=readme-ov-file)
-[Video-ChatGPT](https://mbzuai-oryx.github.io/Video-ChatGPT/)
+[MiniGPT4](https://github.com/Vision-CAIR/MiniGPT-4)
+[Video-ChatGPT](https://mbzuai-oryx.github.io/Video-ChatGPT)
 
 ## License
