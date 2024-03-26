@@ -96,17 +96,17 @@ We used the same evaluation as [Video-ChatGPT](https://mbzuai-oryx.github.io/Vid
 <!-- ![short_results](repo_imgs/short_results.PNG) -->
 
 |Method| Using Subtitles | Information Correctness | Detailed Orientation | Contextual Understanding | Temporal Understanding | Consistency |
-|:--------------------:|----:|:------------------------:|:---------------------:|:-------------------------:|:-----------------------:|:------------:|
+|:--------------------:|:----:|:------------------------:|:---------------------:|:-------------------------:|:-----------------------:|:------------:|
 | LLaMA Adapter | No| 2.03 | 2.32| 2.30| 1.98| 2.15 |
 | Video LLaMA| No| 1.96 | 2.18| 2.16| 1.82| 1.79 |
-| Video Chat| Yes| 2.23 | 2.50| 2.53| 1.94| 2.24 |
+| Video Chat| :white_check_mark:| 2.23 | 2.50| 2.53| 1.94| 2.24 |
 | Video-ChatGPT | No| 2.40 | 2.52| 2.62| 1.98| 2.37 |
 | BT-Adapter-7B | No| 2.68 | 2.69| 3.27| 2.34| 2.46 |
 | LLaMA-VID-7B| No| 2.96 | 3.00| 3.53| 2.46| 2.51 |
-| **Ours-7B Llama2**| No| 2.93 | 2.97| 3.45| **2.47**| **2.60**|
+| **Ours-7B Llama2**| :white_check_mark:| 2.93 | 2.97| 3.45| **2.47**| **2.60**|
 | **Ours-7B Llama2**| Yes| **3.08** | **3.02**| **3.57**| **2.65**| **2.67**|
 | **Ours-7B Mistral** | No| 2.83|2.52 |3.01 |2.32 |2.40 |
-| **Ours-7B Mistral**| Yes| 2.91 | 2.57| 3.11|2.33 | 2.39|
+| **Ours-7B Mistral**| :white_check_mark:| 2.91 | 2.57| 3.11|2.33 | 2.39|
 
 
 
