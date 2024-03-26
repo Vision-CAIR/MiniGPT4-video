@@ -3,7 +3,7 @@
 <!-- demo link  -->
 ## Overview
 MiniGPT4-Video is an innovative model designed for video question answering, adept at comprehending both visual stimuli and conversational content within the video domain. This model undergoes training on extensive video-text and image-text corpora. The architectural framework of MiniGPT4-Video is visually depicted in the accompanying figure. During the frame encoding phase, EVA-CLIP is employed, incorporating a projection layer to facilitate the mapping of visual features onto the textual domain of the Large Language Model (LLM). Similar to MiniGPT-v2, we condense each group of four adjacent visual tokens into a singular token, resulting in a 75% reduction in token count per image, from 256 to 64. Throughout the training process, the LLM assimilates the fusion of video frame features with subtitles, thereby comprehending the temporal dynamics inherent within the video content. During inference, the Whisper model is utilized to generate subtitles for the video. Then, both the video and the subtitle are input to the MiniGPT4-Video model.
-![methodology](repo_imgs/short_video_figure_new.jpg)
+![methodology](repo_imgs/main_figure.jpg)
 
 ## :rocket: Demo
 **1. Clone the repository** <br>
@@ -42,6 +42,7 @@ python minigpt4_video_inference.py --ckpt path_to_video_checkpoint --cfg-path te
 ### Training datasets
 
 Image text training<br>
+You can find the steps to download the datasets in [MiniGPT4](https://github.com/Vision-CAIR/MiniGPT-4/datasets)<br>
 + LAION <br>
 + Conceptual Captions <br>
 + SBU <br>
@@ -53,6 +54,7 @@ Video text training:<br>
 + [Video Instructional Dataset 100K](https://huggingface.co/datasets/MBZUAI/VideoInstruct-100K) <br>
 
 You can find the datasets annotation files [download](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/tree/main/datasets/training_datasets) <br>
+After downloading the datasets, set the paths for each dataset in the datasets configuration folder here minigpt4/configs/datasets
 
 ### Model training: 
 You can edit the number of gpus in the script.sh below<br>
@@ -91,7 +93,36 @@ You can download our trained weights for this stage from here [Llama2](https://h
 
 ## :zap: Evaluation
 We used the same evaluation as [Video-ChatGPT](https://mbzuai-oryx.github.io/Video-ChatGPT/)<br>
-![short_results](repo_imgs/short_results.PNG)
+<!-- ![short_results](repo_imgs/short_results.PNG) -->
+
+|Method| Using Subtitles | Information Correctness | Detailed Orientation | Contextual Understanding | Temporal Understanding | Consistency |
+|:--------------------:|----:|:------------------------:|:---------------------:|:-------------------------:|:-----------------------:|:------------:|
+| LLaMA Adapter | No| 2.03 | 2.32| 2.30| 1.98| 2.15 |
+| Video LLaMA| No| 1.96 | 2.18| 2.16| 1.82| 1.79 |
+| Video Chat| Yes| 2.23 | 2.50| 2.53| 1.94| 2.24 |
+| Video-ChatGPT | No| 2.40 | 2.52| 2.62| 1.98| 2.37 |
+| BT-Adapter-7B | No| 2.68 | 2.69| 3.27| 2.34| 2.46 |
+| LLaMA-VID-7B| No| 2.96 | 3.00| 3.53| 2.46| 2.51 |
+| **Ours-7B Llama2**| No| 2.93 | 2.97| 3.45| **2.47**| **2.60**|
+| **Ours-7B Llama2**| Yes| **3.08** | **3.02**| **3.57**| **2.65**| **2.67**|
+| **Ours-7B Mistral** | No| 2.83|2.52 |3.01 |2.32 |2.40 |
+| **Ours-7B Mistral**| Yes| 2.91 | 2.57| 3.11|2.33 | 2.39|
+
+
+
+|Method| Using Subtitles | MSVD Acc.↑ | MSVD Score↑ | MSRVTT Acc.↑ | MSRVTT Score↑ | TGIF Acc.↑ | TGIF Score↑ | ActivityNet Acc.↑ | ActivityNet Score↑ | TVQA Acc.↑ |
+|:---------------------------------------:|:----------------:|:-----------:|:------------:|:--------------:|:---------------:|:-----------:|:------------:|:-------------------:|:--------------------:|:------------:|
+| FrozenBiLM|No|32.2| --|16.8 |--| 41 |-- |24.7|--|29.7 |
+| LLaMA Adapter|No|54.9| 3.1 |43.8 |2.7| -- |-- |34.2| 2.7| --|
+| Video LLaMA|No|51.6| 2.5 |29|1.8| -- |-- |12.4| 1.1| --|
+| Video Chat|Yes|56.3| 2.8 |45|2.5|34.4| 2.3 |26.5| 2.2| 40.6|
+| Video-ChatGPT|No|64.9| 3.3 |49.3 |2.8|51.4| 3.0 |35.2| 2.7|23.35|
+| BT-Adapter-7B|No|67.7| 3.7 |57|3.2| -- |-- |45.7| 3.2| --|
+| LLaMA-VID-7B |No|69.7| 3.7 |57.7 |3.2| -- |-- |**47.4**| **3.3**| --|
+| **Ours-7B LLama2**|No|**72.93**|**3.84**|**58.83**|**3.29**|**67.9**|**3.71**| 45.85 |3.23|**36.45** |
+| **Ours-7B Llama2**|Yes|**72.93**|**3.84**|**59.73**|**3.3** |**67.9**|**3.71**| 46.3|3.4 |**46.94** |
+| **Ours-7B Mistral**|No|**72.95**|**3.99**|**55.76**|**3.42**|**69.54**|**3.97**|Running |Running|**38.52** |
+| **Ours-7B Mistral**|Yes|**72.95**|**3.99**|**56.92**|**3.45** |**69.54**|**3.97**| **44.53**|**3.31** |**58.69** |
 
 ### Download datasets for evaluation
 + [MSVD](https://www.cs.utexas.edu/users/ml/clamp/videoDescription/) <br>
@@ -129,7 +160,8 @@ To evaluate open ended questions run the following script <br>
 bash test_benchmark/quantitative_evaluation/evaluate_zeroshot.sh
 ```
 ## Acknowledgements
-[MiniGPT4](https://github.com/Vision-CAIR/MiniGPT-4) [Video-ChatGPT](https://mbzuai-oryx.github.io/Video-ChatGPT)
+[MiniGPT4](https://github.com/Vision-CAIR/MiniGPT-4) <br>
+[Video-ChatGPT](https://mbzuai-oryx.github.io/Video-ChatGPT)
 
 ## License
 This repository is under [BSD 3-Clause License](LICENSE.md).
