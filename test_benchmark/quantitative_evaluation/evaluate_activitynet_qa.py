@@ -184,11 +184,15 @@ def main():
             continue
 
         # Computing accuracy
-        pred = result[0]['pred']
-        if "yes" in pred.lower():
-            yes_count += 1
-        elif "no" in pred.lower():
-            no_count += 1
+        try:
+            pred = result[0]['pred']
+            if "yes" in pred.lower():
+                yes_count += 1
+            elif "no" in pred.lower():
+                no_count += 1
+        except:
+            print("Prediction not found for", key)
+            continue
 
     average_score = score_sum / count
     accuracy = yes_count / (yes_count + no_count)
