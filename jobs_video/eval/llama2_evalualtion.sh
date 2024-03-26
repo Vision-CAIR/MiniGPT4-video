@@ -11,7 +11,7 @@
 #SBATCH --nodes=1
 ## run the application:
 NAME="llama2_stage_3_best" # Name of the experiment
-DATASET="msvd" # available datasets: tvqa, msrvtt, msvd, activitynet,tgif 
+DATASET="msvd" # available datasets: tvqa, msrvtt, msvd, activitynet,tgif ,video_chatgpt_generic,video_chatgpt_temporal,video_chatgpt_consistency
 BATCH_SIZE=8 
 CKPT_PATH="checkpoints/video_llama_checkpoint_best.pth" # path to the checkpoint
 cfg_path="test_configs/llama2_test_config.yaml" # path to the config file
