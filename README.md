@@ -9,7 +9,9 @@ MiniGPT4-Video is an innovative model designed for video question answering, ade
 **1. Clone the repository** <br>
 ```bash
 git clone https://github.com/Vision-CAIR/MiniGPT4-video.git
+cd MiniGPT4-video
 ```
+
 **2. Set up the environment** <br>
 ```bash
 conda env create -f environment.yml
