@@ -3,12 +3,13 @@
 <!-- demo link  -->
 ## Overview
 MiniGPT4-Video is an innovative model designed for video question answering, adept at comprehending both visual stimuli and conversational content within the video domain. This model undergoes training on extensive video-text and image-text corpora. The architectural framework of MiniGPT4-Video is visually depicted in the accompanying figure. During the frame encoding phase, EVA-CLIP is employed, incorporating a projection layer to facilitate the mapping of visual features onto the textual domain of the Large Language Model (LLM). Similar to MiniGPT-v2, we condense each group of four adjacent visual tokens into a singular token, resulting in a 75% reduction in token count per image, from 256 to 64. Throughout the training process, the LLM assimilates the fusion of video frame features with subtitles, thereby comprehending the temporal dynamics inherent within the video content. During inference, the Whisper model is utilized to generate subtitles for the video. Then, both the video and the subtitle are input to the MiniGPT4-Video model.
-![methodology](repo_imgs/main_figure.jpg)
+![methodology](repo_imgs/MiniGPT4-video_fig.jpg)
 
 ## :rocket: Demo
 **1. Clone the repository** <br>
 ```bash
 git clone https://github.com/Vision-CAIR/MiniGPT4-video.git
+cd MiniGPT4-video
 ```
 **2. Set up the environment** <br>
 ```bash
@@ -119,10 +120,10 @@ We used the same evaluation as [Video-ChatGPT](https://mbzuai-oryx.github.io/Vid
 | Video-ChatGPT|No|64.9| 3.3 |49.3 |2.8|51.4| 3.0 |35.2| 2.7|23.35|
 | BT-Adapter-7B|No|67.7| 3.7 |57|3.2| -- |-- |45.7| 3.2| --|
 | LLaMA-VID-7B |No|69.7| 3.7 |57.7 |3.2| -- |-- |**47.4**| **3.3**| --|
-| **Ours-7B LLama2**|No|**72.93**|**3.84**|**58.83**|**3.29**|**67.9**|**3.71**| 45.85 |3.23|**36.45** |
-| **Ours-7B Llama2**|Yes|**72.93**|**3.84**|**59.73**|**3.3** |**67.9**|**3.71**| 46.3|3.4 |**46.94** |
-| **Ours-7B Mistral**|No|**72.95**|**3.99**|**55.76**|**3.42**|**69.54**|**3.97**|Running |Running|**38.52** |
-| **Ours-7B Mistral**|Yes|**72.95**|**3.99**|**56.92**|**3.45** |**69.54**|**3.97**| **44.53**|**3.31** |**58.69** |
+| **Ours-7B LLama2**|No|72.93|3.84|58.83|3.29|67.9|3.71| 45.85 |3.23|36.45|
+| **Ours-7B Llama2**|Yes|72.93|3.84|**59.73**|**3.3** |67.9|3.71| 46.3|3.4 |46.94|
+| **Ours-7B Mistral**|No|**73.92**|**4.06**|58.26|3.52|**72.22**|**4.08**|44.25 |3.35|33.90|
+| **Ours-7B Mistral**|Yes|**73.92**|**4.06**|58.68|3.53 |**72.22**|**4.08**| 44.38|3.36 |**54.21** |
 
 ### Download datasets for evaluation
 + [MSVD](https://www.cs.utexas.edu/users/ml/clamp/videoDescription/) <br>
