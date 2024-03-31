@@ -10,7 +10,9 @@ MiniGPT4-Video is an innovative model designed for video question answering, ade
 ```bash
 git clone https://github.com/Vision-CAIR/MiniGPT4-video.git
 cd MiniGPT4-video
+cd MiniGPT4-video
 ```
+
 **2. Set up the environment** <br>
 ```bash
 conda env create -f environment.yml
@@ -72,9 +74,9 @@ torchrun --nproc-per-node NUM_GPU train.py --cfg-path 224_minigpt4_mistral_image
 You can download our trained weights for this stage from here [Llama2](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/blob/main/checkpoints/image_llama2_checkpoint.pth) [Mistral](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/blob/main/checkpoints/image_mistral_checkpoint.pth)<br>
 #### Stage 2 (video captioning pretraining)
 
-For **Llama2**, set the cfg-path in the script to train_configs/224_v2_llama2_video_stage_2.yaml <br>
+For **Llama2**, set the cfg-path in the script to `train_configs/224_v2_llama2_video_stage_2.yaml` <br>
 
-For **Mistral**, set the cfg-path in the script to train_configs/224_v2_mistral_video_stage_2.yaml <br>
+For **Mistral**, set the cfg-path in the script to `train_configs/224_v2_mistral_video_stage_2.yaml` <br>
 
 ```bash
 bash jobs_video/train/stage_2.sh
@@ -83,9 +85,9 @@ You can download our trained weights for this stage from here [Llama2](https://h
 
 #### Stage 3 (video Instruction finetuning)
 
-For **Llama2**, set the cfg-path in the script to train_configs/224_v2_llama2_video_stage_3.yaml <br>
+For **Llama2**, set the cfg-path in the script to `train_configs/224_v2_llama2_video_stage_3.yaml` <br>
 
-For **Mistral**, set the cfg-path in the script to train_configs/224_v2_mistral_video_stage_3.yaml <br>
+For **Mistral**, set the cfg-path in the script to `train_configs/224_v2_mistral_video_stage_3.yaml` <br>
 
 ```bash
 bash jobs_video/train/stage_3.sh
@@ -97,32 +99,32 @@ We used the same evaluation as [Video-ChatGPT](https://mbzuai-oryx.github.io/Vid
 <!-- ![short_results](repo_imgs/short_results.PNG) -->
 
 |Method| Using Subtitles | Information Correctness | Detailed Orientation | Contextual Understanding | Temporal Understanding | Consistency |
-|:--------------------:|----:|:------------------------:|:---------------------:|:-------------------------:|:-----------------------:|:------------:|
-| LLaMA Adapter | No| 2.03 | 2.32| 2.30| 1.98| 2.15 |
-| Video LLaMA| No| 1.96 | 2.18| 2.16| 1.82| 1.79 |
-| Video Chat| Yes| 2.23 | 2.50| 2.53| 1.94| 2.24 |
-| Video-ChatGPT | No| 2.40 | 2.52| 2.62| 1.98| 2.37 |
-| BT-Adapter-7B | No| 2.68 | 2.69| 3.27| 2.34| 2.46 |
-| LLaMA-VID-7B| No| 2.96 | 3.00| 3.53| 2.46| 2.51 |
-| **Ours-7B Llama2**| No| 2.93 | 2.97| 3.45| **2.47**| **2.60**|
-| **Ours-7B Llama2**| Yes| **3.08** | **3.02**| **3.57**| **2.65**| **2.67**|
-| **Ours-7B Mistral** | No| 2.83|2.52 |3.01 |2.32 |2.40 |
-| **Ours-7B Mistral**| Yes| 2.91 | 2.57| 3.11|2.33 | 2.39|
+|:--------------------:|:----:|:------------------------:|:---------------------:|:-------------------------:|:-----------------------:|:------------:|
+| LLaMA Adapter | :x:| 2.03 | 2.32| 2.30| 1.98| 2.15 |
+| Video LLaMA| :x:| 1.96 | 2.18| 2.16| 1.82| 1.79 |
+| Video Chat| :white_check_mark:| 2.23 | 2.50| 2.53| 1.94| 2.24 |
+| Video-ChatGPT | :x:| 2.40 | 2.52| 2.62| 1.98| 2.37 |
+| BT-Adapter-7B | :x:| 2.68 | 2.69| 3.27| 2.34| 2.46 |
+| LLaMA-VID-7B| :x:| 2.96 | 3.00| 3.53| 2.46| 2.51 |
+| **Ours-7B Llama2**| :x:| 2.93 | 2.97| 3.45| **2.47**| **2.60**|
+| **Ours-7B Llama2**| :white_check_mark:| **3.08** | **3.02**| **3.57**| **2.65**| **2.67**|
+| **Ours-7B Mistral** | :x:| 2.83|2.52 |3.01 |2.32 |2.40 |
+| **Ours-7B Mistral**| :white_check_mark:| 2.91 | 2.57| 3.11|2.33 | 2.39|
 
 
 
 |Method| Using Subtitles | MSVD Acc.↑ | MSVD Score↑ | MSRVTT Acc.↑ | MSRVTT Score↑ | TGIF Acc.↑ | TGIF Score↑ | ActivityNet Acc.↑ | ActivityNet Score↑ | TVQA Acc.↑ |
 |:---------------------------------------:|:----------------:|:-----------:|:------------:|:--------------:|:---------------:|:-----------:|:------------:|:-------------------:|:--------------------:|:------------:|
-| FrozenBiLM|No|32.2| --|16.8 |--| 41 |-- |24.7|--|29.7 |
-| LLaMA Adapter|No|54.9| 3.1 |43.8 |2.7| -- |-- |34.2| 2.7| --|
-| Video LLaMA|No|51.6| 2.5 |29|1.8| -- |-- |12.4| 1.1| --|
-| Video Chat|Yes|56.3| 2.8 |45|2.5|34.4| 2.3 |26.5| 2.2| 40.6|
-| Video-ChatGPT|No|64.9| 3.3 |49.3 |2.8|51.4| 3.0 |35.2| 2.7|23.35|
-| BT-Adapter-7B|No|67.7| 3.7 |57|3.2| -- |-- |45.7| 3.2| --|
-| LLaMA-VID-7B |No|69.7| 3.7 |57.7 |3.2| -- |-- |**47.4**| **3.3**| --|
-| **Ours-7B LLama2**|No|72.93|3.84|58.83|3.29|67.9|3.71| 45.85 |3.23|36.45|
+| FrozenBiLM|:x:|32.2| --|16.8 |--| 41 |-- |24.7|--|29.7 |
+| LLaMA Adapter|:x:|54.9| 3.1 |43.8 |2.7| -- |-- |34.2| 2.7| --|
+| Video LLaMA|:x:|51.6| 2.5 |29|1.8| -- |-- |12.4| 1.1| --|
+| Video Chat|:white_check_mark:|56.3| 2.8 |45|2.5|34.4| 2.3 |26.5| 2.2| 40.6|
+| Video-ChatGPT|:x:|64.9| 3.3 |49.3 |2.8|51.4| 3.0 |35.2| 2.7|23.35|
+| BT-Adapter-7B|:x:|67.7| 3.7 |57|3.2| -- |-- |45.7| 3.2| --|
+| LLaMA-VID-7B |:x:|69.7| 3.7 |57.7 |3.2| -- |-- |**47.4**| **3.3**| --|
+| **Ours-7B LLama2**|:x:|72.93|3.84|58.83|3.29|67.9|3.71| 45.85 |3.23|36.45|
 | **Ours-7B Llama2**|Yes|72.93|3.84|**59.73**|**3.3** |67.9|3.71| 46.3|3.4 |46.94|
-| **Ours-7B Mistral**|No|**73.92**|**4.06**|58.26|3.52|**72.22**|**4.08**|44.25 |3.35|33.90|
+| **Ours-7B Mistral**|:x:|**73.92**|**4.06**|58.26|3.52|**72.22**|**4.08**|44.25 |3.35|33.90|
 | **Ours-7B Mistral**|Yes|**73.92**|**4.06**|58.68|3.53 |**72.22**|**4.08**| 44.38|3.36 |**54.21** |
 
 ### Download datasets for evaluation
