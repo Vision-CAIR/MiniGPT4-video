@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="MiniGPT-Video">
+  <meta name="keywords" content="GPT-4, open-source, vision-language">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MiniGPT-Video</title>
+
+  <!-- Global site tag (gtag.js) - Google Analytics
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYVRSFMDRL"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+
+    gtag('config', 'G-PYVRSFMDRL');
+  </script> -->
+
+  <meta name="google-site-verification" content="6lbYN1vX7A4sD8SrVniq84UEKyEUSBgxeP7d3FjuuK0" />
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <!-- <link rel="icon" href="./static/images/icon.png"> -->
+  <link rel="stylesheet" href="./static/css/index.css">
+
+  <link rel="shortcut icon" href="path/to/favicon.ico" type="image/x-icon">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+  </head>
+
+  <style>
+
+    #main{
+        position: relative;;
+        width: 1200px;
+    }
+
+    .box{
+        float: left;
+        padding: 15px 0 0 15px;
+/*        background-color: red;*/
+    }
+
+    .pic{
+        width: 500px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #fff;
+    }
+
+    .pic img{
+        width: 800px;
+    }
+
+  </style>
+
+
+
+  <body>
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">MiniGPT-Video:</h1>
+          <h2 class="title is-2 publication-title">Advancing Multimodal LLMs for Video Understanding with
+            Interleaved Visual-Textual Tokens</h2>
+          <div class="is-size-5">
+            <span class="author-block">
+                <a href="" style="color:#008AD7;font-weight:normal;">Kirolos Ataallah
+                </a>,                
+            </span>
+            <span class="author-block">
+              <a href="https://xiaoqian-shen.github.io/" style="color:#008AD7;font-weight:normal;">Xiaoqian Shen</a>,</span>
+            <span class="author-block">
+              <a href="https://eslambakr.github.io/" style="color:#008AD7;font-weight:normal;">Eslam Abdelrahman</a>,
+            </span>
+            <span class="author-block">
+              <a href="https://essamsleiman.com" style="color:#F2A900;font-weight:normal;">Essam Sleiman</a>,
+            </span>
+            <span class="author-block">
+              <a href="https://tsutikgiau.github.io/" style="color:#008AD7;font-weight:normal;">Deyao Zhu</a>,
+            </span>
+            <span class="author-block">
+              <a href="https://dingjiansw101.github.io/" style="color:#008AD7;font-weight:normal;">Jian Ding</a>,
+            </span>
+            <span class="author-block">
+              <a href="https://www.mohamed-elhoseiny.com/" style="color:#008AD7;font-weight:normal;">Mohamed Elhoseiny</a>
+            </span>
+
+          </div>
+
+          <br>
+          <div class="is-size-5 publication-authors">
+            <span class="author-block"><b style="color:#008AD7; font-weight:normal">&#x25B6 </b> King Abdullah University of Science and Technology </span>
+            <span class="author-block"><b style="color:#F2A900; font-weight:normal">&#x25B6 </b>Harvard University; </span>
+            <!-- <span class="author-block"><b style="color:#00A4EF; font-weight:normal">&#x25B6 </b>Microsoft Research, Redmond; </span> -->
+            <!-- <span class="author-block"><b style="color:#008AD7; font-weight:normal">&#x25B6 </b>Microsoft Cloud & AI </span> -->
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <!-- <span class="author-block"><sup>&#x2628;</sup>Equal Advisory Contribution, </span> -->
+            <!-- <span class="author-block"><sup>&#x2691;</sup>Project Lead </span> -->
+          </div>
+
+          <br>
+         <!--  <div class="is-size-5 publication-authors">
+            <span class="author-block"><b style="color:#e08ba0; font-weight:normal"> <b>In CVPR2023</b> </b></span>
+          </div> -->
+
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <span class="link-block">
+                <a href="https://www.w3.org/Provider/Style/dummy.html" target="_blank"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="ai ai-arxiv"></i>
+                  </span>
+                  <span>Paper</span>
+                </a>
+              </span>
+
+              <span class="link-block">
+                <a href="https://github.com/Vision-CAIR/MiniGPT4-video" target="_blank"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code</span>
+                  </a>
+              </span>
+
+<!--              <span class="link-block">-->
+<!--                      <a href="https://www.w3.org/Provider/Style/dummy.html" target="_blank"-->
+<!--                         class="external-link button is-normal is-rounded is-dark">-->
+<!--                      <span class="icon">-->
+<!--                        🤗-->
+<!--                      </span>-->
+<!--                      <span>Space</span>-->
+<!--                    </a>-->
+<!--                  </span>-->
+
+<!--              <script>-->
+<!--                  window.addEventListener('load', function() {-->
+<!--                    const urls = [-->
+<!--                      'https://bb0eec8976f38a480c.gradio.live',-->
+<!--                      'https://94c50413658b59829f.gradio.live',-->
+<!--                      'https://16440e488436f49d99.gradio.live',-->
+<!--                      'https://02edd560d60615d755.gradio.live',-->
+<!--                    ];-->
+<!--                    const randomIndex = Math.floor(Math.random() * urls.length);-->
+<!--                    const randomURL = urls[randomIndex];-->
+<!--                    document.getElementById('randomLink').href = randomURL;-->
+<!--                  });-->
+<!--                </script>-->
+
+<!--               <span class="link-block">
+                <a id="randomLink" href="#" target="_blank" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                    <i class="fa fa-play"></i>
+                  </span>
+                  <span>Demo</span>
+                </a>
+              </span> -->
+
+              <span class="link-block">
+                <a href="https://www.w3.org/Provider/Style/dummy.html" target="_blank"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                    <i class="fab fa-youtube"></i>
+                  </span>
+                  <span>Video</span>
+                  </a>
+              </span>
+
+<!--              <span class="link-block">-->
+<!--                <a href="https://github.com/Vision-CAIR/MiniGPT-4/datasets" target="_blank"-->
+<!--                   class="external-link button is-normal is-rounded is-dark">-->
+<!--                  <span class="icon">-->
+<!--                    <i class="fa fa-database"></i>-->
+<!--                  </span>-->
+<!--                  <span>Dataset</span>-->
+<!--                  </a>-->
+<!--              </span>-->
+
+              <span class="link-block">
+                <a href="https://huggingface.co/Vision-CAIR/MiniGPT4-Video" target="_blank"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                    <i class="fa fa-laugh"></i>
+                  </span>
+                  <span>Model</span>
+                  </a>
+              </span>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!--<script>-->
+<!--      window.addEventListener('load', function() {-->
+<!--        const urls = [-->
+<!--          'https://bb0eec8976f38a480c.gradio.live',-->
+<!--          'https://94c50413658b59829f.gradio.live',-->
+<!--          'https://16440e488436f49d99.gradio.live',-->
+<!--          'https://02edd560d60615d755.gradio.live',-->
+<!--        ];-->
+<!--        const randomIndex = Math.floor(Math.random() * urls.length);-->
+<!--        const randomURL = urls[randomIndex];-->
+<!--        const iframe = document.getElementById('gradio');-->
+<!--        iframe.setAttribute('src', randomURL);-->
+<!--      });-->
+<!--    </script>-->
+
+<!--     <iframe id="gradio" width="100%" height="900">
+      <p>Gradio.</p>
+    </iframe> -->
+
+<!-- <link rel="stylesheet" href="js/ft-carousel.css" />
+<script src="js/jquery.min.js"></script>
+<script src="js/ft-carousel.min.js"></script>
+<script type="text/javascript">
+  $("#carousel_1").FtCarousel();
+
+  $("#carousel_2").FtCarousel({
+    index: 1,
+    auto: false
+  });
+
+  $("#carousel_3").FtCarousel({
+    index: 0,
+    auto: true,
+    time: 3000,
+    indicators: false,
+    buttons: true
+  });
+</script> -->
+
+<!-- <section class="hero teaser">
+  <div class="container is-max-desktop">
+    <div class="example">
+      <div class="ft-carousel" id="carousel_1">
+        <ul class="carousel-inner"> -->
+          <!-- <li class="carousel-item"><img src="demos/wop_2.png" /></li>
+          <li class="carousel-item"><img src="demos/cook_1.png" /></li>
+          <li class="carousel-item"><img src="demos/fix_1.png" /></li>
+          <li class="carousel-item"><img src="demos/rhyme_1.png" /></li> -->
+       <!--    <li class="carousel-item"><img src="img/a1.jpg" /></li>
+      <li class="carousel-item"><img src="img/a2.jpg" /></li>
+      <li class="carousel-item"><img src="img/a3.jpg" /></li>
+      <li class="carousel-item"><img src="img/a4.jpg" /></li>
+      <li class="carousel-item"><img src="img/a5.jpg" /></li>
+      <li class="carousel-item"><img src="img/a6.jpg" /></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section> -->
+
+<!-- 
+<section class="hero is-small">
+  <div class="hero-body">
+    <div class="container">
+      <div id="results-carousel" class="carousel results-carousel">
+       <div class="item">
+        <img src="demos/wop_2.png" alt="MY ALT TEXT"/>
+        <h2 class="subtitle has-text-centered">
+        </h2>
+      </div>
+      <div class="item">
+        <img src="demos/cook_1.png" alt="MY ALT TEXT"/>
+        <h2 class="subtitle has-text-centered">
+        </h2>
+      </div>
+      <div class="item">
+        <img src="demos/fix_1.png" alt="MY ALT TEXT"/>
+        <h2 class="subtitle has-text-centered">
+       </h2>
+     </div>
+     <div class="item">
+      <img src="demos/rhyme_1.png" alt="MY ALT TEXT"/>
+      <h2 class="subtitle has-text-centered">
+      </h2>
+    </div>
+  </div>
+</div>
+</div>
+</section>
+ -->
+
+<link rel="stylesheet" type="text/css" href="js/simple_style.css" />
+<script type="text/javascript" src="js/simple_swiper.js"></script>
+
+
+<!-- <div class="app">
+  <div id="swiper-demo" class="simple-swiper-container">
+    <a id="prev" class="btn btn-prev"></a>
+    <a id="next" class="btn btn-next"></a>
+    <div class="pagination"></div>
+  </div>
+</div>
+<p id="index"></p>
+
+<script type="text/javascript">
+  new SimSwiper("#swiper-demo", {
+    autoplay: 4000,
+    duration: 300,
+    easing: 'ease',
+    button: {
+      prev: "#prev", // 前进后退按钮
+      next: "#next"
+    },
+    pagination: {
+      el: '.pagination',
+      click: true// 是否可以点击
+    },
+    // 轮播图数据
+    data: [{
+      index: 0,
+      href: '#',
+      src: 'demos/wop_2.png'
+    }, {
+      index: 1,
+      href: '#',
+      src: 'demos/cook_1.png'
+    }, {
+      index: 2,
+      href: '#',
+      src: 'demos/fix_1.png'
+    }, {
+      index: 3,
+      href: '#',
+      src: 'demos/rhyme_1.png'
+    }]
+  });
+</script> -->
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <!-- Abstract. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            <!-- The recent GPT-4 has demonstrated extraordinary multi-modal abilities, such as directly generating websites from handwritten text and identifying humorous elements within images. These features are rarely observed in previous vision-language models. We believe the primary reason for GPT-4's advanced multi-modal generation capabilities lies in the utilization of a more advanced large language model (LLM). To examine this phenomenon, we present MiniGPT-4, which aligns a frozen visual encoder with a frozen LLM, Vicuna, using just one projection layer. Our findings reveal that MiniGPT-4 possesses many capabilities similar to those exhibited by GPT-4 like detailed image description generation and website creation from hand-written drafts. Furthermore, we also observe other emerging capabilities in MiniGPT-4, including writing stories and poems inspired by given images, providing solutions to problems shown in images, teaching users how to cook based on food photos, etc. In our experiment, we found that only performing the pretraining on raw image-text pairs could produce unnatural language outputs that lack coherency including repetition and fragmented sentences. To address this problem, we curate a high-quality, well-aligned dataset in the second stage to finetune our model using a conversational template. This step proved crucial for augmenting the model's generation reliability and overall usability. Notably, our model is highly computationally efficient, as we only train a projection layer utilizing approximately 5 million aligned image-text pairs. -->
+            This paper introduces MiniGPT4-Video, a multimodal Large Language Model (LLM) designed specifically for video understanding. The model is capable of processing both temporal visual and textual data, making it adept at understanding the complexities of videos.
+            Building upon the success of MiniGPT-v2, which excelled in translating visual features into the LLM space for single images and achieved impressive results on various image-text benchmarks, this paper extends the model's capabilities to process a sequence of frames, enabling it to comprehend videos.
+            MiniGPT4-video does not only consider visual content but also incorporates textual conversations, allowing the model to effectively answer queries involving both visual and text components. The proposed model outperforms existing state-of-the-art methods, registering gains of 4.22%, 1.13%, 20.82%, and 13.1% on the MSVD, MSRVTT, TGIF, and TVQA benchmarks respectively.
+            </b>
+          </p>
+        </div>
+      </div>
+    </div>
+    <!--/ Abstract. -->
+    <br>
+    <br>
+    <!-- Paper video. -->
+    <!-- <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Video</h2>
+        <div class="publication-video">
+          <iframe width=“560” height=“315" src=“https://www.youtube.com/embed/__tftoxpBAw” title=“YouTube video player” frameborder=“0” allow=“accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share” allowfullscreen></iframe>
+        </div>
+      </div>
+    </div> -->
+
+
+    <div class="container">
+      <h2 class="title has-text-centered">Video Demo</h2>
+      <div class="columns is-centered has-text-centered">
+          <div class="column is-four-fifths">
+              <div class="publication-video">
+                  <video width="760" height="515" controls>
+                      <source src="https://minigpt-4.s3.amazonaws.com/demo.mp4" type="video/mp4">
+                      Your browser does not support the video tag.
+                  </video>
+              </div>
+          </div>
+      </div>
+    </div>
+    <!--/ Paper video. -->
+    <br>
+    <br>
+    <!-- Paper Model. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-six-fifths">
+        <h2 class="title is-3">Model</h2>
+        <div class="content has-text-justified">
+          <p>
+            <b>MiniGPT-Video consists of a vision encoder (EVA-CLIP), a single linear projection layer, and large language model (LLama2 or Mistral).</b>:
+          </p>
+          <ul>
+            <!-- <li>It has two types of queries (latent queries and text queries) and outputs (semantic outputs and pixel-level outputs).</li>
+            <li>It uses a single text encoder for all text corpus, ranging from class concepts, referring phrases to image captions.</li>
+            <li>It decouples image and text encoder to accomadate cross-image tasks (e.g., image-text retrieval) and within-image tasks (e.g., segmentation and captioning).</li> -->
+
+          </ul>
+        </div>
+        <img id="model" width="80%" src="images/MiniGPT4-video_fig.jpg">
+        <h3 class="subtitle has-text-centered">
+          <p style="font-family:Times New Roman"><b>The architecture of MiniGPT-4.</b></p>
+        </h3>
+        <br>
+        <br>
+
+      </div>
+    </div>
+    <br>
+    <br>
+    <br>
+    <br>
+    <!-- Paper Model. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-six-fifths">
+        <h2 class="title is-3">Results</h2>
+        <div class="content has-text-justified">
+          <p>
+            <b>For a comprehensive evaluation of our proposed architecture, we assessed its performance across three bench-mark types: Video-ChatGPT, Open-ended Questions, and
+              Multiple-Choice Questions (MCQs). In the Video-ChatGPT
+              benchmark, depicted in Table 1, our model is comparable
+              with the previous methods without subtitles. When we add
+              the subtitles as input, our model achieves the state-of-the-
+              art in all five dimensions, which verified that our model
+              can utilize the subtitle information to improve the video
+              understanding. In the zero-shot evaluation of open-ended
+              and multiple-choice question benchmarks, our proposed MiniGPT4-Video sig-
+              nificantly outperforms existing state-of-the-art methods. It
+              achieves notable margins of improvement 4.22%, 1.13%,
+              20.82%, and 13.1% on the MSVD, MSRVTT, TGIF, and
+              TVQA benchmarks, respectively. The results, both with and
+              without subtitles, further demonstrate
+              that integrating subtitle information alongside visual cues
+              significantly enhances performance, with accuracy rising
+              from 33.9% to 54.21% on TVQA. While subtitles contribute
+              substantially to performance improvements on TVQA, their
+              inclusion doesn’t offer added value for datasets like MSVD-
+              QA, MSRVTT-QA, TGIF-QA, and ActivityNet, where ques-
+              tions are exclusively vision-based.</b>:
+          </p>
+          <ul>
+            <!-- <li>It has two types of queries (latent queries and text queries) and outputs (semantic outputs and pixel-level outputs).</li>
+            <li>It uses a single text encoder for all text corpus, ranging from class concepts, referring phrases to image captions.</li>
+            <li>It decouples image and text encoder to accomadate cross-image tasks (e.g., image-text retrieval) and within-image tasks (e.g., segmentation and captioning).</li> -->
+
+          </ul>
+        </div>
+        <img id="model" width="70%" src="images/table_1.png">
+        <br>
+        <br>
+        <br>
+
+        <img id="model" width="70%" src="images/table_2.png">
+        <br>
+        <br>
+
+      </div>
+    </div>
+    <br>
+    <br>
+    <!--/ Paper video. -->
+  </div>
+</section>
+
+<script src="js/Underscore-min.js"></script>
+<script src="js/index.js"></script>
+
+<section class="section">
+  <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+      <div class="column is-six-fifths">
+        <h2 class="title is-3">Examples</h2>
+          <div>
+            <img src="images/2.png" alt="">
+            <img src="images/3.png" alt="">
+            <img src="images/4.png" alt="">
+            <img src="images/5.png" alt="">
+            <img src="images/6.png" alt="">
+            <img src="images/7.png" alt="">
+            <img src="images/8.png" alt="">
+        </div>
+    </div>
+  </div>
+    </div>
+  <!--/ Results. -->
+</section>
+
+<!--<section class="section" id="BibTeX">-->
+<!--  <div class="container is-max-desktop content">-->
+<!--    <h2 class="title">BibTeX</h2>-->
+<!--    <pre><code>-->
+
+<!--@article{tbd,-->
+<!--  title={MiniGPT-Video: Advancing Multimodal LLMs for Video Understanding with Interleaved Visual-Textual Tokens},-->
+<!--  author={},-->
+<!--  journal={arXiv preprint arXiv:tbd},-->
+<!--  year={2024}-->
+<!--}-->
+
+<!--</code></pre>-->
+<!--  </div>-->
+<!--</section>-->
+
+
+
+<section class="section" id="Acknowledgement">
+  <div class="container is-max-desktop content">
+    <h2 class="title">Acknowledgement</h2>
+    <p>
+      This website is adapted from <a
+      href="https://github.com/nerfies/nerfies.github.io">Nerfies</a>, licensed under a <a rel="license"
+                                          href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
+      Commons Attribution-ShareAlike 4.0 International License</a>.
+    </p>
+  </div>
+</section>
+
+</body>
+
+</html>

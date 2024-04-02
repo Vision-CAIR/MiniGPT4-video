@@ -1,0 +1,105 @@
+/*.container2 {
+  position: center;
+  display: flex;
+  width: 100%;
+  padding: 0% 0%;
+  box-sizing: border-box;
+  height: 100vh;
+}
+
+.box_t {
+  flex: 1;
+  overflow: hidden;
+  transition: .5s;
+  margin: 0 2%;
+  box-shadow: 0 20px 30px rgba(0, 0, 0, 0.1);
+  line-height: 0;
+}
+
+.box_t > img {
+  width: 100%;
+  height: calc(100% - 10vh);
+  -o-object-fit: cover;
+     object-fit: cover;
+  transition: .5s;
+}
+
+.box_t > span {
+  font-size: 3.8vh;
+  display: block;
+  text-align: center;
+  height: 10vh;
+  line-height: 2.6;
+}
+
+.box_t:hover {
+  flex: 1 1 50%;
+}
+
+.box_t:hover > img {
+  width: 100%;
+  height: 100%;
+}
+*/
+
+.container2 {
+  position: center;
+  display: flex;
+  width: 100%;
+  padding: 0% 0%;
+  margin: 0 0;
+  box-sizing: border-box;
+  height: 100vh;
+}
+.box_t {
+  /*width: 500px;*/
+  flex: 1;
+  overflow: hidden;
+  transition: 0.5s;
+  margin: 0 2%;
+  box-shadow: 0 20px 30px rgba(0, 0, 0, 0.1);
+  line-height: 0;
+}
+.box_t > img {
+  width: 100%;
+  height: calc(100% - 10vh);
+  -o-object-fit: cover;
+  object-fit: cover;
+  transition: 0.5s;
+}
+.box_t > span {
+  font-size: 3.8vh;
+  display: block;
+  text-align: center;
+  height: 10vh;
+  line-height: 2.6;
+}
+.box_t:hover {
+  flex: 1 1 60%;
+}
+.box_t:hover > img {
+  width: 100%;
+  height: 100%;
+}
+/* 媒体查询 */
+@media (max-width: 1024px) {
+  .box_t > span {
+    font-size: 3.2vh;
+  }
+}
+@media (max-width: 768px) {
+  .box_t > span {
+    font-size: 2.8vh;
+  }
+}
+@media (max-width: 480px) {
+  .container2 {
+    flex-direction: column;
+  }
+  .box_t {
+    margin: 2% 0;
+  }
+  .box_t > span {
+    font-size: 3.8vh;
+  }
+}
