@@ -1,21 +1,11 @@
 #!/bin/bash
 
 # Define common arguments for all scripts
-# Without subtitles
-PRED_GENERIC=""
-PRED_TEMPORAL="test_benchmark/Other models/video_llava_temporal.json"
-PRED_CONSISTENCY="test_benchmark/Other models/video_llava_consistency.json"
-OUTPUT_DIR="/ibex/ai/home/ataallka/minigpt_video_results/quantitative_evaluation/ckpt_52_without_subtitles"
-rm -rf $OUTPUT_DIR
-# # With subtitles
-# PRED_GENERIC="results/ckpt_52_video_chatgpt_generic_subtitles.json"
-# PRED_TEMPORAL="results/ckpt_52_video_chatgpt_temporal_subtitles.json"
-# PRED_CONSISTENCY="results/ckpt_52_video_chatgpt_consistency_subtitles.json"
-#  OUTPUT_DIR="/ibex/ai/home/ataallka/minigpt_video_results/quantitative_evaluation/ckpt_52_with_subtitles"
-# rm -rf $OUTPUT_DIR
 
-API_KEY="open_ai_key"
-NUM_TASKS=64
+PRED="pred_path"
+OUTPUT_DIR="output_dir"
+API_KEY="api_key"
+NUM_TASKS=128
 
 # Run the "correctness" evaluation script
 python evaluate_benchmark_1_correctness.py \
