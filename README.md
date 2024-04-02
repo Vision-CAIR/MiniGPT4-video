@@ -1,9 +1,12 @@
 # MiniGPT4-Video: Advancing Multimodal LLMs for Video Understanding with Interleaved Visual-Textual Tokens
 <!-- technical report link  -->
 <!-- demo link  -->
-<!-- ![demo_1](repo_imgs/sample_1.gif) -->
+<a href='https://vision-cair.github.io/MiniGPT4-video/'><img src='https://img.shields.io/badge/Project-Page-Green'></a>
+<a href=''><img src='https://img.shields.io/badge/Paper-PDF-red'></a>
+<!-- <a href='https://github.com/Vision-CAIR/MiniGPT4-video'><img src='https://img.shields.io/badge/Github-Code-blue'></a> -->
+![demo_1](repo_imgs/sample_1.gif)
 ![demo_2](repo_imgs/sample_2.gif)
-<!-- ![demo_3](repo_imgs/sample_3.gif) -->
+![demo_3](repo_imgs/sample_3.gif) 
 ## Overview
 This paper introduces MiniGPT4-Video, a multimodal Large Language Model (LLM) designed specifically for video understanding. The model is capable of processing both temporal visual and textual data, making it adept at understanding the complexities of videos.
 Building upon the success of MiniGPT-v2, which excelled in translating visual features into the LLM space for single images and achieved impressive results on various image-text benchmarks, this paper extends the model's capabilities to process a sequence of frames, enabling it to comprehend videos.
@@ -24,7 +27,7 @@ conda env create -f environment.yml
 ```
 **3. Download the checkpoints**
 
-| MiniGPT-Video (Llama2 Chat 7B) | MiniGPT-Video (Mistral 7B) |
+| MiniGPT4-Video (Llama2 Chat 7B) | MiniGPT4-Video (Mistral 7B) |
 :------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------:
 | [Download](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/blob/main/checkpoints/video_llama_checkpoint_last.pth) | [Download](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/blob/main/checkpoints/video_mistral_checkpoint_last.pth) |
 
@@ -58,14 +61,14 @@ You can find the steps to download the datasets in [MiniGPT4](https://github.com
 Video text training:<br>
 
 + [CMD](https://www.robots.ox.ac.uk/~vgg/data/condensed-movies/) <br>
-+ Webvid <br> <!-- -[Webvid](https://huggingface.co/datasets/TempoFunk/webvid-10M?row=2)  -->
++ [Webvid](https://huggingface.co/datasets/TempoFunk/webvid-10M?row=2) <br>
 + [Video Instructional Dataset 100K](https://huggingface.co/datasets/MBZUAI/VideoInstruct-100K) <br>
 
 You can find the datasets annotation files [download](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/tree/main/datasets/training_datasets) <br>
-After downloading the datasets, set the paths for each dataset in the datasets configuration folder here minigpt4/configs/datasets
+After downloading the datasets, go to the datasets configuration folder here minigpt4/configs/datasets set the paths for each dataset there.
 
 ### Model training: 
-You can edit the number of gpus in the script.sh below<br>
+You can edit the number of gpus in the each script.sh below<br>
 #### Stage 1 (image text pretraining)
 
 Same as [MiniGPT4](https://github.com/Vision-CAIR/MiniGPT-4), you can directly download the pretrained [checkpoint](https://drive.google.com/file/d/11nAPjEok8eAGGEG1N2vXo3kBLCg0WgUk/view?usp=sharing) aligned with Llama2.
@@ -97,9 +100,11 @@ For **Mistral**, set the cfg-path in the script to `train_configs/224_v2_mistral
 ```bash
 bash jobs_video/train/stage_3.sh
 ```
-You can download our trained weights for this stage from here [Llama2](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/blob/main/checkpoints/video_llama_checkpoint_best.pth) [Mistral](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/blob/main/checkpoints/video_mistral_checkpoint_best.pth)<br>
+You can download our trained weights for this stage from here [Llama2](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/blob/main/checkpoints/video_llama_checkpoint_last.pth) [Mistral](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/blob/main/checkpoints/video_mistral_checkpoint_last.pth)<br>
 
 ## :zap: Evaluation
+To reproduce the results use the best checkpoints for each model <br>
+[Llama2](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/blob/main/checkpoints/video_captioning_llama_checkpoint_best.pth) [Mistral](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/blob/main/checkpoints/video_captioning_mistral_checkpoint_best.pth)<br>
 We used the same evaluation as [Video-ChatGPT](https://mbzuai-oryx.github.io/Video-ChatGPT/)<br>
 <!-- ![short_results](repo_imgs/short_results.PNG) -->
 
@@ -123,7 +128,7 @@ We used the same evaluation as [Video-ChatGPT](https://mbzuai-oryx.github.io/Vid
 | FrozenBiLM|:x:|32.2| --|16.8 |--| 41 |-- |24.7|--|29.7 |
 | LLaMA Adapter|:x:|54.9| 3.1 |43.8 |2.7| -- |-- |34.2| 2.7| --|
 | Video LLaMA|:x:|51.6| 2.5 |29|1.8| -- |-- |12.4| 1.1| --|
-| Video Chat|:white_check_mark:|56.3| 2.8 |45|2.5|34.4| 2.3 |26.5| 2.2| 40.6|
+| Video Chat|:white_check_mark:|56.3| 2.8 |45|2.5|34.4| 2.3 |26.5| 2.2|--|
 | Video-ChatGPT|:x:|64.9| 3.3 |49.3 |2.8|51.4| 3.0 |35.2| 2.7|23.35|
 | BT-Adapter-7B|:x:|67.7| 3.7 |57|3.2| -- |-- |45.7| 3.2| --|
 | LLaMA-VID-7B |:x:|69.7| 3.7 |57.7 |3.2| -- |-- |**47.4**| **3.3**| --|
@@ -140,10 +145,10 @@ We used the same evaluation as [Video-ChatGPT](https://mbzuai-oryx.github.io/Vid
 + [TVQA](https://tvqa.cs.unc.edu/) <br>
 + [Video-ChatGPT benchmark](https://mbzuai-oryx.github.io/Video-ChatGPT/) <br>
 
-You can find the datasets annotation files [download](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/tree/main/datasets/evaluation_datasets) <br>
+You can find the evaluation datasets annotation files [download](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/tree/main/datasets/evaluation_datasets) <br>
 
 ### Run evaluation script
-Edit the evaluation script to include the path to the checkpoints, the dataset name and whether to use subtitles or not <br> 
+Set the each evaluation script parameters to include the path to the checkpoints, the dataset name and whether to use subtitles or not <br> 
 
 ```bash
 # Llama2
@@ -152,7 +157,7 @@ bash jobs_video/eval/llama2_evaluation.sh
 bash jobs_video/eval/mistral_evalualtion.sh
 ```
 Then Use GPT3.5 turbo to compare the predictions with the ground truth and generate the accuracy and scores <br>
-Set these variables in the script <br>
+Set these variables in both evaluate_benchmark.sh and evaluate_zeroshot.sh <br>
 ```bash
 PRED="path_to_predictions"
 OUTPUT_DIR="path_to_output_dir"
