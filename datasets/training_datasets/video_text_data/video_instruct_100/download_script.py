@@ -92,4 +92,3 @@ for video_path in tqdm(data,desc='Downloading videos') :
         convert_xml_vtt(xml_file_path,f'subtitles_vtt/{video_id}.vtt')
         
     
-
