@@ -195,3 +195,4 @@ sbatch_generate*
 # ignore workspace folder
 workspace/*
 flagged/*
+jobs_video/eval/choose_best_ckpt/*
