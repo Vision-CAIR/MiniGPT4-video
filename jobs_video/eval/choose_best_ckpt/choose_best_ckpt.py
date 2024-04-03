@@ -1,6 +1,6 @@
 import os 
 import shutil 
-ckpt_dir = '/ibex/ai/home/ataallka/Weights_folder/minigpt4_video/ckpt_mistral/cmd_webvid_video_instruct/202403171707'
+ckpt_dir = 'ckpt_dir'
 print(f'number of ckpts: {len(os.listdir(ckpt_dir))}')
 for ckpt in sorted(os.listdir(ckpt_dir)):
     if not ckpt.endswith('.pth'):
