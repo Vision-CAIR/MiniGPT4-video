@@ -196,3 +196,4 @@ sbatch_generate*
 workspace/*
 flagged/*
 jobs_video/eval/choose_best_ckpt/*
+datasets/*
