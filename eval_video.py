@@ -79,13 +79,6 @@ elif args.dataset == 'tgif':
     annotations_keys=['question','answer','gif_name']
     # annotations_keys=['question','description','gif_name']
     data = VideoChatGPTEvalDataset(vis_processor, videos_path, ann_path,subtitles_path,annotations_keys,videos_features_path, add_subtitles=False,llm_name=llm_name)
-elif args.dataset == 'Video_validation_Dataset':
-    ann_path= "/ibex/project/c2090/datasets/VideoInstruct100K/test_videos/all_datasets_samples_val_qa.json"
-    videos_path= "/ibex/project/c2090/datasets/VideoInstruct100K/test_videos/all_datasets_samples_val"
-    subtitles_path= "/home/ataallka/minigpt_video/minigpt_multi_img/inference_subtitles"
-    annotations_keys= ['question','answer','video_id']
-    vis_processor=Blip2ImageTrainProcessor()
-    data = Video_validation_Dataset(vis_processor, videos_path, ann_path,subtitles_path,annotations_keys,args.add_subtitles,llm_name=llm_name)
 elif args.dataset == 'tvqa':
     # TVQA dataset
     ann_path="datasets/evaluation_datasets/tvqa_short/tvqa_val.json"
@@ -93,14 +86,6 @@ elif args.dataset == 'tvqa':
     subtitles_path="/ibex/project/c2090/datasets/TVR_dataset/TVRetrieval/data/tvqa_preprocessed_subtitles.json"
     videos_features_path="/ibex/project/c2106/kirolos/videos_features/evaluation/tvqa"
     data = TVQAEVAL(vis_processor, videos_path, ann_path,subtitles_path,videos_features_path,add_subtitles=args.add_subtitles,llm_name=llm_name)
-    
-elif args.dataset == 'tvqa_long_videos':
-    # TVQA dataset
-    ann_path="datasets/evaluation_datasets/tvqa_short/tvqa_val.json"
-    videos_path= "/ibex/project/c2106/kirolos/Long_TVQA/videos"
-    subtitles_path="/ibex/project/c2106/kirolos/Long_TVQA/tvqa_subtitles"
-    videos_features_path="/ibex/project/c2106/kirolos/videos_features/evaluation/tvqa_long"
-    data = TVQAEVAL_Long(vis_processor, videos_path, ann_path,subtitles_path,videos_features_path,add_subtitles=True,llm_name=llm_name)
 
 eval_dataloader = DataLoader(data, batch_size=args.batch_size, shuffle=False)
 

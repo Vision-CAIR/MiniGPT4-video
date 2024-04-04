@@ -63,8 +63,6 @@ run:
 
   evaluate: False
   train_splits: ["train"]
-  valid_splits: ["val"]
-  video_instruction_eval: False
 
   device: "cuda"
   world_size: 1
