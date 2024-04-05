@@ -1,4 +1,4 @@
-name: minigpt4_video
+name: minigpt4_video_test_v100
 channels:
   - conda-forge
 dependencies:
@@ -265,8 +265,7 @@ dependencies:
       - python-multipart==0.0.6
       - python-slugify==8.0.1
       - python-utils==3.8.1
-      - pytube==15.0.0
-      - pytubefix==2.2.1
+      - pytubefix
       - pytz==2023.3.post1
       - pyyaml==6.0.1
       - referencing==0.32.0
