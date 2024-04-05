@@ -62,7 +62,7 @@ You can find the steps to download the datasets in [MiniGPT4](https://github.com
 Video text training:<br>
 
 + [CMD](https://www.robots.ox.ac.uk/~vgg/data/condensed-movies/) <br>
-+ [Webvid](https://huggingface.co/datasets/TempoFunk/webvid-10M?row=2) <br>
++ [Webvid] (https://github.com/m-bain/webvid) <!-- + [Webvid](https://huggingface.co/datasets/TempoFunk/webvid-10M?row=2) <br> -->
 + [Video Instructional Dataset 100K](https://huggingface.co/datasets/MBZUAI/VideoInstruct-100K) <br>
 
 You can find the datasets annotation files [download](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/tree/main/datasets/training_datasets) <br>
