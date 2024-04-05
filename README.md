@@ -52,9 +52,9 @@ python minigpt4_video_inference.py --ckpt path_to_video_checkpoint --cfg-path te
 ## :fire: Training
 
 ### Training datasets
-
+After downloading the datasets below, **you should go to the datasets configuration folder here minigpt4/configs/datasets set the paths for each dataset there.**
 Image text training<br>
-You can find the steps to download the datasets in [MiniGPT4](https://github.com/Vision-CAIR/MiniGPT-4/datasets)<br>
+You can find the steps to download the datasets in [MiniGPT4](https://github.com/Vision-CAIR/MiniGPT-4/tree/main/dataset)<br>
 + LAION <br>
 + Conceptual Captions <br>
 + SBU <br>
@@ -62,11 +62,11 @@ You can find the steps to download the datasets in [MiniGPT4](https://github.com
 Video text training:<br>
 
 + [CMD](https://www.robots.ox.ac.uk/~vgg/data/condensed-movies/) <br>
-+ [Webvid] (https://github.com/m-bain/webvid) <!-- + [Webvid](https://huggingface.co/datasets/TempoFunk/webvid-10M?row=2) <br> -->
++ [Webvid](https://github.com/m-bain/webvid/) <br> <!-- + [Webvid](https://huggingface.co/datasets/TempoFunk/webvid-10M?row=2) <br> -->
 + [Video Instructional Dataset 100K](https://huggingface.co/datasets/MBZUAI/VideoInstruct-100K) <br>
 
-You can find the datasets annotation files [download](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/tree/main/datasets/training_datasets) <br>
-After downloading the datasets, go to the datasets configuration folder here minigpt4/configs/datasets set the paths for each dataset there.
+You can find the datasets annotation files for video_text datasets here [download](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/tree/main/datasets/training_datasets) <br>
+
 
 ### Model training: 
 You can edit the number of gpus in the each script.sh below<br>
@@ -76,9 +76,9 @@ Same as [MiniGPT4](https://github.com/Vision-CAIR/MiniGPT-4), you can directly d
 
 ```bash
 # Llama2
-torchrun --nproc-per-node NUM_GPU train.py --cfg-path 224_minigpt4_llama2_image.yaml
+torchrun --nproc-per-node NUM_GPU train.py --cfg-path train_configs/224_minigpt4_llama2_image.yaml
 # Mistral
-torchrun --nproc-per-node NUM_GPU train.py --cfg-path 224_minigpt4_mistral_image.yaml
+torchrun --nproc-per-node NUM_GPU train.py --cfg-path train_configs/224_minigpt4_mistral_image.yaml
 ```
 You can download our trained weights for this stage from here [Llama2](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/blob/main/checkpoints/image_llama2_checkpoint.pth) [Mistral](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/blob/main/checkpoints/image_mistral_checkpoint.pth)<br>
 #### Stage 2 (video captioning pretraining)

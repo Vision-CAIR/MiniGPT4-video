@@ -10,6 +10,6 @@ datasets:
 
     build_info:
       # Be careful not to append minus sign (-) before split to avoid itemizing
-      vis_root: /ibex/ai/reference/videos/CondensedMovies/data/images
-      ann_paths: [datasets/training_datasets/video_text_data/cmd/train.json]
-      cc_path: datasets/training_datasets/video_text_data/cmd/caption.json
+      vis_root: path/to/videos/
+      ann_paths: [path/to/annotations.json]
+      cc_path: path/to/subtitles.json
