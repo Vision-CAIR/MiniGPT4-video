@@ -173,6 +173,17 @@ To evaluate open ended questions run the following script <br>
 ```bash
 bash test_benchmark/quantitative_evaluation/evaluate_zeroshot.sh
 ```
+
+If you're using MiniGPT4-Video in your research or applications, please cite using this BibTeX:
+```
+@article{ataallah2024minigpt4video,
+      title={MiniGPT4-Video: Advancing Multimodal LLMs for Video Understanding with Interleaved Visual-Textual Tokens}, 
+      author={Ataallah, Kirolos and Shen, Xiaoqian and Abdelrahman, Eslam and Sleiman, Essam and Zhu, Deyao and Ding, Jian and Elhoseiny, Mohamed},
+      year={2024},
+      journal={arXiv preprint arXiv:2404.03413},
+}
+```
+
 ## Acknowledgements
 [MiniGPT4](https://github.com/Vision-CAIR/MiniGPT-4) <br>
 [Video-ChatGPT](https://mbzuai-oryx.github.io/Video-ChatGPT)
