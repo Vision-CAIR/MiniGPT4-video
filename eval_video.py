@@ -5,7 +5,7 @@ from torch.utils.data import DataLoader
 from minigpt4.common.eval_utils import prepare_texts, init_model, eval_parser
 from minigpt4.conversation.conversation import CONV_VISION
 from minigpt4.processors.blip_processors import Blip2ImageTrainProcessor,BlipCaptionProcessor
-from minigpt4.datasets.datasets.video_datasets import VideoChatGPTEvalDataset,VideoChatGPTEval_consistancy,Video_validation_Dataset,TVQAEVAL,TVQAEVAL_Long
+from minigpt4.datasets.datasets.video_datasets import VideoChatGPTEvalDataset,VideoChatGPTEval_consistancy,Video_validation_Dataset,TVQAEVAL
 
 parser = eval_parser()
 parser.add_argument("--dataset", type=str, default='msvd', help="dataset to evaluate")

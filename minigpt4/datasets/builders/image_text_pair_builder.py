@@ -16,7 +16,7 @@ from minigpt4.datasets.datasets.coyo_dataset import COYOCaptionWDSDataset,COYOBo
 # , COYOBBoxPhraseDataset
 from minigpt4.datasets.datasets.grounded_detailed_image_caption_dataset import GroundedDetailDataset
 from minigpt4.datasets.datasets.reasoning_dataset import ReasoningDataset
-from minigpt4.datasets.datasets.video_datasets import CMDVideoDataset, WebVidDataset,VideoChatGPTDataset,Video_validation_Dataset
+from minigpt4.datasets.datasets.video_datasets import CMDVideoDataset, WebVidDataset,VideoChatGPTDataset
 from minigpt4.datasets.datasets.cot import CoTDataset
 from minigpt4.datasets.datasets.unnatural_instruction import UnnaturalDataset
 from minigpt4.datasets.datasets.caption_reasoning import CaptionReasonDataset
@@ -778,7 +778,6 @@ class WebVidBuilder(BaseDatasetBuilder):
 @registry.register_builder("video_chatgpt")
 class VideoChatGPTBuilder(BaseDatasetBuilder):
     train_dataset_cls = VideoChatGPTDataset
-    eval_dataset_cls=Video_validation_Dataset
 
     DATASET_CONFIG_DICT = {
         "default": "configs/datasets/video_chatgpt/default.yaml",
