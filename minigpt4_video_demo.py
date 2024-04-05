@@ -135,7 +135,7 @@ def run (video_path,instruction,model,vis_processor,gen_subtitles=True):
         subtitle_path=None
     prepared_images,prepared_instruction=prepare_input(vis_processor,video_path,subtitle_path,instruction)
     if prepared_images is None:
-        return "Video cann't be open ,check the video path again"
+        return "Please re-upload the video while changing the instructions."
     length=len(prepared_images)
     prepared_images=prepared_images.unsqueeze(0)
     conv = CONV_VISION.copy()
