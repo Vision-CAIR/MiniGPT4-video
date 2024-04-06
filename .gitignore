@@ -195,3 +195,5 @@ sbatch_generate*
 # ignore workspace folder
 workspace/*
 flagged/*
+datasets/*
+checkpoints/*
