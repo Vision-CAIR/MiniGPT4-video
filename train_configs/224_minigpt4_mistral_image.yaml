@@ -1,6 +1,6 @@
 model:
-  arch: minigpt4
-  model_type: mini_gpt4_llama_v2
+  arch: mini_gpt4_llama_v2
+  model_type: pretrain_vicuna
   llama_model: "mistralai/Mistral-7B-Instruct-v0.2"
 
 
@@ -42,7 +42,7 @@ run:
   iters_per_epoch: 5000
 
   seed: 42
-  output_dir: "output/minigpt4_stage1_pretrain"
+  output_dir: "output/minigpt4_stage1_pretrain_mistral"
 
   amp: True
   resume_ckpt_path: null
@@ -56,4 +56,4 @@ run:
   distributed: True
 
   wandb_log: True
-  job_name: minigpt4_llama2_pretrain
+  job_name: minigpt4_mistral_pretrain

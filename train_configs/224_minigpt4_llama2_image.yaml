@@ -1,6 +1,6 @@
 model:
-  arch: minigpt4
-  model_type: mini_gpt4_llama_v2
+  arch: mini_gpt4_llama_v2
+  model_type: pretrain_vicuna
   llama_model: "meta-llama/Llama-2-7b-chat-hf"
 
 
@@ -42,7 +42,7 @@ run:
   iters_per_epoch: 5000
 
   seed: 42
-  output_dir: "output/minigpt4_stage1_pretrain"
+  output_dir: "output/minigpt4_stage1_pretrain_llama2"
 
   amp: True
   resume_ckpt_path: null
