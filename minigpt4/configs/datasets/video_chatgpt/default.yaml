@@ -10,7 +10,7 @@ datasets:
 
     build_info:
       # Be careful not to append minus sign (-) before split to avoid itemizing
-      ann_paths: [datasets/training_datasets/video_text_data/video_instruct_100/VideoInstruct100K.json]
-      vis_root: /ibex/project/c2090/datasets/VideoInstruct100K/
-      subtitles_path: /ibex/project/c2090/datasets/VideoInstruct100K/subtitles/
+      ann_paths: [path/to/annotations_json] # list of paths to annotation files
+      vis_root: path/to/videos_folder
+      subtitles_path: path/to/subtitles_folder
       model_name: 'llama2' # Language Model Name (available: llama2, mistral)
