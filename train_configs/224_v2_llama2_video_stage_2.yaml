@@ -8,7 +8,7 @@ model:
   image_size: 224
   end_sym: "</s>"
   llama_model: "meta-llama/Llama-2-7b-chat-hf"
-  ckpt: "checkpoints/image_llama2_checkpoint.pth"
+  ckpt: "checkpoints/image_llama2_checkpoint.pth" # set the checkpoint to start the training from
   use_grad_checkpoint: True
   chat_template: True
   lora_r: 64

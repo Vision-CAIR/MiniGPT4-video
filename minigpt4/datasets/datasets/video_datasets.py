@@ -98,7 +98,7 @@ class __DisplMixin:
 
 
 class CMDVideoDataset(BaseDataset, __DisplMixin):
-    def __init__(self, vis_processor, text_processor, vis_root, ann_paths, cc_path):
+    def __init__(self, vis_processor, text_processor, vis_root, ann_paths, cc_path,model_name='llama2'):
         """
         vis_root (string): Root directory of images (e.g. coco/images/)
         ann_root (string): directory to store the annotation file
@@ -121,7 +121,13 @@ class CMDVideoDataset(BaseDataset, __DisplMixin):
         ]
         self.img_ids = {}
         n = 0
-        self.length = 90
+        self.model_name=model_name
+        if self.model_name =='mistral':
+            self.length = 90
+            self.max_sub_len = 800
+        else:
+            self.length = 45
+            self.max_sub_len = 400
         for ann in self.annotation:
             img_id = ann["image_id"]
             if img_id not in self.img_ids.keys():
@@ -144,6 +150,7 @@ class CMDVideoDataset(BaseDataset, __DisplMixin):
         sampling_interval = int(num_of_images / self.length)
         if sampling_interval == 0:
             sampling_interval = 1
+        num_of_words=0
         for frame_id in range(0,num_of_images,sampling_interval):
             image_path = os.path.join(self.vis_root, video_id, f'frame_{frame_id}.jpg')
             image = Image.open(image_path).convert("RGB")
@@ -153,7 +160,9 @@ class CMDVideoDataset(BaseDataset, __DisplMixin):
             time_step = str(frame_id * 2)
             if captions is not None:
                 if time_step in captions:
-                    img_placeholder += f"{self.text_sep}{captions[time_step]}"
+                    num_of_words+=len(captions[time_step].split(' '))
+                    if num_of_words<self.max_sub_len:
+                        img_placeholder += f"{self.text_sep}{captions[time_step]}"
             if len(images) >= self.length:
                 break
         
@@ -175,7 +184,7 @@ class CMDVideoDataset(BaseDataset, __DisplMixin):
 
 
 class WebVidDataset(BaseDataset, __DisplMixin):
-    def __init__(self, vis_processor, text_processor, vis_root, ann_paths,subtitles_path,add_subtitles=False):
+    def __init__(self, vis_processor, text_processor, vis_root, ann_paths,subtitles_path,model_name,add_subtitles=False):
         """
         vis_root (string): Root directory of images (e.g. coco/images/)
         ann_root (string): directory to store the annotation file
@@ -198,8 +207,13 @@ class WebVidDataset(BaseDataset, __DisplMixin):
         ]
         self.img_ids = {}
         n = 0
-        self.length = 90
-        self.max_sub_len = 800
+        self.model_name=model_name
+        if self.model_name =='mistral':
+            self.length = 90
+            self.max_sub_len = 800
+        else:
+            self.length = 45
+            self.max_sub_len = 400
         self.add_subtitles = add_subtitles
         self.videos_has_subtitles = {}
         if self.add_subtitles:
@@ -291,7 +305,7 @@ class WebVidDataset(BaseDataset, __DisplMixin):
         }
 
 class VideoChatGPTDataset(BaseDataset, __DisplMixin):
-    def __init__(self, vis_processor, text_processor, vis_root, ann_paths,add_subtitles=True):
+    def __init__(self, vis_processor, text_processor, vis_root, ann_paths,subtitles_path,model_name='llama2',add_subtitles=True):
         """
         vis_root (string): Root directory of images (e.g. coco/images/)
         ann_root (string): directory to store the annotation file
@@ -299,12 +313,17 @@ class VideoChatGPTDataset(BaseDataset, __DisplMixin):
         super().__init__(vis_processor, text_processor, vis_root, ann_paths)
         self.img_ids = {}
         n=0
-        self.length = 90
-        self.max_sub_len = 800
+        self.model_name=model_name
+        if self.model_name =='mistral':
+            self.length = 90
+            self.max_sub_len = 800
+        else:
+            self.length = 45
+            self.max_sub_len = 400
         self.add_subtitles = add_subtitles
         self.videos_has_subtitles = {}
         if self.add_subtitles:
-            self.subtitle_folder = os.path.join(self.vis_root,'subtitles')
+            self.subtitle_folder = subtitles_path
             for sub in os.listdir(self.subtitle_folder):
                 video_id = sub.split('.')[0]
                 self.videos_has_subtitles[video_id] = True

@@ -83,9 +83,12 @@ torchrun --nproc-per-node NUM_GPU train.py --cfg-path train_configs/224_minigpt4
 You can download our trained weights for this stage from here [Llama2](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/blob/main/checkpoints/image_llama2_checkpoint.pth) [Mistral](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/blob/main/checkpoints/image_mistral_checkpoint.pth)<br>
 #### Stage 2 (video captioning pretraining)
 
-For **Llama2**, set the cfg-path in the script to `train_configs/224_v2_llama2_video_stage_2.yaml` <br>
-
-For **Mistral**, set the cfg-path in the script to `train_configs/224_v2_mistral_video_stage_2.yaml` <br>
+For **Llama2** <br>
+set the cfg-path in the script to `train_configs/224_v2_llama2_video_stage_2.yaml` <br>
+set the model name here `minigpt4/configs/datasets/cmd_video/default.yaml` and `minigpt4/configs/datasets/webvid/default.yaml` to llama2<br>
+For **Mistral**<br> 
+set the cfg-path in the script to `train_configs/224_v2_mistral_video_stage_2.yaml` <br>
+set the model name here `minigpt4/configs/datasets/cmd_video/default.yaml` and `minigpt4/configs/datasets/webvid/default.yaml` to mistral<br>
 
 ```bash
 bash jobs_video/train/stage_2.sh
@@ -94,9 +97,13 @@ You can download our trained weights for this stage from here [Llama2](https://h
 
 #### Stage 3 (video Instruction finetuning)
 
-For **Llama2**, set the cfg-path in the script to `train_configs/224_v2_llama2_video_stage_3.yaml` <br>
+For **Llama2** <br>
+set the cfg-path in the script to `train_configs/224_v2_llama2_video_stage_3.yaml` <br>
+set the model name here `minigpt4/configs/datasets/video_chatgpt/default.yaml` to llama2<br>
 
-For **Mistral**, set the cfg-path in the script to `train_configs/224_v2_mistral_video_stage_3.yaml` <br>
+For **Mistral**<br> 
+set the cfg-path in the script to `train_configs/224_v2_mistral_video_stage_3.yaml` <br>
+set the model name here `minigpt4/configs/datasets/video_chatgpt/default.yaml` to mistral<br>
 
 ```bash
 bash jobs_video/train/stage_3.sh

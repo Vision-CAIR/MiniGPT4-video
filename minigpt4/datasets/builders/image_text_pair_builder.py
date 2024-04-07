@@ -739,7 +739,8 @@ class CMDVideoBuilder(BaseDatasetBuilder):
             text_processor=self.text_processors["train"],
             vis_root=build_info.vis_root,
             ann_paths=build_info.ann_paths,
-            cc_path=build_info.cc_path
+            cc_path=build_info.cc_path,
+            model_name= 'llama2',
         )
 
         return datasets
@@ -770,6 +771,7 @@ class WebVidBuilder(BaseDatasetBuilder):
             vis_root=build_info.vis_root,
             ann_paths=build_info.ann_paths,
             subtitles_path=build_info.subtitles_path,
+            model_name= 'llama2',
         )
 
         return datasets
@@ -799,6 +801,8 @@ class VideoChatGPTBuilder(BaseDatasetBuilder):
             text_processor=self.text_processors["train"],
             vis_root=build_info.vis_root,
             ann_paths=build_info.ann_paths,
+            subtitles_path=build_info.subtitles_path,
+            model_name='llama2'
         )
 
         return datasets

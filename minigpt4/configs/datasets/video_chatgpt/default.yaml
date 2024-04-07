@@ -13,3 +13,4 @@ datasets:
       ann_paths: [datasets/training_datasets/video_text_data/video_instruct_100/VideoInstruct100K.json]
       vis_root: /ibex/project/c2090/datasets/VideoInstruct100K/
       subtitles_path: /ibex/project/c2090/datasets/VideoInstruct100K/subtitles/
+      model_name: 'llama2' # Language Model Name (available: llama2, mistral)

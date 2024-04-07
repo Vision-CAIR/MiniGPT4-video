@@ -8,7 +8,7 @@ model:
   image_size: 224
   end_sym: "</s>"
   llama_model: "mistralai/Mistral-7B-Instruct-v0.2"
-  ckpt: "checkpoints/video_captioning_mistral_checkpoint_last.pth"
+  ckpt: "checkpoints/video_captioning_mistral_checkpoint_last.pth" # set the checkpoint to start the training from
   use_grad_checkpoint: True
   chat_template: True
   lora_r: 64

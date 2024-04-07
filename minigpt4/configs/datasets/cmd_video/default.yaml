@@ -13,3 +13,4 @@ datasets:
       vis_root: path/to/videos/
       ann_paths: [path/to/annotations.json]
       cc_path: path/to/subtitles.json
+      model_name: 'llama2' # Language Model Name (available: llama2, mistral)
