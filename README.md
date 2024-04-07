@@ -176,11 +176,11 @@ bash test_benchmark/quantitative_evaluation/evaluate_zeroshot.sh
 
 If you're using MiniGPT4-Video in your research or applications, please cite using this BibTeX:
 ```
-@article{ataallah2024minigpt4video,
-      title={MiniGPT4-Video: Advancing Multimodal LLMs for Video Understanding with Interleaved Visual-Textual Tokens}, 
-      author={Ataallah, Kirolos and Shen, Xiaoqian and Abdelrahman, Eslam and Sleiman, Essam and Zhu, Deyao and Ding, Jian and Elhoseiny, Mohamed},
-      year={2024},
-      journal={arXiv preprint arXiv:2404.03413},
+@article{ataallah2024minigpt4,
+  title={MiniGPT4-Video: Advancing Multimodal LLMs for Video Understanding with Interleaved Visual-Textual Tokens},
+  author={Ataallah, Kirolos and Shen, Xiaoqian and Abdelrahman, Eslam and Sleiman, Essam and Zhu, Deyao and Ding, Jian and Elhoseiny, Mohamed},
+  journal={arXiv preprint arXiv:2404.03413},
+  year={2024}
 }
 ```
 
