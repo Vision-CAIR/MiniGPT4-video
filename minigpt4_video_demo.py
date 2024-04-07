@@ -308,7 +308,7 @@ with gr.Blocks(title="MiniGPT4-video 🎞️🍿",css=text_css ) as demo :
         # )
         with gr.Row():
             with gr.Column():
-                youtube_link = gr.Textbox(label="Enter the youtube link", placeholder="Paste YouTube URL here")
+                youtube_link = gr.Textbox(label="Enter the youtube link", placeholder="Paste YouTube URL with this format 'https://www.youtube.com/watch?v=video_id'")
                 video_player = gr.Video(autoplay=False)
                 download_finish = gr.State(value=False)
                 youtube_link.change(
