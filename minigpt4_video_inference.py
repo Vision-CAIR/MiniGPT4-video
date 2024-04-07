@@ -91,19 +91,20 @@ def extract_audio(video_path, audio_path):
     
 def generate_subtitles(video_path):
     video_id=video_path.split('/')[-1].split('.')[0]
-    audio_path = f"inference_subtitles/mp3/{video_id}"+'.mp3'
+    audio_path = f"workspace/inference_subtitles/mp3/{video_id}"+'.mp3'
+    os.makedirs("workspace/inference_subtitles/mp3",exist_ok=True)
     if existed_subtitles.get(video_id,False):
-        print("subtitle already generated")
-        return f"inference_subtitles/{video_id}"+'.vtt'
+        return f"workspace/inference_subtitles/{video_id}"+'.vtt'
     try:
         extract_audio(video_path,audio_path)
         print("successfully extracted")
-        os.system(f"whisper {audio_path}  --language English --model large --output_format vtt --output_dir inference_subtitles")
+        os.system(f"whisper {audio_path}  --language English --model large --output_format vtt --output_dir workspace/inference_subtitles")
         # remove the audio file
         os.system(f"rm {audio_path}")
         print("subtitle successfully generated")  
-        return f"inference_subtitles/{video_id}"+'.vtt'
-    except:
+        return f"workspace/inference_subtitles/{video_id}"+'.vtt'
+    except Exception as e:
+        print("error",e)
         print("error",video_path)
         return None
     
