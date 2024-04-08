@@ -146,10 +146,10 @@ def run (video_path,instruction,model,vis_processor,gen_subtitles=True):
     prompt = [conv.get_prompt()]
     answers = model.generate(prepared_images, prompt, max_new_tokens=args.max_new_tokens, do_sample=True, lengths=[length],num_beams=2)
     # remove the subtitle file and the video file
-    if subtitle_path:
-        os.system(f"rm {subtitle_path}")
-    if video_path.split('.')[-1] == 'mp4' or video_path.split('.')[-1] == 'mkv' or video_path.split('.')[-1] == 'avi':
-        os.system(f"rm {video_path}")
+    # if subtitle_path:
+    #     os.system(f"rm {subtitle_path}")
+    # if video_path.split('.')[-1] == 'mp4' or video_path.split('.')[-1] == 'mkv' or video_path.split('.')[-1] == 'avi':
+    #     os.system(f"rm {video_path}")
     return answers[0]
 
 def run_single_image (image_path,instruction,model,vis_processor):
