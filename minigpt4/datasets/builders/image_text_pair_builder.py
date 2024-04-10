@@ -806,6 +806,36 @@ class VideoChatGPTBuilder(BaseDatasetBuilder):
         )
 
         return datasets
+    
+@registry.register_builder("Name of the builder as in the config file")
+class VideoTemplateBuilder(BaseDatasetBuilder):
+    train_dataset_cls = ... # Add the dataset class here
+
+    DATASET_CONFIG_DICT = {
+        "default": "path to the config file",
+    }
+    print(DATASET_CONFIG_DICT)
+
+    def build_datasets(self):
+        # download, split, etc...
+        # only called on 1 GPU/TPU in distributed
+        self.build_processors()
+
+        build_info = self.config.build_info # information from the config file
+        datasets = dict()
+
+        # create datasets
+        dataset_cls = self.train_dataset_cls
+        datasets['train'] = dataset_cls(
+            vis_processor=self.vis_processors["train"], # Add the vis_processor here
+            text_processor=self.text_processors["train"], # Add the text_processor here
+            vis_root=build_info.vis_root, # Add videos path here
+            ann_paths=build_info.ann_paths, # Add annotations path here
+            subtitles_path=build_info.subtitles_path, # Add subtitles path here
+            model_name='llama2' # Add model name here (llama2 or mistral)
+        )
+
+        return datasets
 
 @registry.register_builder("r2r")
 class NavR2RBuilder(BaseDatasetBuilder):

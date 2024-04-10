@@ -50,9 +50,11 @@ python minigpt4_video_inference.py --ckpt path_to_video_checkpoint --cfg-path te
 python minigpt4_video_inference.py --ckpt path_to_video_checkpoint --cfg-path test_configs/mistral_test_config.yaml --video_path path_to_video --question "Your question here" 
 ```
 ## :fire: Training
-
+### To customize MiniGPT4-Video for your own Video-text dataset 
+<!-- point to file here Custom_training.md -->
+You can find the steps to customize MiniGPT4-Video for your own video-text dataset in [Custom_training.md](Custom_training.md)
 ### Training datasets
-After downloading the datasets below, **you should go to the datasets configuration folder here minigpt4/configs/datasets set the paths for each dataset there.**
+After downloading the datasets below, **you should go to the datasets configuration folder here minigpt4/configs/datasets set the paths for each dataset there.**<br>
 Image text training<br>
 You can find the steps to download the datasets in [MiniGPT4](https://github.com/Vision-CAIR/MiniGPT-4/tree/main/dataset)<br>
 + LAION <br>

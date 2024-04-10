@@ -263,8 +263,8 @@ class WebVidDataset(BaseDataset, __DisplMixin):
             ret, frame = cap.read()
             if not ret:
                 break
-            # Find the corresponding subtitle for the frame and combine the interval subtitles into one subtitle
-            # we choose 1 frame for every 2 seconds,so we need to combine the subtitles in the interval of 2 seconds
+            # Find the corresponding subtitle for the each frame and combine the interval subtitles into one subtitle
+
             if self.add_subtitles and has_subtitles:
                 for subtitle in vtt_file:
                     sub=subtitle.text.replace('\n',' ')
@@ -372,8 +372,8 @@ class VideoChatGPTDataset(BaseDataset, __DisplMixin):
             ret, frame = cap.read()
             if not ret:
                 break
-            # Find the corresponding subtitle for the frame and combine the interval subtitles into one subtitle
-            # we choose 1 frame for every 2 seconds,so we need to combine the subtitles in the interval of 2 seconds
+            # Find the corresponding subtitle for the each frame and combine the interval subtitles into one subtitle
+
             if self.add_subtitles and has_subtitles:
                 for subtitle in vtt_file:
                     sub=subtitle.text.replace('\n',' ')
@@ -532,8 +532,8 @@ class WebVidEvalDataset(torch.utils.data.Dataset):
             ret, frame = cap.read()
             if not ret:
                 break
-            # Find the corresponding subtitle for the frame and combine the interval subtitles into one subtitle
-            # we choose 1 frame for every 2 seconds,so we need to combine the subtitles in the interval of 2 seconds
+            # Find the corresponding subtitle for the each frame and combine the interval subtitles into one subtitle
+
             if self.add_subtitles and has_subtitles:
                 for subtitle in vtt_file:
                     sub=subtitle.text.replace('\n',' ')
@@ -635,8 +635,8 @@ class VideoChatGPTEvalDataset(torch.utils.data.Dataset):
             ret, frame = cap.read()
             if not ret:
                 break
-            # Find the corresponding subtitle for the frame and combine the interval subtitles into one subtitle
-            # we choose 1 frame for every 2 seconds,so we need to combine the subtitles in the interval of 2 seconds
+            # Find the corresponding subtitle for the each frame and combine the interval subtitles into one subtitle
+
             if self.add_subtitles and subtitle_path is not None:
                 for subtitle in vtt_file:
                     sub=subtitle.text.replace('\n',' ')
@@ -730,8 +730,8 @@ class Video_validation_Dataset(torch.utils.data.Dataset):
             ret, frame = cap.read()
             if not ret:
                 break
-            # Find the corresponding subtitle for the frame and combine the interval subtitles into one subtitle
-            # we choose 1 frame for every 2 seconds,so we need to combine the subtitles in the interval of 2 seconds
+            # Find the corresponding subtitle for the each frame and combine the interval subtitles into one subtitle
+
             if self.add_subtitles and subtitle_path is not None:
                 for subtitle in vtt_file:
                     sub=subtitle.text.replace('\n',' ')
@@ -827,8 +827,8 @@ class VideoChatGPTEval_consistancy(torch.utils.data.Dataset):
             ret, frame = cap.read()
             if not ret:
                 break
-            # Find the corresponding subtitle for the frame and combine the interval subtitles into one subtitle
-            # we choose 1 frame for every 2 seconds,so we need to combine the subtitles in the interval of 2 seconds
+            # Find the corresponding subtitle for the each frame and combine the interval subtitles into one subtitle
+
             if self.add_subtitles and subtitle_path is not None:
                 for subtitle in vtt_file:
                     sub=subtitle.text.replace('\n',' ')
@@ -919,8 +919,8 @@ class TVQAEVAL (torch.utils.data.Dataset):
         history_subtitles = {}
         number_of_sub_words=0
         for i,frame in enumerate(sorted(os.listdir(video_frames_path))):
-            # Find the corresponding subtitle for the frame and combine the interval subtitles into one subtitle
-            # we choose 1 frame for every 2 seconds,so we need to combine the subtitles in the interval of 2 seconds
+            # Find the corresponding subtitle for the each frame and combine the interval subtitles into one subtitle
+
             if self.add_subtitles:
                 for subtitle in self.subtitles[video_id]:
                     if (subtitle['start'] <= (i / self.fps) <= subtitle['end']) and subtitle['text'] not in subtitle_text_in_interval:
@@ -951,3 +951,113 @@ class TVQAEVAL (torch.utils.data.Dataset):
         images = torch.stack(images)
         instruction = img_placeholder + '\n' + instruction
         return images,instruction,answer,self.length,video_id  
+
+
+
+
+
+
+class Video_loader_template(BaseDataset, __DisplMixin):
+    def __init__(self, vis_processor, text_processor, vis_root, ann_paths,subtitles_path,model_name='llama2',add_subtitles=True):
+        """
+        vis_root (string): Root directory of images (e.g. coco/images/)
+        ann_root (string): directory to store the annotation file
+        """
+        super().__init__(vis_processor, text_processor, vis_root, ann_paths)
+        self.model_name=model_name
+        if self.model_name =='mistral':
+            self.length = 90
+            self.max_sub_len = 800
+        else:
+            self.length = 45
+            self.max_sub_len = 400
+        self.add_subtitles = add_subtitles
+        self.videos_has_subtitles = {}
+        if self.add_subtitles:
+            self.subtitle_folder = subtitles_path
+            for sub in os.listdir(self.subtitle_folder):
+                video_id = sub.split('.')[0]
+                self.videos_has_subtitles[video_id] = True
+        self.videos_extension={}
+        for video in os.listdir(os.path.join(self.vis_root,'videos')):
+            self.videos_extension[video.split('.')[0]]=video.split('.')[1]
+        self.transform = transforms.Compose([
+                transforms.ToPILImage(),
+            ])
+    def __len__(self):
+        return len(self.annotation)
+    def __getitem__(self, index):
+        ann = self.annotation[index]
+        video_id = ann["video_id"] # video_id
+        answer=ann["a"] # answer (ground truth)
+        instruction=ann["q"] # question (instruction)
+        images=[]
+        img_placeholder = ""
+        has_subtitles = self.videos_has_subtitles.get(video_id, False)
+        if self.add_subtitles and has_subtitles:
+            subtitle_path = os.path.join(self.subtitle_folder, f'{video_id}.vtt')
+            # Load the VTT subtitle file
+            vtt_file = webvtt.read(subtitle_path)
+                
+        video_path = os.path.join(self.vis_root,'videos',f'{video_id}.{self.videos_extension[video_id]}')
+        clip = VideoFileClip(video_path)
+        total_num_frames = int(clip.duration * clip.fps)
+        clip.close()
+        cap = cv2.VideoCapture(video_path)
+        frame_count = 0
+        # Choose sampling interval based on the total number of frames in the video and the desired length of the video
+        sampling_interval = int(total_num_frames / self.length)
+        if sampling_interval == 0:
+            sampling_interval = 1
+        img_placeholder = ""
+        subtitle_text_in_interval = ""
+        history_subtitles = {}
+        number_of_sub_words=0
+        # Iterate through the video frames and extract the frames based on the sampling interval and add the subtitles if needed
+        while cap.isOpened():
+            ret, frame = cap.read()
+            if not ret:
+                break
+            # Find the corresponding subtitle for the each frame and combine the interval subtitles into one subtitle
+            if self.add_subtitles and has_subtitles:
+                for subtitle in vtt_file:
+                    sub=subtitle.text.replace('\n',' ')
+                    if (subtitle.start_in_seconds <= (frame_count / int(clip.fps)) <= subtitle.end_in_seconds) and sub not in subtitle_text_in_interval:
+                        if not history_subtitles.get(sub,False):
+                            subtitle_text_in_interval+=sub+" "
+                        history_subtitles[sub]=True
+                        break
+            if frame_count % sampling_interval == 0:
+                frame = self.transform(frame[:,:,::-1])# BGR to RGB 
+                frame = self.vis_processor(frame)
+                images.append(frame)
+                img_placeholder += '<Img><ImageHere>'
+                if self.add_subtitles and has_subtitles and number_of_sub_words<self.max_sub_len:
+                    if subtitle_text_in_interval != "":
+                        img_placeholder+=f'<Cap>{subtitle_text_in_interval}'
+                        number_of_sub_words+=len(subtitle_text_in_interval.split(' '))
+                        subtitle_text_in_interval = ""
+            frame_count += 1
+            if len(images) >= self.length:
+                break
+        cap.release()
+        if len(images) ==0:
+            print("Video not found",video_path)
+            
+        if 0 <len(images) < self.length:
+            last_item = images[-1]
+            while len(images) < self.length:
+                images.append(last_item)
+                img_placeholder += '<Img><ImageHere>'
+        images = torch.stack(images)
+        # Combine the images and the instruction
+        instruction = img_placeholder + '\n' + instruction
+        # Return the images, instruction, answer, video_id, and the length of the video
+        return{
+            "image": images,
+            "answer": answer,
+            "image_id": video_id,
+            "instruction_input": instruction,
+            "length": self.length,
+        }
+        
