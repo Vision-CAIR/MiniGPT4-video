@@ -197,4 +197,4 @@ workspace/*
 flagged/*
 jobs_video/eval/choose_best_ckpt/*
 datasets/*
-demo_job.sh
+demo_job_new.sh
