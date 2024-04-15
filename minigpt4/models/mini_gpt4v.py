@@ -382,7 +382,12 @@ class MiniGPT4v(Blip2Base):
             cond_embeds, cond_atts = regress_embeds[:, :0], regress_atts[:, :0]
 
         else:
-            instruction = samples["instruction_input"] if "instruction_input" in samples else None
+            if "instruction_input" in samples:
+                instruction = samples["instruction_input"]
+            elif len(self.prompt_list) > 1:
+                instruction = random.choice(self.prompt_list)
+            else:
+                instruction = None
 
             # print("instruction before", instruction)
             if self.remove_template:
