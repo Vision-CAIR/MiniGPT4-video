@@ -5,7 +5,7 @@ model:
 
   max_txt_len: 160
   end_sym: "</s>"
-  prompt_path: "prompts/alignment.txt"
+  prompt_path: "alignment.txt"
   prompt_template: '[INST] {} [/INST] '
   ckpt: put your pretrained ckpt here
 
