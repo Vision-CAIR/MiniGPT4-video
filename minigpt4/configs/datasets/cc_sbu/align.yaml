@@ -2,4 +2,5 @@ datasets:
   cc_sbu_align:
     data_type: images
     build_info:
-      storage: "/ibex/project/c2133/minigpt4_1/MiniGPT-4/minigpt4/configs/datasets/cc_sbu_align"
+      # storage: "/ibex/project/c2090/datasets/cc_sbu_align"
+      storage: "path/to/cc_sbu_align/dataset"
