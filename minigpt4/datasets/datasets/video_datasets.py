@@ -334,7 +334,7 @@ class VideoChatGPTDataset(BaseDataset, __DisplMixin):
                 n+= 1
             
         self.videos_extension={}
-        for video in os.listdir(os.path.join(self.vis_root,'videos')):
+        for video in os.listdir(self.vis_root):
             self.videos_extension[video.split('.')[0]]=video.split('.')[1]
 
         self.transform = transforms.Compose([
@@ -355,7 +355,7 @@ class VideoChatGPTDataset(BaseDataset, __DisplMixin):
             # Load the VTT subtitle file
             vtt_file = webvtt.read(subtitle_path)
                 
-        video_path = os.path.join(self.vis_root,'videos',f'{video_id}.{self.videos_extension[video_id]}')
+        video_path = os.path.join(self.vis_root,f'{video_id}.{self.videos_extension[video_id]}')
         clip = VideoFileClip(video_path)
         total_num_frames = int(clip.duration * clip.fps)
         clip.close()
