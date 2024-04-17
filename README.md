@@ -3,7 +3,7 @@
 <!-- demo link  -->
 <a href='https://vision-cair.github.io/MiniGPT4-video/'><img src='https://img.shields.io/badge/Project-Page-Green'></a>
 <a href='https://arxiv.org/abs/2404.03413'><img src='https://img.shields.io/badge/Paper-PDF-red'></a>
-<a href='https://39a9ec33e00596cf3a.gradio.live'><img src='https://img.shields.io/badge/Project-Demo-violet'></a>
+<a href='https://f7a67744775413a943.gradio.live'><img src='https://img.shields.io/badge/Project-Demo-violet'></a>
 <!-- <a href='https://github.com/Vision-CAIR/MiniGPT4-video'><img src='https://img.shields.io/badge/Github-Code-blue'></a> -->
 ![demo_1](repo_imgs/sample_1.gif)
 ![demo_2](repo_imgs/sample_2.gif)
