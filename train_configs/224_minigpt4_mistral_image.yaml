@@ -2,7 +2,8 @@ model:
   arch: mini_gpt4_llama_v2
   model_type: pretrain_vicuna
   llama_model: "mistralai/Mistral-7B-Instruct-v0.2"
-
+  max_txt_len: 160
+  max_context_len: 512
 
 datasets:
   laion:
