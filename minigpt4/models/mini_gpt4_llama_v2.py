@@ -87,11 +87,6 @@ class MiniGPT4_llama_v2(Blip2Base):
         self.max_context_len = max_context_len
         self.chat_template = chat_template
 
-        # print('Loading VIT')
-        # self.visual_encoder, self.ln_vision = self.init_vision_encoder(
-        #     vit_model, img_size, drop_path_rate, use_grad_checkpoint, vit_precision
-        # )
-
         if freeze_vit:
             # vit_precision="fp32"
             print("vit precision", vit_precision)
@@ -147,18 +142,6 @@ class MiniGPT4_llama_v2(Blip2Base):
                 # device_map={'':0}
                 
             )
-            # bnb_config = BitsAndBytesConfig(
-            #         load_in_4bit=True,
-            #         bnb_4bit_use_double_quant=True,
-            #         bnb_4bit_quant_type="nf4",
-            #         bnb_4bit_compute_dtype=torch.bfloat16,
-            #     )
-            # self.llama_model = llm_model.from_pretrained(
-            #         llama_model,
-            #         torch_dtype=torch.bfloat16,
-            #         device_map={'':torch.cuda.current_device()},
-            #         quantization_config=bnb_config,
-            #     )
         else:
             self.llama_model = llm_model.from_pretrained(
                 llama_model,
@@ -182,24 +165,10 @@ class MiniGPT4_llama_v2(Blip2Base):
         )
         self.llama_model = get_peft_model(self.llama_model, loraconfig)
 
-        # if ckpt_path:
-        #     print('load the llm under lora')
-        #     ckpt = torch.load(ckpt_path)
-        #     set_peft_model_state_dict(self.llama_model,ckpt)
-
-
-
         self.llama_model.print_trainable_parameters()
 
         if self.use_grad_checkpoint_llm:
             self.llama_model.gradient_checkpointing_enable()
-
-        # if not self.low_resource:
-        #     for name, param in self.llama_model.named_parameters():
-        #         if "embed_token" in name:
-        #             param.data = param.data.float()
-        #             param.requires_grad = True
-        
        
         print('Loading LLAMA Done')
 
@@ -256,15 +225,6 @@ class MiniGPT4_llama_v2(Blip2Base):
         mixed_embs = [emb for pair in zip(seg_embs[:-1], img_list) for emb in pair] + [seg_embs[-1]]
 
         mixed_embs = torch.cat(mixed_embs, dim=1)
-        #  # truncate the length of tokens to the max context window
-        # mixed_embs_without_instruction = [emb for pair in zip(seg_embs[:-1], img_list) for emb in pair]
-        # mixed_embs_without_instruction=torch.cat(mixed_embs_without_instruction, dim=1)
-        # # check if the number of token in the second dimention is more than the max context window then truncate it
-        # context_window=self.max_context_len-seg_embs[-1].shape[1]
-        # if mixed_embs_without_instruction.shape[1] > context_window :
-        #     mixed_embs_without_instruction = mixed_embs_without_instruction[:, 0:context_window] 
-        # mixed_embs=torch.cat([mixed_embs_without_instruction,seg_embs[-1]], dim=1)        
-        # print("mixed_embs",mixed_embs.shape)
         
         return mixed_embs
 
@@ -288,7 +248,8 @@ class MiniGPT4_llama_v2(Blip2Base):
         else:
             # return the multi-modal embedding in right padding
             emb_lists = []
-
+            if type(prompts) == str:
+                prompts = [prompts] * len(img_embeds)
             for idx, (each_img_embed, each_prompt) in enumerate(zip(img_embeds, prompts)):
                 pn = each_img_embed.shape[-2]
                 if lengths is not None:
@@ -299,12 +260,8 @@ class MiniGPT4_llama_v2(Blip2Base):
                 interleave_emb = []
                 for idx, seg in enumerate(p_segs[:-1]):
                     p_tokens = self.llama_tokenizer(seg, return_tensors="pt", add_special_tokens=False).to(img_embeds.device)
-                    # print("p_embed device",p_tokens.input_ids.device)
-                    # print("p_tokens",img_embeds.device)
-                    # print("emb layer", list(self.llama_model.base_model.model.model.embed_tokens.parameters())[0].device)
                     p_embed = self.embed_tokens(p_tokens.input_ids)
                     
-                    # print("model device",self.llama_model.get_device())
                     interleave_emb.append(torch.cat([p_embed, each_img_embed[None][:, idx*pn:(idx+1)*pn]], dim=1))
 
                 wrapped_emb = torch.cat(interleave_emb, dim=1)
@@ -356,17 +313,6 @@ class MiniGPT4_llama_v2(Blip2Base):
                     input_atts[i][input_len:]
                 ])
             )
-            # print('===================================')
-            # print('check input emb: ', input_embs[i][this_input_ones-2:this_input_ones])
-            # print('check pad emb: ', input_embs[i][this_input_ones:this_input_ones+2])
-            # print('check out emb: ', output_embs[i][:2])
-            # print('check out pad emb: ', output_embs[i][-2:])
-            # print('+++++++++++++++++++++++++++++++++++')
-            #
-            # print('check attn before: ', input_atts[i][:this_input_ones])
-            # print('check attn after: ', input_atts[i][this_input_ones:])
-            # print('check attn gt before: ', output_atts[i][:3])
-            # print('check attn gt after: ', output_atts[i][-3:])
 
         cat_embs = torch.stack(cat_embs)
         cat_atts = torch.stack(cat_atts)
@@ -433,7 +379,6 @@ class MiniGPT4_llama_v2(Blip2Base):
         ### prepare input tokens
         if 'image' in samples:
             img_embeds, img_atts = self.encode_img(samples["image"])
-            # print("img_embeds shape",img_embeds.shape)
         else:
             img_embeds = img_atts = None
 
@@ -460,10 +405,8 @@ class MiniGPT4_llama_v2(Blip2Base):
             else:
                 instruction = None
 
-            # print("instruction before", instruction)
             if self.remove_template:
                 instruction = remove_special_tokens(instruction)
-            # print("instruction after", instruction)
                 
             if self.chat_template:
                 instruction = ["[INST] " + instruct + "[/INST]" for instruct in instruction]
@@ -507,9 +450,6 @@ class MiniGPT4_llama_v2(Blip2Base):
         # concat the embedding to condition and the embedding to regress
         inputs_embeds, attention_mask, input_lens = \
             self.concat_emb_input_output(cond_embeds, cond_atts, regress_embeds, regress_atts)
-        print("inputs_embeds shape",inputs_embeds.shape)
-        print("cond_embeds shape",cond_embeds.shape)
-        print("regress_embeds shape",regress_embeds.shape)
         # get bos token embedding
         bos = torch.ones_like(part_targets[:, :1]) * self.llama_tokenizer.bos_token_id
         bos_embeds = self.embed_tokens(bos)
@@ -518,16 +458,12 @@ class MiniGPT4_llama_v2(Blip2Base):
         # add bos token at the begining
         inputs_embeds = torch.cat([bos_embeds, inputs_embeds], dim=1)
         attention_mask = torch.cat([bos_atts, attention_mask], dim=1)
-        # print length of instruction_input and answer words 
-        # for i in range (len(samples["instruction_input"])):
-        #     print("instruction_input length",len(samples["instruction_input"][i].split(" ")))
-        #     print("answer length",len(samples["answer"][i].split(" ")))
-        # ensemble the final targets
+
         targets = torch.ones([inputs_embeds.shape[0], inputs_embeds.shape[1]],
                              dtype=torch.long).to(self.device).fill_(-100)
         for i, target in enumerate(part_targets):
             targets[i, input_lens[i]+1:input_lens[i]+len(target)+1] = target  # plus 1 for bos
-        print("targets shape",targets.shape)
+
         with self.maybe_autocast():
             outputs = self.llama_model(
                 inputs_embeds=inputs_embeds,
@@ -574,7 +510,6 @@ class MiniGPT4_llama_v2(Blip2Base):
             img_embeds = self.llama_proj(img_embeds) # project to llama input size (200,64,5632) -> (200,64,4096)
             atts_img = torch.ones(img_embeds.size()[:-1], dtype=torch.long).to(self.device)
             
-        print("img_embeds shape",img_embeds.shape) 
         if lengths is not None:
             image_lists = []
             img_embeds = img_embeds.reshape(len(lengths), -1, img_embeds.shape[-2], img_embeds.shape[-1])
@@ -597,8 +532,6 @@ class MiniGPT4_llama_v2(Blip2Base):
             emb_len = emb.shape[1]
             embs[i, -emb_len:] = emb[0]
             attn_mask[i, -emb_len:] = 1
-        # print("inputs_embeds shape",embs.shape)
-        # print("attention_mask shape",attn_mask.shape)
         # check if the input embedding tokens are in the range of the model cotext window (4096) and if it is not, then truncate it to the max context window
         if self.model_type == "Llama":
             context_window = 3700
@@ -607,8 +540,6 @@ class MiniGPT4_llama_v2(Blip2Base):
         if embs.shape[1] > context_window:
             embs = embs[:, -context_window:]
             attn_mask = attn_mask[:, -context_window:]
-        print("inputs_embeds shape",embs.shape)
-        print("attention_mask shape",attn_mask.shape)
         with self.maybe_autocast():
             if return_video_temporal_features:
                 last_hidden_state = self.llama_model(
@@ -670,15 +601,8 @@ class MiniGPT4_llama_v2(Blip2Base):
         stopping_criteria = StoppingCriteriaList([StoppingCriteriaSub(
             stops=[torch.tensor([i]).to(self.device) for i in stop_words_ids])])
         
-        # seg_tokens=[]
-        # for i, text in enumerate(texts):
-        #     seg_tokens.append(self.llama_tokenizer(text, return_tensors="pt", add_special_tokens=True).to(self.device).input_ids)
-
         batch_embs = [torch.cat([self.embed_tokens(seg_t)]) for seg_t in seg_tokens]
 
-        # seg_embs = torch.cat(seg_embs, dim=1)
-        # print("seg_embs shape",seg_embs.shape)
-        # batch_embs=[seg_embs]
         batch_size = len(batch_embs)
         max_len = max([emb.shape[1] for emb in batch_embs])
         emb_dim = batch_embs[0].shape[2]
@@ -692,9 +616,6 @@ class MiniGPT4_llama_v2(Blip2Base):
             embs[i, -emb_len:] = emb[0]
             attn_mask[i, -emb_len:] = 1
         
-        
-        print("inputs_embeds shape",embs.shape)
-        print("attention_mask shape",attn_mask.shape)
         with self.maybe_autocast():
             outputs = self.llama_model.generate(
                 inputs_embeds=embs,
