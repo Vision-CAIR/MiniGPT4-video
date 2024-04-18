@@ -4,8 +4,9 @@ model:
   llama_model: "mistralai/Mistral-7B-Instruct-v0.2"
 
   max_txt_len: 160
+  max_context_len: 512
   end_sym: "</s>"
-  prompt_path: "alignment.txt"
+  prompt_path: "train_configs/alignment.txt"
   prompt_template: '[INST] {} [/INST] '
   ckpt: put your pretrained ckpt here
 
