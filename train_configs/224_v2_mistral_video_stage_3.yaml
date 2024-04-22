@@ -46,7 +46,7 @@ run:
   iters_per_epoch: 875
 
   seed: 42
-  output_dir: "training_output/pretrained_video_instruct"
+  output_dir: "training_output/pretrained_video_instruct/mistral"
 
   amp: True
   resume_ckpt_path: null

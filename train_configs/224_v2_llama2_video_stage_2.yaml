@@ -56,7 +56,7 @@ run:
   iters_per_epoch: 1000
 
   seed: 42
-  output_dir: "training_output/cmd_webvid_pretrain"
+  output_dir: "training_output/cmd_webvid_pretrain/llama2"
 
   amp: True
   resume_ckpt_path: null
