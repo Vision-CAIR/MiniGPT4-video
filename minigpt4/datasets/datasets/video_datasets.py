@@ -7,7 +7,8 @@
 
 import os
 from collections import OrderedDict
-import sys 
+import sys
+sys.path.append('/ibex/project/c2090/kirolos/MiniGPT4-video-llama3')
 from minigpt4.datasets.datasets.base_dataset import BaseDataset
 from PIL import Image
 import random
@@ -98,7 +99,7 @@ class __DisplMixin:
 
 
 class CMDVideoDataset(BaseDataset, __DisplMixin):
-    def __init__(self, vis_processor, text_processor, vis_root, ann_paths, cc_path,model_name='llama2'):
+    def __init__(self, vis_processor, text_processor, vis_root, ann_paths, subtitles_path,model_name='llama2'):
         """
         vis_root (string): Root directory of images (e.g. coco/images/)
         ann_root (string): directory to store the annotation file
@@ -119,8 +120,7 @@ class CMDVideoDataset(BaseDataset, __DisplMixin):
             'Please provide a depiction of the video.',
             'Illustrate what is happening in the video.',
         ]
-        self.img_ids = {}
-        n = 0
+
         self.model_name=model_name
         if self.model_name =='mistral':
             self.length = 90
@@ -128,59 +128,87 @@ class CMDVideoDataset(BaseDataset, __DisplMixin):
         else:
             self.length = 45
             self.max_sub_len = 400
-        for ann in self.annotation:
-            img_id = ann["image_id"]
-            if img_id not in self.img_ids.keys():
-                self.img_ids[img_id] = n
-                n += 1
         
-        self.cc = json.load(open(cc_path,'r'))
-        self.image_sep = "<Img>"
-        self.text_sep = "<Cap>"
+        self.subtitle_folder = subtitles_path
+        self.videos_has_subtitles={}
+        for sub in os.listdir(self.subtitle_folder):
+            video_id = sub.split('.')[0]
+            self.videos_has_subtitles[video_id] = True
+        self.transform = transforms.Compose([
+                transforms.ToPILImage(),
+            ])
 
     def __getitem__(self, index):
         ann = self.annotation[index]
         video_id = ann["image_id"]
-        captions = self.cc[video_id] if video_id in self.cc else None
-        answer = self.text_processor(ann["caption"])
+        answer =ann['caption']
         instruction = random.choice(self.instruction_pool)
-        images = []
-        img_placeholder = ""
-        num_of_images=len(os.listdir(os.path.join(self.vis_root, video_id)))            
-        sampling_interval = int(num_of_images / self.length)
+        has_subtitles = self.videos_has_subtitles.get(video_id, False)
+        if has_subtitles:
+            subtitle_path = os.path.join(self.subtitle_folder, f'{video_id}.en.vtt')
+            # Load the VTT subtitle file
+            vtt_file = webvtt.read(subtitle_path)
+        video_path = os.path.join(self.vis_root, f'{video_id}.mp4')
+        clip = VideoFileClip(video_path)
+        total_num_frames = int(clip.duration * clip.fps)
+        clip.close()
+        cap = cv2.VideoCapture(video_path)
+        frame_count = 0
+        sampling_interval = int(total_num_frames / self.length)
         if sampling_interval == 0:
             sampling_interval = 1
-        num_of_words=0
-        for frame_id in range(0,num_of_images,sampling_interval):
-            image_path = os.path.join(self.vis_root, video_id, f'frame_{frame_id}.jpg')
-            image = Image.open(image_path).convert("RGB")
-            image = self.vis_processor(image)
-            images.append(image)
-            img_placeholder += f"{self.image_sep}<ImageHere>"
-            time_step = str(frame_id * 2)
-            if captions is not None:
-                if time_step in captions:
-                    num_of_words+=len(captions[time_step].split(' '))
-                    if num_of_words<self.max_sub_len:
-                        img_placeholder += f"{self.text_sep}{captions[time_step]}"
+        img_placeholder = ""
+        subtitle_text_in_interval = ""
+        number_of_sub_words=0
+        images=[]
+        history_subtitles = {}
+        previous_sub = ""
+        while cap.isOpened():
+            ret, frame = cap.read()
+            if not ret:
+                break
+            # Find the corresponding subtitle for the each frame and combine the interval subtitles into one subtitle
+            if has_subtitles:
+                for subtitle in vtt_file:
+                    sub=subtitle.text.replace('\n',' ')
+                    if (subtitle.start_in_seconds <= (frame_count / int(clip.fps)) <= subtitle.end_in_seconds):
+                        if not history_subtitles.get(sub,False):
+                            for word in sub.split(' '):
+                                if word not in subtitle_text_in_interval and word not in previous_sub:
+                                    subtitle_text_in_interval+=word+" "
+                        history_subtitles[sub]=True
+            if frame_count % sampling_interval == 0:
+                frame = self.transform(frame[:,:,::-1])# BGR to RGB 
+                frame = self.vis_processor(frame)
+                images.append(frame)
+                img_placeholder += '<Img><ImageHere>'
+                if has_subtitles and number_of_sub_words<self.max_sub_len:
+                    if subtitle_text_in_interval != "":
+                        img_placeholder+=f'<Cap>{subtitle_text_in_interval}'
+                        number_of_sub_words+=len(subtitle_text_in_interval.split(' '))
+                        previous_sub = subtitle_text_in_interval
+                        subtitle_text_in_interval = ""
+            frame_count += 1
             if len(images) >= self.length:
                 break
-        
-        if len(images) < self.length:
+        cap.release()
+        if len(images) ==0:
+            print("Video not found",video_path)
+            
+        if 0 <len(images) < self.length:
             last_item = images[-1]
             while len(images) < self.length:
                 images.append(last_item)
+                img_placeholder += '<Img><ImageHere>'
         images = torch.stack(images)
-        instruction = f"{img_placeholder}\n{instruction}"
-        return {
+        instruction = img_placeholder + '\n' + instruction
+        return{
             "image": images,
             "answer": answer,
             "image_id": video_id,
             "instruction_input": instruction,
             "length": self.length,
         }
-
-
 
 
 class WebVidDataset(BaseDataset, __DisplMixin):
@@ -205,8 +233,6 @@ class WebVidDataset(BaseDataset, __DisplMixin):
             'Please provide a depiction of the video.',
             'Illustrate what is happening in the video.',
         ]
-        self.img_ids = {}
-        n = 0
         self.model_name=model_name
         if self.model_name =='mistral':
             self.length = 90
@@ -221,23 +247,16 @@ class WebVidDataset(BaseDataset, __DisplMixin):
             for sub in os.listdir(self.subtitle_folder):
                 video_id = sub.split('.')[0]
                 self.videos_has_subtitles[video_id] = True
-        for ann in self.annotation:
-            img_id = ann["videoid"]
-            if img_id not in self.img_ids.keys():
-                self.img_ids[img_id] = n
-                n += 1
         self.transform = transforms.Compose([
                 transforms.ToPILImage(),
             ])
 
     def __getitem__(self, index):
         ann = self.annotation[index]
-
         video_id = ann["videoid"]
         images = []
         caption = ann["name"].split('-')[-1].split(':')[-1]
         # caption = self.text_processor(caption)
-
         video_path = os.path.join(self.vis_root, ann['page_dir'], f'{video_id}.mp4')
         has_subtitles = self.videos_has_subtitles.get(video_id, False)
         if self.add_subtitles and has_subtitles:
@@ -259,6 +278,7 @@ class WebVidDataset(BaseDataset, __DisplMixin):
         subtitle_text_in_interval = ""
         history_subtitles = {}
         number_of_sub_words=0
+        previous_sub = ""
         while cap.isOpened():
             ret, frame = cap.read()
             if not ret:
@@ -268,11 +288,12 @@ class WebVidDataset(BaseDataset, __DisplMixin):
             if self.add_subtitles and has_subtitles:
                 for subtitle in vtt_file:
                     sub=subtitle.text.replace('\n',' ')
-                    if (subtitle.start_in_seconds <= (frame_count / int(clip.fps)) <= subtitle.end_in_seconds) and sub not in subtitle_text_in_interval:
+                    if (subtitle.start_in_seconds <= (frame_count / int(clip.fps)) <= subtitle.end_in_seconds):
                         if not history_subtitles.get(sub,False):
-                            subtitle_text_in_interval+=sub+" "
+                            for word in sub.split(' '):
+                                if word not in subtitle_text_in_interval and word not in previous_sub:
+                                    subtitle_text_in_interval+=word+" "
                         history_subtitles[sub]=True
-                        break
             if frame_count % sampling_interval == 0:
                 frame = self.transform(frame[:,:,::-1])
                 frame = self.vis_processor(frame)
@@ -281,6 +302,7 @@ class WebVidDataset(BaseDataset, __DisplMixin):
                 if self.add_subtitles and has_subtitles and subtitle_text_in_interval != "" and number_of_sub_words<self.max_sub_len:
                     img_placeholder+=f'<Cap>{subtitle_text_in_interval}'
                     number_of_sub_words+=len(subtitle_text_in_interval.split(' '))
+                    previous_sub = subtitle_text_in_interval
                     subtitle_text_in_interval = ""
             frame_count += 1
             if len(images) >= self.length:
@@ -368,6 +390,7 @@ class VideoChatGPTDataset(BaseDataset, __DisplMixin):
         subtitle_text_in_interval = ""
         history_subtitles = {}
         number_of_sub_words=0
+        previous_sub = ""
         while cap.isOpened():
             ret, frame = cap.read()
             if not ret:
@@ -377,11 +400,12 @@ class VideoChatGPTDataset(BaseDataset, __DisplMixin):
             if self.add_subtitles and has_subtitles:
                 for subtitle in vtt_file:
                     sub=subtitle.text.replace('\n',' ')
-                    if (subtitle.start_in_seconds <= (frame_count / int(clip.fps)) <= subtitle.end_in_seconds) and sub not in subtitle_text_in_interval:
+                    if (subtitle.start_in_seconds <= (frame_count / int(clip.fps)) <= subtitle.end_in_seconds):
                         if not history_subtitles.get(sub,False):
-                            subtitle_text_in_interval+=sub+" "
+                            for word in sub.split(' '):
+                                if word not in subtitle_text_in_interval and word not in previous_sub:
+                                    subtitle_text_in_interval+=word+" "
                         history_subtitles[sub]=True
-                        break
             if frame_count % sampling_interval == 0:
                 frame = self.transform(frame[:,:,::-1])# BGR to RGB 
                 frame = self.vis_processor(frame)
@@ -391,6 +415,7 @@ class VideoChatGPTDataset(BaseDataset, __DisplMixin):
                     if subtitle_text_in_interval != "":
                         img_placeholder+=f'<Cap>{subtitle_text_in_interval}'
                         number_of_sub_words+=len(subtitle_text_in_interval.split(' '))
+                        previous_sub = subtitle_text_in_interval
                         subtitle_text_in_interval = ""
             frame_count += 1
             if len(images) >= self.length:
@@ -1060,4 +1085,4 @@ class Video_loader_template(BaseDataset, __DisplMixin):
             "instruction_input": instruction,
             "length": self.length,
         }
-        
+             
