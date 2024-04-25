@@ -1,4 +1,4 @@
-name: minigpt4_video_test_v100
+name: minigpt4_video
 channels:
   - conda-forge
 dependencies:
