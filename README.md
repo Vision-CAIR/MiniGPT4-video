@@ -1,5 +1,5 @@
 # MiniGPT4-Video: Advancing Multimodal LLMs for Video Understanding with Interleaved Visual-Textual Tokens
-<center><a href='https://huggingface.co/spaces/Vision-CAIR/MiniGPT4-video'><img src='repo_imgs/minigpt4_demo_icon.png' width=200 height=200 ></a></center>
+<center><a href='https://huggingface.co/spaces/Vision-CAIR/MiniGPT4-video'><img src='repo_imgs/minigpt4_demo_icon.png' width=200 height=200 align="center"></a></center>
 
 <h3 align="center">Online Demo </h3>
 
