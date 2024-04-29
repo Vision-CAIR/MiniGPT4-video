@@ -1,9 +1,12 @@
 # MiniGPT4-Video: Advancing Multimodal LLMs for Video Understanding with Interleaved Visual-Textual Tokens
-<center><a href='https://huggingface.co/spaces/Vision-CAIR/MiniGPT4-video'><img src='repo_imgs/minigpt4_demo_icon.png' width=200 height=200 ></a>
-<h3>Online Demo </h3>
+<center><a href='https://huggingface.co/spaces/Vision-CAIR/MiniGPT4-video'><img src='repo_imgs/minigpt4_demo_icon.png' width=200 height=200 ></a></center>
 
-<a href='https://vision-cair.github.io/MiniGPT4-video/'><img src='https://img.shields.io/badge/Project-Page-Green'></a>
-<a href='https://arxiv.org/abs/2404.03413'><img src='https://img.shields.io/badge/Paper-PDF-red'></a>
+<h3 align="center">Online Demo </h3>
+
+<p align="center">
+  <a href='https://vision-cair.github.io/MiniGPT4-video/'><img src='https://img.shields.io/badge/Project-Page-Green'></a>
+  <a href='https://arxiv.org/abs/2404.03413'><img src='https://img.shields.io/badge/Paper-PDF-red'></a>
+</p>
 
 [//]: # (<a href='https://huggingface.co/spaces/Vision-CAIR/MiniGPT4-video'><img src='https://img.shields.io/badge/Project-Demo-violet'></a>)
 ![demo_1](repo_imgs/sample_1.gif)
