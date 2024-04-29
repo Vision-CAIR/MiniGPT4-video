@@ -1,6 +1,6 @@
 # MiniGPT4-Video: Advancing Multimodal LLMs for Video Understanding with Interleaved Visual-Textual Tokens
-<h3>Try our Online Demo now</h3>
-<a href='https://huggingface.co/spaces/Vision-CAIR/MiniGPT4-video'><img src='repo_imgs/online_demo.jpeg' width=100 height=100 ></a>
+<center><a href='https://huggingface.co/spaces/Vision-CAIR/MiniGPT4-video'><img src='repo_imgs/minigpt4_demo_icon.png' width=200 height=200 ></a>
+<h3>Online Demo </h3>
 
 <a href='https://vision-cair.github.io/MiniGPT4-video/'><img src='https://img.shields.io/badge/Project-Page-Green'></a>
 <a href='https://arxiv.org/abs/2404.03413'><img src='https://img.shields.io/badge/Paper-PDF-red'></a>
