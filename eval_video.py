@@ -30,62 +30,55 @@ conv_temp = CONV_VISION.copy()
 conv_temp.system = ""
 if args.dataset == 'video_chatgpt_generic':
     ann_path="datasets/evaluation_datasets/videochatgpt_benchmark/generic_qa.json"
-    videos_path="/ibex/project/c2090/datasets/VideoInstruct100K/test_videos/Test_Videos"
-    subtitles_path="/home/ataallka/minigpt_video/minigpt_multi_img/inference_subtitles"
-    videos_features_path="/ibex/project/c2106/kirolos/videos_features/evaluation/benchmark/generic"
+    videos_path= "videos path"
+    subtitles_path="whisper_generated_subtitles"
     annotations_keys=['Q','A','video_name']
-    data = VideoChatGPTEvalDataset(vis_processor, videos_path, ann_path,subtitles_path,annotations_keys,videos_features_path, add_subtitles=args.add_subtitles,llm_name=llm_name)
+    data = VideoChatGPTEvalDataset(vis_processor, videos_path, ann_path,subtitles_path,annotations_keys, add_subtitles=args.add_subtitles,llm_name=llm_name)
 elif args.dataset == 'video_chatgpt_temporal':
     ann_path="datasets/evaluation_datasets/videochatgpt_benchmark/temporal_qa.json"
-    videos_path="/ibex/project/c2090/datasets/VideoInstruct100K/test_videos/Test_Videos"
-    subtitles_path="/home/ataallka/minigpt_video/minigpt_multi_img/inference_subtitles"
-    videos_features_path="/ibex/project/c2106/kirolos/videos_features/evaluation/benchmark/temporal"
+    videos_path= "videos path"
+    subtitles_path="whisper_generated_subtitles"
     annotations_keys=['Q','A','video_name']
-    data = VideoChatGPTEvalDataset(vis_processor, videos_path, ann_path,subtitles_path,annotations_keys,videos_features_path, add_subtitles=args.add_subtitles,llm_name=llm_name)
+    data = VideoChatGPTEvalDataset(vis_processor, videos_path, ann_path,subtitles_path,annotations_keys, add_subtitles=args.add_subtitles,llm_name=llm_name)
 elif args.dataset == 'video_chatgpt_consistency':
     ann_path="datasets/evaluation_datasets/videochatgpt_benchmark/consistency_qa.json"
-    videos_path="/ibex/project/c2090/datasets/VideoInstruct100K/test_videos/Test_Videos"
-    subtitles_path="/home/ataallka/minigpt_video/minigpt_multi_img/inference_subtitles"
+    videos_path= "videos path"
+    subtitles_path="whisper_generated_subtitles"
     annotations_keys=[['Q1','Q2'],'A','video_name']
     data = VideoChatGPTEval_consistancy(vis_processor, videos_path, ann_path,subtitles_path,annotations_keys, add_subtitles=args.add_subtitles,llm_name=llm_name)
     
 elif args.dataset == 'msrvtt':
     ann_path="datasets/evaluation_datasets/msrvtt/val_qa_edited.json"
-    videos_path="/ibex/project/c2090/datasets/VideoInstruct100K/test_videos/MSRVTT/videos/all"
-    subtitles_path="/home/ataallka/minigpt_video/minigpt_multi_img/inference_subtitles"
-    videos_features_path="/ibex/project/c2106/kirolos/videos_features/evaluation/msrvtt"
+    videos_path= "videos path"
+    subtitles_path="whisper_generated_subtitles"
     annotations_keys=['question','answer','video_id']
-    data = VideoChatGPTEvalDataset(vis_processor, videos_path, ann_path,subtitles_path,annotations_keys,videos_features_path, add_subtitles=args.add_subtitles,llm_name=llm_name)
+    data = VideoChatGPTEvalDataset(vis_processor, videos_path, ann_path,subtitles_path,annotations_keys, add_subtitles=args.add_subtitles,llm_name=llm_name)
 
 elif args.dataset == 'msvd':
     ann_path="datasets/evaluation_datasets/msvd/val_qa_edited.json"
-    videos_path="/ibex/project/c2090/datasets/VideoInstruct100K/test_videos/MSVD-QA/videos"
-    subtitles_path="/home/ataallka/minigpt_video/minigpt_multi_img/inference_subtitles"
-    videos_features_path="/ibex/project/c2106/kirolos/videos_features/evaluation/msvd"
+    videos_path= "videos path"
+    subtitles_path="" # no subtitles for msvd as these videos don't have audio 
     annotations_keys=['question','answer','video_id']
-    data = VideoChatGPTEvalDataset(vis_processor, videos_path, ann_path,subtitles_path,annotations_keys,videos_features_path, add_subtitles=args.add_subtitles,llm_name=llm_name)
+    data = VideoChatGPTEvalDataset(vis_processor, videos_path, ann_path,subtitles_path,annotations_keys, add_subtitles=args.add_subtitles,llm_name=llm_name)
 elif args.dataset == 'activitynet':
     ann_path="datasets/evaluation_datasets/activityNet/test_qa.json"
-    videos_path="/ibex/project/c2090/datasets/VideoInstruct100K/test_videos/Activity_net/Activity_net_videos"
-    subtitles_path="/home/ataallka/minigpt_video/minigpt_multi_img/inference_subtitles/"
-    videos_features_path="/ibex/project/c2106/kirolos/videos_features/evaluation/activity_net"
+    videos_path= "videos path"
+    subtitles_path="whisper_generated_subtitles"
     annotations_keys=['question','answer','video_id']
-    data = VideoChatGPTEvalDataset(vis_processor, videos_path, ann_path,subtitles_path,annotations_keys,videos_features_path, add_subtitles=args.add_subtitles,llm_name=llm_name)
+    data = VideoChatGPTEvalDataset(vis_processor, videos_path, ann_path,subtitles_path,annotations_keys, add_subtitles=args.add_subtitles,llm_name=llm_name)
 elif args.dataset == 'tgif':
     ann_path="datasets/evaluation_datasets/tgif/Test_frameqa_question.json"
-    videos_path="/ibex/project/c2090/datasets/VideoInstruct100K/test_videos/TGIF/mp4s"
-    subtitles_path="/home/ataallka/minigpt_video/minigpt_multi_img/inference_subtitles"
-    videos_features_path="/ibex/project/c2106/kirolos/videos_features/evaluation/tgif"
+    videos_path= "videos path"
+    subtitles_path="" # no subtitles for TGIF as these videos don't have audio
     annotations_keys=['question','answer','gif_name']
     # annotations_keys=['question','description','gif_name']
-    data = VideoChatGPTEvalDataset(vis_processor, videos_path, ann_path,subtitles_path,annotations_keys,videos_features_path, add_subtitles=False,llm_name=llm_name)
+    data = VideoChatGPTEvalDataset(vis_processor, videos_path, ann_path,subtitles_path,annotations_keys, add_subtitles=False,llm_name=llm_name)
 elif args.dataset == 'tvqa':
     # TVQA dataset
     ann_path="datasets/evaluation_datasets/tvqa_short/tvqa_val.json"
-    videos_path= "/ibex/project/c2090/datasets/TVR_dataset/videos/video_files/frames_hq/"
-    subtitles_path="/ibex/project/c2090/datasets/TVR_dataset/TVRetrieval/data/tvqa_preprocessed_subtitles.json"
-    videos_features_path="/ibex/project/c2106/kirolos/videos_features/evaluation/tvqa"
-    data = TVQAEVAL(vis_processor, videos_path, ann_path,subtitles_path,videos_features_path,add_subtitles=args.add_subtitles,llm_name=llm_name)
+    videos_path= "videos path"
+    subtitles_path="tvqa subtitles"
+    data = TVQAEVAL(vis_processor, videos_path, ann_path,subtitles_path,add_subtitles=args.add_subtitles,llm_name=llm_name)
 
 eval_dataloader = DataLoader(data, batch_size=args.batch_size, shuffle=False)
 

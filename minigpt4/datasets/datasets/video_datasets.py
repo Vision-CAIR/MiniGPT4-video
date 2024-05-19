@@ -602,7 +602,7 @@ class WebVidEvalDataset(torch.utils.data.Dataset):
 
 
 class VideoChatGPTEvalDataset(torch.utils.data.Dataset):
-    def __init__(self, vis_processor, videos_path, ann_path,subtitles_path,annotations_keys,videos_features_path,add_subtitles=True,llm_name="llama2"):
+    def __init__(self, vis_processor, videos_path, ann_path,subtitles_path,annotations_keys,add_subtitles=True,llm_name="llama2"):
         if llm_name=="llama2":
             self.length = 45
             self.max_sub_len = 400
@@ -628,7 +628,7 @@ class VideoChatGPTEvalDataset(torch.utils.data.Dataset):
         self.transform = transforms.Compose([
                 transforms.ToPILImage(),
             ])
-        self.videos_features_path=videos_features_path
+        
     def __len__(self):
         return len(self.annotation)
     def __getitem__(self, index):
@@ -892,7 +892,7 @@ class VideoChatGPTEval_consistancy(torch.utils.data.Dataset):
 
                         
 class TVQAEVAL (torch.utils.data.Dataset):
-    def __init__(self, vis_processor, videos_path, ann_path,subtitles_path,videos_features_path,add_subtitles=True,llm_name="llama2"):
+    def __init__(self, vis_processor, videos_path, ann_path,subtitles_path,add_subtitles=True,llm_name="llama2"):
         self.tv_shows_mapping={"Grey's Anatomy":"grey_frames", 'How I Met You Mother':"met_frames", 'Friends':"friends_frames", 'The Big Bang Theory':"bbt_frames", 'House M.D.':"house_frames", 'Castle':"castle_frames"} 
         self.fps=3
         if llm_name=="llama2":
@@ -914,12 +914,7 @@ class TVQAEVAL (torch.utils.data.Dataset):
         self.transform = transforms.Compose([
                 transforms.ToPILImage(),
             ])
-        self.videos_features_path=videos_features_path
-        self.processed_videos={}
-        self.save_pkl="subtitles" if self.add_subtitles else "no_subtitles"
-        for video_pkl in os.listdir(videos_features_path):
-            video_id_sub=video_pkl.split('.')[0]
-            self.processed_videos[video_id_sub]=True
+        
     def __len__(self):
         return len(self.annotation)
     def __getitem__(self, index):
