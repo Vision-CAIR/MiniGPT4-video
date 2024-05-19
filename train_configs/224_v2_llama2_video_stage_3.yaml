@@ -7,8 +7,8 @@ model:
   low_resource: False
   image_size: 224
   end_sym: "</s>"
-  llama_model: "meta-llama/Meta-Llama-3-8B-Instruct"
-  # ckpt: "checkpoints/video_captioning_llama_checkpoint_last.pth" # set the checkpoint to start the training from
+  llama_model: "meta-llama/Llama-2-7b-chat-hf"
+  ckpt: "checkpoints/video_captioning_llama_checkpoint_last.pth" # set the checkpoint to start the training from
   use_grad_checkpoint: True
   chat_template: True
   lora_r: 64
