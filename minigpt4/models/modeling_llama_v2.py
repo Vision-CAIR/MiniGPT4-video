@@ -9,7 +9,7 @@ from transformers.utils import add_start_docstrings_to_model_forward, replace_re
 from transformers.modeling_outputs import CausalLMOutputWithPast
 from transformers.models.llama.modeling_llama import LLAMA_INPUTS_DOCSTRING, _CONFIG_FOR_DOC
 from transformers.models.llama.modeling_llama import LlamaForCausalLM as LlamaForCausalLMOrig
-
+# from minigpt4_video.models.transformers.src.transformers.models.llama.modeling_llama import LlamaForCausalLM as LlamaForCausalLMOrig
 
 class LlamaForCausalLM(LlamaForCausalLMOrig):
 
@@ -27,7 +27,9 @@ class LlamaForCausalLM(LlamaForCausalLMOrig):
         output_attentions: Optional[bool] = None,
         output_hidden_states: Optional[bool] = None,
         return_dict: Optional[bool] = None,
+        cache_position: Optional[torch.LongTensor] = None,
         reduction: Optional[str] = "mean",
+        use_fastv: Optional[bool] = False,
     ) -> Union[Tuple, CausalLMOutputWithPast]:
         r"""
         Args:
@@ -62,17 +64,41 @@ class LlamaForCausalLM(LlamaForCausalLMOrig):
         return_dict = return_dict if return_dict is not None else self.config.use_return_dict
 
         # decoder outputs consists of (dec_features, layer_state, dec_hidden, dec_attn)
-        outputs = self.model(
-            input_ids=input_ids,
-            attention_mask=attention_mask,
-            position_ids=position_ids,
-            past_key_values=past_key_values,
-            inputs_embeds=inputs_embeds,
-            use_cache=use_cache,
-            output_attentions=output_attentions,
-            output_hidden_states=output_hidden_states,
-            return_dict=return_dict,
-        )
+        if use_fastv :
+            fastv_config = {
+                "use_fastv": True,
+                "fastv_k": 3,
+                "fastv_r": 0.75,
+                "image_token_start_index": 5, 
+                "image_token_length": 576
+            }
+            print(f"Using fastv :{fastv_config}")
+            outputs = self.model.fastv_forward(
+                input_ids=input_ids,
+                attention_mask=attention_mask,
+                position_ids=position_ids,
+                past_key_values=past_key_values,
+                inputs_embeds=inputs_embeds,
+                use_cache=use_cache,
+                output_attentions=output_attentions,
+                output_hidden_states=output_hidden_states,
+                return_dict=return_dict,
+                fastv_config=fastv_config,
+                cache_position=cache_position,
+            )
+        else:
+            outputs = self.model(
+                input_ids=input_ids,
+                attention_mask=attention_mask,
+                position_ids=position_ids,
+                past_key_values=past_key_values,
+                inputs_embeds=inputs_embeds,
+                use_cache=use_cache,
+                output_attentions=output_attentions,
+                output_hidden_states=output_hidden_states,
+                return_dict=return_dict,
+                # cache_position=cache_position,
+            )
 
         hidden_states = outputs[0]
         if self.config.pretraining_tp > 1:

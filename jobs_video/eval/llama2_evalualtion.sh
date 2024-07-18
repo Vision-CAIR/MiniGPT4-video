@@ -13,7 +13,7 @@ DATASET="tvqa" # available datasets: tvqa, msrvtt, msvd, activitynet,tgif ,video
 BATCH_SIZE=8 
 CKPT_PATH="checkpoints/video_llama_checkpoint_last.pth" # path to the checkpoint
 cfg_path="test_configs/llama2_test_config.yaml" # path to the config file
-# # if the number of samples are large you can specify the start and end index to evaluate on several machines
+# # if the number of samples are too large you can specify the start and end index to evaluate on several machines
 # pass the start and end index as arguments
 start=$1 # start index
 end=$2 # end index

@@ -19,7 +19,7 @@ import torch
 import random
 import numpy as np
 import torch.backends.cudnn as cudnn
-
+import time
 def prepare_input(vis_processor,video_path,subtitle_path,instruction):  
     cap = cv2.VideoCapture(video_path)
     if subtitle_path is not None: 
@@ -175,6 +175,9 @@ if __name__ == "__main__":
     video_path=args.video_path
     instruction=args.question
     add_subtitles=args.add_subtitles
-    # setup_seeds(seed)
+    setup_seeds(seed)
+    t1=time.time()
     pred=run(video_path,instruction,model,vis_processor,gen_subtitles=add_subtitles)
     print(pred)
+    print("time taken : ",time.time()-t1)
+    print("Number of output words : ",len(pred.split(' ')))
