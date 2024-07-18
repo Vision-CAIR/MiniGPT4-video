@@ -106,7 +106,7 @@ class GoldFish_LV:
         self.model, self.vis_processor = init_model(args)
         self.original_llama_model,self.original_llama_tokenizer=self.load_original_llama_model()
         # self.summary_instruction="Generate a description of this video .Pay close attention to the objects, actions, emotions portrayed in the video,providing a vivid description of key moments.Specify any visual cues or elements that stand out."
-        self.summary_instruction="I'm a blind person, please provide me with a detailed summary of the video content and try to be as descriptive as possible."
+        self.summary_instruction="I'm a blind person, please provide me with a detailed summary of the video content and try to be as descriptive as possible. The videos are created from Nexar's road camera"
     def load_original_llama_model(self):
         model_name="meta-llama/Llama-2-7b-chat-hf"
         tokenizer = AutoTokenizer.from_pretrained(model_name)
@@ -389,7 +389,7 @@ class GoldFish_LV:
             os.system(f"python split_long_video_in_parallel.py --video_path {video_path} --output_folder {tmp_save_path}")
         videos_list = sorted(os.listdir(tmp_save_path))
         return videos_list,tmp_save_path
-    def long_inference_video(self, videos_list,tmp_save_path,subtitle_paths, use_subtitles) -> Optional[str]:
+    def long_inference_video(self, videos_list: List[str], tmp_save_path: str, subtitle_paths: Optional[List[str]] = None, use_subtitles: bool = False) -> Optional[dict]:
         save_long_videos_path = "new_workspace/clips_summary/demo"
         os.makedirs(save_long_videos_path, exist_ok=True)
         file_path = f'{save_long_videos_path}/{self.video_name}.json'
@@ -398,46 +398,46 @@ class GoldFish_LV:
             print("Clips inference already done")
             with open(file_path, 'r') as file:
                 video_information = json.load(file)
-        else:
-            video_number = 0
-            batch_size = 2
-            batch_video_paths, batch_instructions ,batch_subtitles= [], [],[]
-            video_information = {}
-            video_captions = []
-            for i, video in tqdm(enumerate(videos_list), desc="Inference video clips", total=len(videos_list)):
-                clip_path = os.path.join(tmp_save_path, video)
-                batch_video_paths.append(clip_path)
-                # previous_caption =  "You are analysing a one long video of mutiple clips and this is the summary from all previous clips :"+video_captions[-1]+"\n\n" if video_captions else ""
-                previous_caption=""
-                batch_instructions.append(self.summary_instruction)
-                batch_subtitles.append(subtitle_paths[i])
-                # Process each batch
-                if len(batch_video_paths) % batch_size == 0 and i != 0:
-                    batch_preds,videos_conversation=self.run_batch(batch_video_paths,batch_instructions, batch_subtitles,previous_caption)
-                    for pred,subtitle in zip(batch_preds,videos_conversation):
-                        video_number += 1
-                        save_name=f"{video_number}".zfill(5)
-                        video_information[f'caption__{save_name}'] = pred
-                        video_information[f'subtitle__{save_name}'] = subtitle
-                        video_captions.append(pred)
-                    batch_video_paths, batch_instructions,batch_subtitles = [], [],[]
+            return video_information
 
-            # Process any remaining videos in the last batch
-            if batch_video_paths:
-                batch_preds,videos_conversation=self.run_batch(batch_video_paths,batch_instructions, batch_subtitles,previous_caption)
-                for pred,subtitle in zip(batch_preds,videos_conversation):
-                    video_number += 1
-                    save_name=f"{video_number}".zfill(5)
+        video_information = {}
+        video_captions = []
+        batch_video_paths, batch_instructions, batch_subtitles = [], [], []
+
+        for i, video in tqdm(enumerate(videos_list), desc="Inference video clips", total=len(videos_list)):
+            clip_path = os.path.join(tmp_save_path, video)
+            batch_video_paths.append(clip_path)
+            batch_instructions.append(self.summary_instruction)
+            if use_subtitles and subtitle_paths:
+                batch_subtitles.append(subtitle_paths[i])
+            else:
+                batch_subtitles.append(None)  # Handling for no subtitle case
+
+            if len(batch_video_paths) % 2 == 0:  # Assuming batch_size is 2
+                batch_preds, videos_conversation = self.run_batch(batch_video_paths, batch_instructions, batch_subtitles)
+                for pred, subtitle in zip(batch_preds, videos_conversation):
+                    video_number = i + 1  # Better scope handling for video number
+                    save_name = f"{video_number}".zfill(5)
                     video_information[f'caption__{save_name}'] = pred
                     video_information[f'subtitle__{save_name}'] = subtitle
-                    video_captions.append(pred)    
+                    video_captions.append(pred)
+                batch_video_paths, batch_instructions, batch_subtitles = [], [], []
 
-            # summary = self.compine_summaries(preds)
-            # preds['summary'] = summary
-            video_information['summary'] ="summary"
-            with open(file_path, 'w') as file:
-                json.dump(video_information, file, indent=4)
-            print("Clips inference done")
+        # Process any remaining videos in the last batch
+        if batch_video_paths:
+            batch_preds, videos_conversation = self.run_batch(batch_video_paths, batch_instructions, batch_subtitles)
+            for pred, subtitle in zip(batch_preds, videos_conversation):
+                video_number = len(videos_list) - len(batch_video_paths) + len(batch_preds)
+                save_name = f"{video_number}".zfill(5)
+                video_information[f'caption__{save_name}'] = pred
+                video_information[f'subtitle__{save_name}'] = subtitle
+                video_captions.append(pred)
+
+        video_information['summary'] = "summary"  # Example summary
+        with open(file_path, 'w') as file:
+            json.dump(video_information, file, indent=4)
+        print("Clips inference done")
+
         return video_information
 
     def compine_summaries(self, text: str, rag: str = False) -> str:
@@ -833,6 +833,3 @@ class GoldFish_LV:
 #         print(minigpt_lv.inference_RAG(questions,contexts))
     
 #     print("time for 18 clip",time.time()-t1)
-    
-            
-    
