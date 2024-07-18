@@ -14,20 +14,7 @@
 <h3 style="text-align: center;">Online Demos</h3>
 <div style="display: flex; justify-content: center; gap: 40px;">
     <div style="text-align: center;">
-        <a href='https://huggingface.co/spaces/Vision-CAIR/MiniGPT4-video'>
-            <img src='repo_imgs/minigpt4_demo_icon.png' width=200 height=200>
-        </a>
-        <div>
-            <font size=3>
-                <div>
-                    <a href="https://vision-cair.github.io/MiniGPT4-video/">🎞️ Project Page</a>
-                    <a href="https://arxiv.org/abs/2404.03413">📝 arXiv Paper</a>
-                </div>
-            </font>
-        </div>
-    </div>
-    <div style="text-align: center;">
-        <a href='https://huggingface.co/spaces/Vision-CAIR/Goldfish'>
+        <a href='https://6662c025106d5b5341.gradio.live'>
             <img src='repo_imgs/goldfishai_png.png' width=200 height=200>
         </a>
         <div>
@@ -37,6 +24,19 @@
                     <a href="https://vision-cair.github.io/Goldfish_website/">Project Page</a>
                     <a href="https://arxiv.org/abs/2407.12679">📝 arXiv Paper</a>
                     <a href="https://huggingface.co/datasets/Vision-CAIR/TVQA-Long/tree/main">🤗 TVQA-Long Dataset</a>
+                </div>
+            </font>
+        </div>
+    </div>
+    <div style="text-align: center;">
+        <a href='https://huggingface.co/spaces/Vision-CAIR/MiniGPT4-video'>
+            <img src='repo_imgs/minigpt4_demo_icon.png' width=200 height=200>
+        </a>
+        <div>
+            <font size=3>
+                <div>
+                    <a href="https://vision-cair.github.io/MiniGPT4-video/">🎞️ Project Page</a>
+                    <a href="https://arxiv.org/abs/2404.03413">📝 arXiv Paper</a>
                 </div>
             </font>
         </div>
@@ -74,7 +74,7 @@ indicate that our models have significant improvements in both long and
 short-video understanding.
 ### Goldfish framework (Long videos)
 ![methodology](repo_imgs/goldfish_framework.JPG)<br>
-Long videos demos gif here
+![Gold ish demo](repo_imgs/demo_1.JPG)
 ### MiniGPT4-Video  (Short videos)
 ![methodology](repo_imgs/final_short_video_model.jpg)
 
@@ -348,7 +348,7 @@ annotation_json_folder="path to the jsons folder"
 # then run the script
 bash jobs_video/long_video_eval/movies/eval_model_summary_movie_chat.sh
 ```
-## TVQA-Long
+### TVQA-Long
 For Goldfish evaluation we can use the original separated clips from the original TVQA dataset <br>
 Download the original TVQA videos for short videos from [here](https://tvqa.cs.unc.edu/download_tvqa.html)<br>
 ```bash 
@@ -379,19 +379,21 @@ bash test_benchmark/quantitative_evaluation/evaluate_zeroshot.sh
 ## Citation
 If you're using MiniGPT4-Video or Goldfish in your research or applications, please cite using this BibTeX:
 ```
+@misc{ataallah2024goldfishvisionlanguageunderstandingarbitrarily,
+      title={Goldfish: Vision-Language Understanding of Arbitrarily Long Videos}, 
+      author={Kirolos Ataallah and Xiaoqian Shen and Eslam Abdelrahman and Essam Sleiman and Mingchen Zhuge and Jian Ding and Deyao Zhu and Jürgen Schmidhuber and Mohamed Elhoseiny},
+      year={2024},
+      eprint={2407.12679},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2407.12679}, 
+}
 @article{ataallah2024minigpt4,
   title={MiniGPT4-Video: Advancing Multimodal LLMs for Video Understanding with Interleaved Visual-Textual Tokens},
   author={Ataallah, Kirolos and Shen, Xiaoqian and Abdelrahman, Eslam and Sleiman, Essam and Zhu, Deyao and Ding, Jian and Elhoseiny, Mohamed},
   journal={arXiv preprint arXiv:2404.03413},
   year={2024}
 }
-
-<!-- @article{ataallah2024goldfish,
-  title={Goldfish: Vision-Language Understanding of Arbitrarily Long Videos},
-  author={Ataallah, Kirolos and Shen, Xiaoqian and Abdelrahman, Eslam and Sleiman, Essam and Zhu, Deyao and Ding, Jian and Elhoseiny, Mohamed},
-  journal={arXiv preprint arXiv:2404.03413},
-  year={2024}
-} -->
 
 ```
 
