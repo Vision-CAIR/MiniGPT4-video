@@ -58,13 +58,7 @@ class MemoryIndex:
             done=False
             while not done:
                 try:
-                    response = self.client.embeddings.create(
-                        # model= "text-embedding-ada-002",
-                        model="text-embedding-3-small",
-                        input=[text]
-                    )
-                    # Extract the AI output embedding as a list of floats
-                    embedding = response["data"][0]["embedding"]
+                    embedding=self.client.embeddings.create(input = [text], model="text-embedding-3-small").data[0].embedding
                     # Convert the list to a PyTorch tensor
                     embedding = torch.tensor(embedding)
                     done=True

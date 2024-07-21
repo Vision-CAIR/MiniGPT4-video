@@ -13,8 +13,8 @@ import moviepy.editor as mp
 from index import MemoryIndex  
 
 
-hf_token = os.environ.get('HF_TKN')
-login(token=hf_token)
+# hf_token = os.environ.get('HF_TKN')
+# login(token=hf_token)
 def str2bool(v):
     if isinstance(v, bool):
         return v
@@ -59,7 +59,7 @@ def is_youtube_url(url: str) -> bool:
 
 @spaces.GPU(duration=60*5)
 def gradio_long_inference_video(videos_list,tmp_save_path,subtitle_paths, use_subtitles=True):
-    clips_summary = goldfish_obj.long_inference_video(videos_list,tmp_save_path,subtitle_paths, use_subtitles=use_subtitles)
+    clips_summary = goldfish_obj.long_inference_video(videos_list,tmp_save_path,subtitle_paths)
     return clips_summary
 
 @spaces.GPU(duration=60*3)

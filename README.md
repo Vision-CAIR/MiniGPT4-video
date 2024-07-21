@@ -14,7 +14,7 @@
 <h3 style="text-align: center;">Online Demos</h3>
 <div style="display: flex; justify-content: center; gap: 40px;">
     <div style="text-align: center;">
-        <a href='https://6662c025106d5b5341.gradio.live'>
+        <a href='https://d939bb44c7814e7e75.gradio.live'>
             <img src='repo_imgs/goldfishai_png.png' width=200 height=200>
         </a>
         <div>

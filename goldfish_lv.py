@@ -29,48 +29,19 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 import re
 from transformers import BitsAndBytesConfig
 
-
-
 def time_to_seconds(subrip_time):
     return subrip_time.hours * 3600 + subrip_time.minutes * 60 + subrip_time.seconds + subrip_time.milliseconds / 1000
-
-def split_subtitles_old(subtitle_path, max_duration=180):
-    # read the subtitle file and detect the encoding
-    with open(subtitle_path, 'rb') as f:
-        result = chardet.detect(f.read())
-    subtitles = pysrt.open(subtitle_path, encoding=result['encoding'])
-    # split the subtitle file into paragraphs 
-    current_paragraph = []
-    current_duration = 0
-    paragraphs = []
-
-    for subtitle in subtitles:
-        subtitle_duration = time_to_seconds(subtitle.end - subtitle.start)
-        if current_duration + subtitle_duration > max_duration:
-            paragraphs.append(' '.join(current_paragraph) + '.')
-            current_paragraph = []
-            current_duration = 0
-
-        current_paragraph.append(subtitle.text)
-        current_duration += subtitle_duration
-
-    if current_paragraph:
-        paragraphs.append(' '.join(current_paragraph) + '.')
-
-    return paragraphs
 
 def split_subtitles(subtitle_path, n):
     # read the subtitle file and detect the encoding
     with open(subtitle_path, 'rb') as f:
         result = chardet.detect(f.read())
     subs = pysrt.open(subtitle_path, encoding=result['encoding'])
-
     total_subs = len(subs)
 
     if n <= 0 or n > total_subs:
         print("Invalid value for n. It should be a positive integer less than or equal to the total number of subtitles.")
         return None
-
     subs_per_paragraph = total_subs // n
     remainder = total_subs % n
 
@@ -83,7 +54,6 @@ def split_subtitles(subtitle_path, n):
 
         paragraph_subs = subs[current_index:current_index + num_subs_in_paragraph]
         current_index += num_subs_in_paragraph
-
         # Join subtitles using pysrt's built-in method for efficient formatting
         paragraph = pysrt.SubRipFile(items=paragraph_subs).text
         paragraphs.append(paragraph)
@@ -98,7 +68,7 @@ def clean_text(subtitles_text):
     return subtitles_text.strip()
 class GoldFish_LV:
     """
-    'GoldFish_LV' class is to handle long video processing and subtitle management with MiniGPT-V base model.
+    'GoldFish_LV' class is to handle long video processing and subtitle management with MiniGPT4_video base model.
     """
 
     def __init__(self, args: argparse.Namespace) -> None:
@@ -110,7 +80,6 @@ class GoldFish_LV:
     def load_original_llama_model(self):
         model_name="meta-llama/Llama-2-7b-chat-hf"
         tokenizer = AutoTokenizer.from_pretrained(model_name)
-        # tokenizer.add_special_tokens({'pad_token': '[PAD]'})
         tokenizer.pad_token = "[PAD]"
         tokenizer.padding_side = "left"
         bnb_config = BitsAndBytesConfig(
@@ -123,18 +92,8 @@ class GoldFish_LV:
                 quantization_config=bnb_config,
             )
         return llama_model,tokenizer
-    def _load_existing_subtitles(self) -> Dict[str, bool]:
-
-        subtitles_folder = f"workspace/subtitles/{self.video_name}"
-        os.makedirs(subtitles_folder, exist_ok=True)
-        existing_subtitles = {}
-        for subtitle_file in os.listdir(subtitles_folder):
-            subtitle_name, _ = os.path.splitext(subtitle_file)
-            existing_subtitles[subtitle_name] = True
-        return existing_subtitles
 
     def _youtube_download(self, url: str) -> str:
-
         try:
             video_id = url.split('v=')[-1].split('&')[0]
             video_id = video_id.strip()
@@ -152,7 +111,6 @@ class GoldFish_LV:
 
     @staticmethod
     def is_youtube_url(url: str) -> bool:
-
         youtube_regex = (
             r'(https?://)?(www\.)?'
             '(youtube|youtu|youtube-nocookie)\.(com|be)/'
@@ -160,29 +118,17 @@ class GoldFish_LV:
         )
         return bool(re.match(youtube_regex, url))
 
-
-    def find_max_index(self, prefix, existing_data):
-        max_index = 0
-        for key in existing_data.keys():
-            if key.startswith(f"{prefix}_"):
-                index = int(key.split("_")[1])
-                max_index = max(max_index, index)
-        return max_index
-
     def process_video_url(self, video_path: str) -> str:
-        
         if self.is_youtube_url(video_path):
             return self._youtube_download(video_path)
         else:
             return video_path
 
     def create_video_grid(self, images: list, rows: int, cols: int, save_path: str) -> Image.Image:
-
         image_width, image_height = images[0].size
         grid_width = cols * image_width
         grid_height = rows * image_height
         new_image = Image.new("RGB", (grid_width, grid_height))
-
         for i in range(rows):
             for j in range(cols):
                 index = i * cols + j
@@ -193,7 +139,6 @@ class GoldFish_LV:
                     new_image.paste(image, (x_offset, y_offset))
 
         new_image.save(save_path)
-
         return new_image
 
     def get_subtitles(self, video_path: str) -> Optional[str]:
@@ -209,22 +154,14 @@ class GoldFish_LV:
             return f"{subtitle_dir}/{video_id}"+'.vtt'
         audio_path = f"{audio_dir}/{video_id}"+'.mp3'
         subtitle_path = f"{subtitle_dir}/{video_id}"+'.vtt'
-        # self.existed_subtitles = self._load_existing_subtitles()
-
-        # if self.existed_subtitles.get(video_id, False):
-        #     print("Subtitle already generated")
-        #     return subtitle_path
-        
         try:
             self.extract_audio(video_path, audio_path)
             print("Successfully extracted audio")
-
             os.system(f"whisper {audio_path}  --language English --model medium --output_format vtt --output_dir {subtitle_dir}")
             os.system(f"rm {audio_path}")
             # os.system(f"rm -r {audio_dir}")
             print("Subtitle successfully generated")
             return subtitle_path
-        
         except:
             print(f"Error during subtitle generation for {video_path}")
             return None
@@ -232,7 +169,7 @@ class GoldFish_LV:
     def prepare_input(self, 
                     video_path: str,
                     subtitle_path: Optional[str],
-                    instruction: str,previous_caption="") -> Tuple[Optional[torch.Tensor], Optional[str]]:
+                    instruction: str,previous_caption=""):
         # If a subtitle path is provided, read the VTT (Web Video Text Tracks) file, else set to an empty list
         conversation=""
         if subtitle_path:
@@ -244,24 +181,19 @@ class GoldFish_LV:
                     conversation+=sub
             except:
                 pass
-
         max_images_length = 45
         max_sub_len = 400
-
         # Load the video file using moviepy and calculate the total number of frames
         clip = mp.VideoFileClip(video_path)
         total_num_frames = int(clip.duration * clip.fps)
         clip.close()
-
         # Calculate how often to sample a frame based on the total number of frames and the maximum images length
         cap = cv2.VideoCapture(video_path)
         images = []
         frame_count = 0
         sampling_interval = int(total_num_frames / max_images_length)
-
         if sampling_interval == 0:
             sampling_interval = 1
-
         # Initialize variables to hold image placeholders, current subtitle text, and subtitle history
         if previous_caption != "":
             img_placeholder = previous_caption+" "
@@ -274,8 +206,6 @@ class GoldFish_LV:
         transform=transforms.Compose([
                     transforms.ToPILImage(),
                 ])
-
-        
         # Loop through each frame in the video
         while cap.isOpened():
             ret, frame = cap.read()
@@ -315,13 +245,10 @@ class GoldFish_LV:
         # Return None if no images are extracted
         if len(images) == 0:
             return None, None
-        
-        # Save the concatenated image grid to a specified path
-        # save_concat_img_path=f"workspace/imgs/{self.video_name}"
-        # os.makedirs(save_concat_img_path, exist_ok=True)        
-        # self.create_video_grid(raw_frames,8,len(raw_frames)//8, f"{save_concat_img_path}/concatenated.jpg")
+        while len(images) < max_images_length:
+            images.append(images[-1])
+            img_placeholder += '<Img><ImageHere>'
         images = torch.stack(images)
-
         print("Input instruction length",len(instruction.split(' ')))
         instruction = img_placeholder + '\n' + instruction
         print("number of words",number_of_words)
@@ -330,32 +257,9 @@ class GoldFish_LV:
         return images, instruction,conversation
 
     def extract_audio(self, video_path: str, audio_path: str) -> None:
-
         video_clip = mp.VideoFileClip(video_path)
         audio_clip = video_clip.audio
         audio_clip.write_audiofile(audio_path, codec="libmp3lame", bitrate="320k")
-    
-    def split_video(self, input_path, output_folder, clip_duration=80):
-
-        if len(os.listdir(output_folder)) > 0:
-            return
-        video = mp.VideoFileClip(input_path)
-        total_duration = video.duration
-        num_clips = int(total_duration / clip_duration)
-
-        for i in tqdm (range(num_clips+1), desc="Splitting video"):
-            start_time = i * clip_duration
-            if i == num_clips:
-                end_time=total_duration
-            else:
-                end_time = (i + 1) * clip_duration
-            clip = video.subclip(start_time, end_time)
-            save_name=f"{i + 1}".zfill(5)
-            output_path = os.path.join(output_folder, f"{save_name}.mp4")
-            clip.write_videofile(output_path, codec="libx264", audio_codec="aac")
-
-        video.close()
-
 
     def short_video_inference (self,video_path,instruction,gen_subtitles=True):
         if gen_subtitles:
@@ -383,13 +287,12 @@ class GoldFish_LV:
         os.makedirs(tmp_save_path, exist_ok=True)
         print("tmp_save_path",tmp_save_path)
 
-        # self.split_video(video_path, tmp_save_path)
         if len(os.listdir(tmp_save_path)) == 0:
             print("Splitting Long video")
             os.system(f"python split_long_video_in_parallel.py --video_path {video_path} --output_folder {tmp_save_path}")
         videos_list = sorted(os.listdir(tmp_save_path))
         return videos_list,tmp_save_path
-    def long_inference_video(self, videos_list,tmp_save_path,subtitle_paths, use_subtitles) -> Optional[str]:
+    def long_inference_video(self, videos_list,tmp_save_path,subtitle_paths) -> Optional[str]:
         save_long_videos_path = "new_workspace/clips_summary/demo"
         os.makedirs(save_long_videos_path, exist_ok=True)
         file_path = f'{save_long_videos_path}/{self.video_name}.json'
@@ -400,7 +303,7 @@ class GoldFish_LV:
                 video_information = json.load(file)
         else:
             video_number = 0
-            batch_size = 2
+            batch_size = 4
             batch_video_paths, batch_instructions ,batch_subtitles= [], [],[]
             video_information = {}
             video_captions = []
@@ -431,117 +334,10 @@ class GoldFish_LV:
                     video_information[f'caption__{save_name}'] = pred
                     video_information[f'subtitle__{save_name}'] = subtitle
                     video_captions.append(pred)    
-
-            # summary = self.compine_summaries(preds)
-            # preds['summary'] = summary
-            video_information['summary'] ="summary"
             with open(file_path, 'w') as file:
                 json.dump(video_information, file, indent=4)
             print("Clips inference done")
         return video_information
-
-    def compine_summaries(self, text: str, rag: str = False) -> str:
-        concate_instruction = (
-            "<s>[INST]Task: Generate video summary by "
-            "merging the following list of video clip summaries and the subtitles Ensure the "
-            "final description is detailed, intelligible, and captures the essence "
-            "of the entire video content and DON'T MENTION THE NUMBER OF CLIPS in the output\n\n"
-            f"List of Video Clip Summaries and subtitles:\n{str(text)}\n\n"
-            "Comprehensive Video Description:[/INST]"
-
-        )
-        inputs = self.original_llama_tokenizer(concate_instruction, return_tensors="pt", padding=True, truncation=True,max_length=3500)
-
-        with torch.no_grad():
-            summary_ids = self.original_llama_model.generate(inputs.input_ids,max_new_tokens=512)
-        answers=[]
-        for i in range(len(summary_ids)):
-            output_text=self.original_llama_tokenizer.decode(summary_ids[i], skip_special_tokens=True)
-            output_text = output_text.split('</s>')[0]  # remove the stop sign </s>
-            output_text = output_text.replace("<s>", "")
-            output_text = output_text.split(r'[/INST]')[-1].strip()
-            answers.append(output_text)
-        
-        return answers[0]
-    def compine_summaries_gpt4(self, text_str: str, rag: str = False) -> str:
-        concate_instruction = (
-            "Task: Generate video summary by "
-            "merging the following list of video clip summaries and the subtitles Ensure the "
-            "final description is detailed, intelligible, and captures the essence "
-            "of the entire video content and DON'T MENTION THE NUMBER OF CLIPS in the output\n\n"
-            f"List of Video Clip Summaries and subtitles:\n{text_str}\n\n"
-            "Comprehensive Video Description:"
-        )
-        try:
-            response = client.ChatCompletion.create(
-                model="gpt-4",
-                messages=[
-                        {
-                        "role": "user",
-                        "content": concate_instruction
-                        }],
-            )
-            answer=response.choices[0].message['content']
-        except Exception as e:
-            print("chat gpt error",e)
-        return answer
-    def language_infernece(self, texts):
-        prepared_images=[]
-        prompts=[]
-        lengths=[]
-        for text in texts:
-            placeholder_image = torch.zeros(3, 224, 224).unsqueeze(0)
-            prepared_images.append(placeholder_image)
-            prepared_instruction = '<Img><ImageHere> ' + text
-
-            # Initialize conversation for the model
-            model_conversation = CONV_VISION.copy()
-            model_conversation.system = ""
-            model_conversation.append_message(model_conversation.roles[0], prepared_instruction)
-            model_conversation.append_message(model_conversation.roles[1], None)
-
-            prompts.append(model_conversation.get_prompt())
-            lengths.append(1)
-        try:
-            prepared_images=torch.stack(prepared_images)
-            answers = self.model.generate(prepared_images, prompts, max_new_tokens=self.args.max_new_tokens, do_sample=False, lengths=lengths, num_beams=1)
-            return answers
-        except Exception as e:
-            # Handle exceptions and errors
-            print(f"Error during text inference: {e}")
-            return [f"Error during text inference: {e}"]*len(texts) 
-    
-    # def inference_RAG(self, instructions: str, context_list) -> str:
-    #     prepared_images=[]
-    #     prompts=[]
-    #     lengths=[]
-    #     for instruction,context in zip(instructions,context_list):
-    #         placeholder_image = torch.zeros(3, 224, 224).unsqueeze(0)
-    #         prepared_images.append(placeholder_image)
-    #         inference_format="Your task is to answer questions for long video \n\n Given these related information from the most related clips: \n "+context +"\n\n" +"Answer this question: "+instruction
-    #         prepared_instruction = '<Img><ImageHere> ' + inference_format 
-
-    #         # Initialize conversation for the model
-    #         model_conversation = CONV_VISION.copy()
-    #         model_conversation.system = ""
-    #         model_conversation.append_message(model_conversation.roles[0], prepared_instruction)
-    #         model_conversation.append_message(model_conversation.roles[1], None)
-
-    #         prompts.append(model_conversation.get_prompt())
-    #         lengths.append(1)
-
-    #     try:
-    #         prepared_images=torch.stack(prepared_images)
-    #         answers = self.model.generate(prepared_images, prompts, max_new_tokens=self.args.max_new_tokens, do_sample=False, lengths=lengths, num_beams=1)
-    #         return answers
-    #     except Exception as e:
-    #         # Handle exceptions and errors
-    #         print(f"Error during text inference: {e}")
-    #         return [f"Error during text inference: {e}"]*len(instructions)
-   
-
-    
-
     def inference_RAG(self, instructions, context_list):
         context_promots=[]
         questions_prompts=[]
@@ -572,7 +368,6 @@ class GoldFish_LV:
             output_text = output_text.replace("<s>", "")
             output_text = output_text.split(r'[/INST]')[-1].strip()
             answers.append(output_text)
-        
         return answers
        
         
@@ -659,11 +454,11 @@ class GoldFish_LV:
                     clip_conversation="Clip Subtitles: "+external_memory.documents[key]
                 related_information+=f"{general_sum},{clip_conversation}\n"
         return related_information              
-    def inference(self, video_path, use_subtitles=True, instruction=""):
+    def inference(self,video_path, use_subtitles=True, instruction="", number_of_neighbours=3):
         start_time = time.time()
         video_name = os.path.splitext(os.path.basename(video_path))[0]
+        self.args.neighbours = number_of_neighbours
         print(f"Video name: {video_name}")
-        print("Video path",video_path)
         video_duration = mp.VideoFileClip(video_path).duration
         print(f"Video duration: {video_duration:.2f} seconds")
         # if the video duration is more than 2 minutes we need to run the long inference 
@@ -674,7 +469,12 @@ class GoldFish_LV:
             if not os.path.exists(file_path):
                 print("Clips summary is not ready")
                 videos_list,tmp_save_path=self.split_long_video_into_clips(video_path)
-                clips_summary = self.long_inference_video(videos_list,tmp_save_path, use_subtitles=use_subtitles)
+                subtitle_paths = []
+                for video_p in videos_list:
+                    clip_path = os.path.join(tmp_save_path, video_p)
+                    subtitle_path = self.get_subtitles(clip_path) if use_subtitles else None
+                    subtitle_paths.append(subtitle_path)
+                clips_summary = self.long_inference_video(videos_list,tmp_save_path,subtitle_paths)
             else: 
                 print("External memory is ready")
             os.makedirs("new_workspace/embedding/demo", exist_ok=True)
@@ -694,7 +494,7 @@ class GoldFish_LV:
         
             related_context_documents,related_context_keys = external_memory.search_by_similarity(instruction)
             related_information=self.get_related_context(external_memory,related_context_keys)
-            pred=self.inference_RAG([instruction], [related_information])[0] 
+            pred=self.inference_RAG([instruction],[related_information])
             # remove stored data 
             # os.remove(file_path)
             # os.system(f"rm -r workspace/tmp/{self.video_name}")
@@ -703,15 +503,12 @@ class GoldFish_LV:
         else:
             print("Short video")
             self.video_name=video_path.split('/')[-1].split('.')[0]
-            clips_summary={}
-            clips_summary['summary'] = self.short_video_inference(video_path, self.summary_instruction,use_subtitles)
-            pred=self.short_video_inference(video_path,instruction,use_subtitles)
+            pred=self.short_inference_video(video_path,instruction,use_subtitles)
         processing_time = time.time() - start_time
         print(f"Processing time: {processing_time:.2f} seconds")
         return {
             'video_name': os.path.splitext(os.path.basename(video_path))[0],
             'pred': pred,
-            'clips_summary': "clips_summary['summary']",
         }
 
     
@@ -723,7 +520,6 @@ class GoldFish_LV:
         videos_conversations=[]
 
         for i,video_path, instruction in zip(range(len(video_paths)),video_paths, instructions):
-
             subtitle_path = subtitle_paths[i]
             prepared_images, prepared_instruction,video_conversation = self.prepare_input( video_path, subtitle_path, instruction,previous_caption)
             
@@ -763,9 +559,6 @@ class GoldFish_LV:
         else:
             answers = self.model.generate(images=None,img_embeds=img_embeds,texts=prompts, max_new_tokens=300, do_sample=False, lengths=lengths,num_beams=1, 
                                                        return_video_temporal_features=return_embedding)
-            # for ans, p in zip(answers, prompts):
-            #     print(f"Prompt: {p}")
-            #     print(f"Answer: {ans}")
             return answers
         
     def run_images (self,prepared_images,prepared_instruction,return_embedding=False):        

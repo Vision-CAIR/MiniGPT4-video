@@ -13,7 +13,7 @@ from minigpt4.conversation.conversation import Conversation, SeparatorStyle, Sto
 
 from transformers import LlamaTokenizer
 from transformers import BitsAndBytesConfig
-
+from transformers import AutoConfig, AutoTokenizer
 from peft import (
     LoraConfig,
     get_peft_model,
@@ -22,11 +22,12 @@ from peft import (
     set_peft_model_state_dict,
 )
 import time
+import json
 import numpy as np
 import os
-
+from huggingface_hub import PyTorchModelHubMixin
 @registry.register_model("mini_gpt4_llama_v2")
-class MiniGPT4_llama_v2(Blip2Base):
+class MiniGPT4_llama_v2(Blip2Base,PyTorchModelHubMixin):
     """
     BLIP2 GPT-LLAMA model.
     """
@@ -791,7 +792,8 @@ class MiniGPT4_llama_v2(Blip2Base):
             print("Load Minigpt-4-LLM Checkpoint: {}".format(ckpt_path))
             ckpt = torch.load(ckpt_path, map_location="cpu")
             msg = model.load_state_dict(ckpt['model'], strict=False)
-
+        # push the model to the hub with its metadata and config file
+        # model.push_to_hub("MiniGPT4-video")
         return model
 
 

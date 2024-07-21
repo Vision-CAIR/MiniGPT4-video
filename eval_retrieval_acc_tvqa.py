@@ -89,7 +89,7 @@ class TVQAEVALRetrieval (GoldFish_LV):
         self.max_sub_len=400
         self.max_num_images=45
         self.fps=3
-        with open("datasets/evaluation_datasets/long_video_datasets/tvqa/tvqa_preprocessed_subtitles.json") as f:
+        with open("datasets/evaluation_datasets/goldfish_eval_datasets/tvqa/tvqa_preprocessed_subtitles.json") as f:
             self.subtitles_list=json.load(f)
         self.subtitles={}
         for sub in self.subtitles_list:
