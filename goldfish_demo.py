@@ -64,7 +64,7 @@ def gradio_long_inference_video(videos_list,tmp_save_path,subtitle_paths, use_su
 
 @spaces.GPU(duration=60*3)
 def gradio_short_inference_video(video_path, instruction, use_subtitles=True):
-    pred = goldfish_obj.short_inference_video(video_path, instruction, use_subtitles=use_subtitles)
+    pred = goldfish_obj.short_video_inference(video_path, instruction, use_subtitles)
     return pred
 
 @spaces.GPU(duration=60*3)

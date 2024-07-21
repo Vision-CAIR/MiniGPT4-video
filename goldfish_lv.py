@@ -503,7 +503,7 @@ class GoldFish_LV:
         else:
             print("Short video")
             self.video_name=video_path.split('/')[-1].split('.')[0]
-            pred=self.short_inference_video(video_path,instruction,use_subtitles)
+            pred=self.short_video_inference(video_path,instruction,use_subtitles)
         processing_time = time.time() - start_time
         print(f"Processing time: {processing_time:.2f} seconds")
         return {
