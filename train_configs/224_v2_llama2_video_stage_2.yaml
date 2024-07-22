@@ -1,6 +1,5 @@
 model:
   arch: mini_gpt4_llama_v2
-  model_type: pretrain_vicuna
   freeze_vit: True
   freeze_qformer: True
   max_txt_len: 256
@@ -17,6 +16,24 @@ model:
   use_grad_checkpoint_llm: True
   max_context_len: 3600
   token_pooling: True
+  architectures: [
+    "MiniGPT4_Video"
+  ]
+  device: "cuda"
+  drop_path_rate: 0 
+  img_size: 224
+  model_type: "minigpt4_video"
+  num_query_token: 32
+  prompt: ""
+  torch_dtype: "float32"
+  vit_precision: "fp16"
+  vit_model: "eva_clip_g"
+  lora_target_modules : ["q_proj","v_proj"]
+  lora_dropout: 0.05
+  remove_template: false
+  prompt_path: ""
+  token_pooling: True
+  
 
 
 datasets:

@@ -1,6 +1,6 @@
 model:
   arch: mini_gpt4_llama_v2
-  model_type: pretrain_vicuna
+  model_type: minigpt4_video
   llama_model: "meta-llama/Llama-2-7b-chat-hf"
 
   max_txt_len: 160
@@ -9,6 +9,22 @@ model:
   prompt_path: "train_configs/alignment.txt"
   prompt_template: '[INST] {} [/INST] '
   ckpt: put your pretrained ckpt here
+  architectures: [
+    "MiniGPT4_Video"
+  ]
+  device: "cuda"
+  drop_path_rate: 0 
+  img_size: 224
+  model_type: "minigpt4_video"
+  num_query_token: 32
+  prompt: ""
+  torch_dtype: "float32"
+  vit_precision: "fp16"
+  vit_model: "eva_clip_g"
+  lora_target_modules : ["q_proj","v_proj"]
+  lora_dropout: 0.05
+  remove_template: false
+  token_pooling: True
 
 datasets:
   cc_sbu_align:

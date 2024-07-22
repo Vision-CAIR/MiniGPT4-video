@@ -15,12 +15,14 @@ from minigpt4.common.dist_utils import download_cached_file, is_dist_avail_and_i
 from minigpt4.common.utils import get_abs_path, is_url
 from omegaconf import OmegaConf
 
+from huggingface_hub import PyTorchModelHubMixin
 
-class BaseModel(nn.Module):
+class BaseModel(nn.Module,PyTorchModelHubMixin):
     """Base class for models."""
 
     def __init__(self):
-        super().__init__()
+        PyTorchModelHubMixin.__init__(self)
+        nn.Module.__init__(self)
 
     @property
     def device(self):
@@ -56,20 +58,20 @@ class BaseModel(nn.Module):
         return msg
 
     @classmethod
-    def from_pretrained(cls, model_type):
-        """
-        Build a pretrained model from default configuration file, specified by model_type.
+    # def from_pretrained(cls, model_type):
+    #     """
+    #     Build a pretrained model from default configuration file, specified by model_type.
 
-        Args:
-            - model_type (str): model type, specifying architecture and checkpoints.
+    #     Args:
+    #         - model_type (str): model type, specifying architecture and checkpoints.
 
-        Returns:
-            - model (nn.Module): pretrained or finetuned model, depending on the configuration.
-        """
-        model_cfg = OmegaConf.load(cls.default_config_path(model_type)).model
-        model = cls.from_config(model_cfg)
+    #     Returns:
+    #         - model (nn.Module): pretrained or finetuned model, depending on the configuration.
+    #     """
+    #     model_cfg = OmegaConf.load(cls.default_config_path(model_type)).model
+    #     model = cls.from_config(model_cfg)
 
-        return model
+    #     return model
 
     @classmethod
     def default_config_path(cls, model_type):

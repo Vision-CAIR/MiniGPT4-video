@@ -25,48 +25,51 @@ import time
 import json
 import numpy as np
 import os
-from huggingface_hub import PyTorchModelHubMixin
+from transformers import PretrainedConfig
+from transformers import PreTrainedModel
+from typing import List
+class minigpt4_video_config(PretrainedConfig):
+    model_type="minigpt4_video"
+    def __init__(
+        self,
+        omg_config:dict = {},
+        **kwargs,
+    ):
+        for key, value in omg_config.items():
+            setattr(self, key, value)
+        super().__init__(**kwargs)
+        
+    # def to_dict(self):
+    #     output = super().to_dict()
+    #     return output
+        
 @registry.register_model("mini_gpt4_llama_v2")
-class MiniGPT4_llama_v2(Blip2Base,PyTorchModelHubMixin):
+class MiniGPT4_Video(Blip2Base, PreTrainedModel):
     """
     BLIP2 GPT-LLAMA model.
     """
 
     PRETRAINED_MODEL_CONFIG_DICT = {
-        "pretrain_vicuna": "configs/models/minigpt4.yaml",
+        "minigpt4_video": "configs/models/minigpt4.yaml",
     }
+    config_class=minigpt4_video_config
 
     def __init__(
         self,
-        vit_model="eva_clip_g",
-        img_size=224,
-        drop_path_rate=0,
-        use_grad_checkpoint=False,
-        vit_precision="fp16",
-        freeze_vit=True,
-        llama_model="",
-        prompt_path="",
-        prompt_template="",
-        max_txt_len=32,
-        low_resource=False,  # use 8 bit and put vit in cpu
-        end_sym='\n',
-        lora_r = 8,
-        lora_target_modules = ["q_proj","v_proj"],
-        lora_alpha=16,
-        # lora_r = 16,
-        # lora_target_modules = ["q_proj","v_proj","v_proj"],
-        lora_dropout= 0.05,
-        ckpt_path = "",
-        system_prompt= False,
-        chat_template=False,
-        token_pooling=True,
-        use_grad_checkpoint_llm=False,
-        max_context_len=3800,
-        remove_template = False,
-
+        cfg={},
     ):
-        super().__init__()
-        if "Mistral" in llama_model:
+        ## loop through the config minigpt4_video_config object and set the attributes
+        if isinstance(cfg, minigpt4_video_config):
+            cfg = cfg.to_dict()
+        
+        for key, value in cfg.items():
+            try:
+                setattr(self, key, value)
+            except:
+                print(f"Error setting attribute {key} with value {value}")
+        PreTrainedModel.__init__(self, minigpt4_video_config(cfg))
+        Blip2Base.__init__(self)
+        if "Mistral" in self.llama_model:
             from minigpt4.models.modeling_mistral import MistralForCausalLM as llm_model
             print("Mistral model")
             self.model_type = "Mistral"
@@ -75,22 +78,13 @@ class MiniGPT4_llama_v2(Blip2Base,PyTorchModelHubMixin):
             print("Llama model")
             self.model_type = "Llama"
         self.tokenizer = self.init_tokenizer()
-        self.low_resource = low_resource
-        self.token_pooling = token_pooling
-        self.remove_template = remove_template
 
         print("token pooling", self.token_pooling)
-
-
-        self.use_grad_checkpoint_llm = use_grad_checkpoint_llm
-        self.max_context_len = max_context_len
-        self.chat_template = chat_template
-
-        if freeze_vit:
-            # vit_precision="fp32"
-            print("vit precision", vit_precision)
+        if self.freeze_vit:
+            # self.vit_precision="fp32"
+            print("vit precision", self.vit_precision)
             self.visual_encoder, self.ln_vision = self.init_vision_encoder(
-                vit_model, img_size, drop_path_rate, use_grad_checkpoint, vit_precision
+                self.vit_model, self.img_size, self.drop_path_rate, self.use_grad_checkpoint, self.vit_precision
             )
             for name, param in self.visual_encoder.named_parameters():
                 param.requires_grad = False
@@ -104,35 +98,26 @@ class MiniGPT4_llama_v2(Blip2Base,PyTorchModelHubMixin):
             print("freeze the vision encoder")
 
         else:
-            vit_precision="fp32"
+            self.vit_precision="fp32"
             self.visual_encoder, self.ln_vision = self.init_vision_encoder(
-                vit_model, img_size, drop_path_rate, use_grad_checkpoint, vit_precision
+                self.vit_model, self.img_size, self.drop_path_rate, self.use_grad_checkpoint, self.vit_precision
             )
 
             print("unfreeze the vision encoder")
-
         print('Loading VIT Done')
 
-        # print("visual encoder shape", self.visual_encoder.pos_embed.shape)
-        # assert False
-
         print('Loading LLAMA')
-
-
+        
         self.B_SYS, self.E_SYS = "<<SYS>>\n", "\n<</SYS>>\n\n"
         token=os.environ.get("HF_TKN")
-        self.llama_tokenizer = LlamaTokenizer.from_pretrained(llama_model,use_fast=False,token=token)  #
+        self.llama_tokenizer = LlamaTokenizer.from_pretrained(self.llama_model,use_fast=False,token=token)  #
         self.llama_tokenizer.pad_token = "$$"
-
-        self.system_prompt = system_prompt
-
-
         # use fastv 
         self.use_fastv = False
         print("self.low_resource",self.low_resource)
         if self.low_resource:
             self.llama_model = llm_model.from_pretrained(
-                llama_model,
+                self.llama_model,
                 torch_dtype=torch.float16,
                 # torch_dtype = torch.bfloat16,
                 load_in_8bit=True,
@@ -144,22 +129,17 @@ class MiniGPT4_llama_v2(Blip2Base,PyTorchModelHubMixin):
             )
         else:
             self.llama_model = llm_model.from_pretrained(
-                llama_model,
+                self.llama_model,
                 torch_dtype=torch.float16,token=token
             )
             
-            
-            
         # self.llama_model.resize_token_embeddings(len(self.llama_tokenizer))
         self.llama_model = prepare_model_for_int8_training(self.llama_model)
-
-
-
         loraconfig = LoraConfig(
-            r=lora_r,
-            lora_alpha=lora_alpha,
-            target_modules=lora_target_modules,
-            lora_dropout=lora_dropout,
+            r=self.lora_r,
+            lora_alpha=self.lora_alpha,
+            target_modules=self.lora_target_modules,
+            lora_dropout=self.lora_dropout,
             bias="none",
             task_type="CAUSAL_LM"
         )
@@ -181,15 +161,11 @@ class MiniGPT4_llama_v2(Blip2Base,PyTorchModelHubMixin):
             self.llama_proj = nn.Linear(
                 1408, self.llama_model.config.hidden_size
             )
-
-        self.max_txt_len = max_txt_len
-        self.end_sym = end_sym
-
-        if prompt_path:
-            with open(prompt_path, 'r') as f:
+        if self.prompt_path:
+            with open(self.prompt_path, 'r') as f:
                 raw_prompts = f.read().splitlines()
             filted_prompts = [raw_prompt for raw_prompt in raw_prompts if "<ImageHere>" in raw_prompt]
-            self.prompt_list = [prompt_template.format(p) for p in filted_prompts]
+            self.prompt_list = [self.prompt_template.format(p) for p in filted_prompts]
             print('Load {} training prompts'.format(len(self.prompt_list)))
             print('Prompt Example \n{}'.format(random.choice(self.prompt_list)))
         else:
@@ -735,65 +711,20 @@ class MiniGPT4_llama_v2(Blip2Base,PyTorchModelHubMixin):
 
     @classmethod
     def from_config(cls, cfg):
-        vit_model = cfg.get("vit_model", "eva_clip_g")
-        q_former_model = cfg.get("q_former_model", "https://storage.googleapis.com/sfr-vision-language-research/LAVIS/models/BLIP2/blip2_pretrained_flant5xxl.pth")
-        img_size = cfg.get("image_size")
-        num_query_token = cfg.get("num_query_token")
-        llama_model = cfg.get("llama_model")
-
-        drop_path_rate = cfg.get("drop_path_rate", 0)
-        use_grad_checkpoint = cfg.get("use_grad_checkpoint", False)
-        vit_precision = cfg.get("vit_precision", "fp16")
-        freeze_vit = cfg.get("freeze_vit", True)
-        freeze_qformer = cfg.get("freeze_qformer", True)
-        low_resource = cfg.get("low_resource", False)
-
-        prompt_path = cfg.get("prompt_path", "")
-        prompt_template = cfg.get("prompt_template", "")
-        max_txt_len = cfg.get("max_txt_len", 300)
-        end_sym = cfg.get("end_sym", '\n')
-
-        lora_r = cfg.get("lora_r",64)
-        lora_alpha = cfg.get("lora_alpha",16)
-        chat_template = cfg.get("chat_template",False)
-        system_prompt = cfg.get("system_prompt", False)
-        token_pooling = cfg.get("token_pooling",True)
-
-        use_grad_checkpoint_llm = cfg.get("use_grad_checkpoint_llm", False)
-        max_context_len = cfg.get("max_context_len", 3800)
-        remove_template = cfg.get("remove_template", False)
-
-
         model = cls(
-            vit_model=vit_model,
-            img_size=img_size,
-            drop_path_rate=drop_path_rate,
-            use_grad_checkpoint=use_grad_checkpoint,
-            vit_precision=vit_precision,
-            freeze_vit=freeze_vit,
-            llama_model=llama_model,
-            prompt_path=prompt_path,
-            prompt_template=prompt_template,
-            max_txt_len=max_txt_len,
-            low_resource=low_resource,
-            end_sym=end_sym,
-            lora_r = lora_r,
-            lora_alpha = lora_alpha,
-            chat_template = chat_template,
-            system_prompt = system_prompt,
-            token_pooling = token_pooling,
-            use_grad_checkpoint_llm=use_grad_checkpoint_llm,
-            max_context_len=max_context_len,
-            remove_template = remove_template
+            cfg=cfg,
         )
-
         ckpt_path = cfg.get("ckpt", "")  # load weights of MiniGPT-4
         if ckpt_path:
             print("Load Minigpt-4-LLM Checkpoint: {}".format(ckpt_path))
             ckpt = torch.load(ckpt_path, map_location="cpu")
-            msg = model.load_state_dict(ckpt['model'], strict=False)
+            msg = model.load_state_dict(ckpt['model'], strict=False)  
         # push the model to the hub with its metadata and config file
-        # model.push_to_hub("MiniGPT4-video")
+        # model.push_to_hub("MiniGPT4-video-v2")
+        # video_config = minigpt4_video_config(cfg)
+        # video_config.save_pretrained("minigpt4_video_config")
+        # print("Save Minigpt-4-LLM Config: minigpt4_video_config")
+        # video_config.push_to_hub("MiniGPT4-video")
         return model
 
 

@@ -13,7 +13,7 @@ from minigpt4.common.registry import registry
 from minigpt4.models.base_model import BaseModel
 from minigpt4.models.blip2 import Blip2Base
 from minigpt4.processors.base_processor import BaseProcessor
-from minigpt4.models.mini_gpt4_llama_v2 import MiniGPT4_llama_v2
+from minigpt4.models.mini_gpt4_llama_v2 import MiniGPT4_Video
 # from minigpt4.models.mini_gpt4v import MiniGPT4v
 
 
@@ -21,7 +21,7 @@ __all__ = [
     "load_model",
     "BaseModel",
     "Blip2Base",
-    "MiniGPT4_llama_v2",
+    "MiniGPT4_Video",
     # "MiniGPT4v",
 ]
 
