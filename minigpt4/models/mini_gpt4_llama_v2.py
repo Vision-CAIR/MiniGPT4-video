@@ -30,6 +30,9 @@ from transformers import PreTrainedModel
 from typing import List
 class minigpt4_video_config(PretrainedConfig):
     model_type="minigpt4_video"
+    PRETRAINED_MODEL_CONFIG_DICT = {
+        "minigpt4_video": "configs/models/minigpt4.yaml",
+    }
     def __init__(
         self,
         omg_config:dict = {},
@@ -50,7 +53,7 @@ class MiniGPT4_Video(Blip2Base, PreTrainedModel):
     """
 
     PRETRAINED_MODEL_CONFIG_DICT = {
-        "minigpt4_video": "configs/models/minigpt4.yaml",
+        "minigpt4_video": "minigpt4/configs/models/minigpt4.yaml",
     }
     config_class=minigpt4_video_config
 

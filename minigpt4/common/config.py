@@ -72,7 +72,7 @@ class Config:
         print("model arch",model.arch)
         print("model cls",model_cls)
 
-        model_config_path = model_cls.default_config_path(model_type=model_type)
+        model_config_path = model_cls.PRETRAINED_MODEL_CONFIG_DICT[model_type]
 
         model_config = OmegaConf.create()
         # hierarchy override, customized config > default config
