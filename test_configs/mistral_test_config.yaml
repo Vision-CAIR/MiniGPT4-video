@@ -17,7 +17,7 @@ model:
   use_grad_checkpoint_llm: True
   max_context_len: 7200
   architectures: [
-    "MiniGPT4_llama_v2"
+    "minigpt4_video"
   ]
   device: "cuda"
   drop_path_rate: 0 

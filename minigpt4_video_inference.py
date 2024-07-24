@@ -93,12 +93,12 @@ def generate_subtitles(video_path):
     video_id=video_path.split('/')[-1].split('.')[0]
     audio_path = f"workspace/inference_subtitles/mp3/{video_id}"+'.mp3'
     os.makedirs("workspace/inference_subtitles/mp3",exist_ok=True)
-    if existed_subtitles.get(video_id,False):
-        return f"workspace/inference_subtitles/{video_id}"+'.vtt'
+    if os.path.exists(f"workspace/inference_subtitles/{video_id}"+'.vtt'):
+        return f"workspace/inference_subtitles/{video_id}"+'.vtt' 
     try:
         extract_audio(video_path,audio_path)
         print("successfully extracted")
-        os.system(f"whisper {audio_path}  --language English --model large --output_format vtt --output_dir workspace/inference_subtitles")
+        os.system(f"whisper {audio_path}  --language English --model large --output_format vtt --output_dir workspace/inference_subtitles/")
         # remove the audio file
         os.system(f"rm {audio_path}")
         print("subtitle successfully generated")  
@@ -109,7 +109,7 @@ def generate_subtitles(video_path):
         return None
     
 
-def run (video_path,instruction,model,vis_processor,gen_subtitles=True):
+def inference_fun (video_path,instruction,model,vis_processor,gen_subtitles=True):
     if gen_subtitles:
         subtitle_path=generate_subtitles(video_path)
     else :
@@ -165,11 +165,8 @@ print("seed",seed)
 model, vis_processor = init_model(args)
 conv = CONV_VISION.copy()
 conv.system = ""
-inference_subtitles_folder="inference_subtitles"
-os.makedirs(inference_subtitles_folder,exist_ok=True)
-existed_subtitles={}
-for sub in os.listdir(inference_subtitles_folder):
-    existed_subtitles[sub.split('.')[0]]=True
+inference_subtitles_folder="workspace/inference_subtitles"
+os.makedirs("workspace/inference_subtitles",exist_ok=True)
 
 if __name__ == "__main__":
     video_path=args.video_path
@@ -177,7 +174,7 @@ if __name__ == "__main__":
     add_subtitles=args.add_subtitles
     setup_seeds(seed)
     t1=time.time()
-    pred=run(video_path,instruction,model,vis_processor,gen_subtitles=add_subtitles)
+    pred=inference_fun(video_path,instruction,model,vis_processor,gen_subtitles=add_subtitles)
     print(pred)
     print("time taken : ",time.time()-t1)
     print("Number of output words : ",len(pred.split(' ')))

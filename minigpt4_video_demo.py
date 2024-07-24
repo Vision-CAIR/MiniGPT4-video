@@ -16,6 +16,7 @@ import shutil
 from PIL import Image
 from moviepy.editor import VideoFileClip
 from theme import minigptlv_style, custom_css,text_css
+import re
 def create_video_grid(images, rows, cols,save_path):
     image_width, image_height = images[0].size
     grid_width = cols * image_width
@@ -112,7 +113,7 @@ def generate_subtitles(video_path):
     video_id=video_path.split('/')[-1].split('.')[0]
     audio_path = f"workspace/inference_subtitles/mp3/{video_id}"+'.mp3'
     os.makedirs("workspace/inference_subtitles/mp3",exist_ok=True)
-    if existed_subtitles.get(video_id,False):
+    if os.path.exists(f"workspace/inference_subtitles/{video_id}"+'.vtt'):
         return f"workspace/inference_subtitles/{video_id}"+'.vtt'
     try:
         extract_audio(video_path,audio_path)
@@ -168,20 +169,31 @@ def run_single_image (image_path,instruction,model,vis_processor):
     answers = model.generate(prepared_images, prompt, max_new_tokens=args.max_new_tokens, do_sample=False, lengths=[length],num_beams=1)
     return answers[0]
 
+def is_youtube_url(url: str) -> bool:
+    youtube_regex = (
+        r'(https?://)?(www\.)?'
+        '(youtube|youtu|youtube-nocookie)\.(com|be)/'
+        '(watch\?v=|embed/|v/|.+\?v=)?([^&=%\?]{11})'
+    )
+    return bool(re.match(youtube_regex, url))
 def download_video(youtube_url, download_finish):
-    video_id=youtube_url.split('v=')[-1].split('&')[0]
-    # Create a YouTube object
-    youtube = YouTube(youtube_url)
-    # Get the best available video stream
-    video_stream = youtube.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc().first()
-    # if has_subtitles:
-    # Download the video to the workspace folder
-    print('Downloading video')
-    video_stream.download(output_path="workspace",filename=f"{video_id}.mp4")
-    print('Video downloaded successfully')
-    processed_video_path= f"workspace/{video_id}.mp4"
-    download_finish = gr.State(value=True)
-    return processed_video_path, download_finish
+    if is_youtube_url(youtube_url):
+        video_id=youtube_url.split('v=')[-1].split('&')[0]
+        # Create a YouTube object
+        youtube = YouTube(youtube_url)
+        # Get the best available video stream
+        video_stream = youtube.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc().first()
+        # if has_subtitles:
+        # Download the video to the workspace folder
+        print('Downloading video')
+        os.makedirs("workspace/tmp",exist_ok=True)
+        video_stream.download(output_path="workspace/tmp",filename=f"{video_id}.mp4")
+        print('Video downloaded successfully')
+        processed_video_path= f"workspace/tmp/{video_id}.mp4"
+        download_finish = gr.State(value=True)
+        return processed_video_path, download_finish
+    else:
+        return None, download_finish
  
 def get_video_url(url,has_subtitles):
     # get video id from url
@@ -221,9 +233,6 @@ conv = CONV_VISION.copy()
 conv.system = ""
 inference_subtitles_folder="workspace/inference_subtitles"
 os.makedirs(inference_subtitles_folder,exist_ok=True)
-existed_subtitles={}
-for sub in os.listdir(inference_subtitles_folder):
-    existed_subtitles[sub.split('.')[0]]=True
 
 def gradio_demo_local(video_path,has_sub,instruction):
     pred=run(video_path,instruction,model,vis_processor,gen_subtitles=has_sub)
@@ -243,38 +252,23 @@ def use_example(url,has_sub_1,q):
 
 title = """<h1 align="center">MiniGPT4-video 🎞️🍿</h1>"""
 description = """<h5>This is the demo of MiniGPT4-video Model.</h5>"""
-project_page = """<p><a href='https://vision-cair.github.io/MiniGPT4-video/'><img src='https://img.shields.io/badge/Project-Page-Green'></a></p>"""
-code_link="""<p><a href='https://github.com/Vision-CAIR/MiniGPT4-video'><img src='https://img.shields.io/badge/Github-Code-blue'></a></p>"""
-paper_link="""<p><a href=''><img src='https://img.shields.io/badge/Paper-PDF-red'></a></p>"""
+project_details="""<div style="text-align: center;">
+        <div>
+            <font size=3>
+                <div>
+                    <a href="https://vision-cair.github.io/MiniGPT4-video/">🎞️ Project Page</a>
+                    <a href="https://arxiv.org/abs/2404.03413">📝 arXiv Paper</a>
+                </div>
+            </font>
+        </div>
+    </div>"""
 video_path=""
 with gr.Blocks(title="MiniGPT4-video 🎞️🍿",css=text_css ) as demo :
-    # with gr.Row():
-    #     with gr.Column(scale=2):
     gr.Markdown(title)
     gr.Markdown(description)
-        # gr.Image("repo_imgs/Designer_2_new.jpeg",scale=1,show_download_button=False,show_label=False)
-    # with gr.Row():
-    #     gr.Markdown(project_page)
-    #     gr.Markdown(code_link)
-    #     gr.Markdown(paper_link)
+    gr.Markdown(project_details)
         
     with gr.Tab("Local videos"):
-        # local_interface=gr.Interface(
-        #     fn=gradio_demo_local,
-        #     inputs=[gr.Video(sources=["upload"]),gr.Checkbox(label='Use subtitles'),gr.Textbox(label="Write any Question")],
-        #     outputs=["text",
-        #             ],
-            
-        #     # title="<h2>Local videos</h2>",
-        #     description="Upload your videos with length from one to two minutes",
-        #     examples=[
-        #         ["example_videos/sample_demo_1.mp4", True, "Why is this video funny"],
-        #         ["example_videos/sample_demo_2.mp4", False, "Generate a creative advertisement for this product."],
-        #         ["example_videos/sample_demo_3.mp4", False, "Write a poem inspired by this video."],
-        #     ],
-        #     css=custom_css,  # Apply custom CSS
-        #     allow_flagging='auto'
-        # )
         with gr.Row():
             with gr.Column():
                 video_player_local = gr.Video(sources=["upload"])
@@ -288,24 +282,6 @@ with gr.Blocks(title="MiniGPT4-video 🎞️🍿",css=text_css ) as demo :
         process_button_local.click(fn=gradio_demo_local, inputs=[video_player_local, has_subtitles_local, question_local], outputs=[answer_local])
         
     with gr.Tab("Youtube videos"):
-        # youtube_interface=gr.Interface(
-        #     fn=gradio_demo_youtube,
-        #     inputs=[gr.Textbox(label="Enter the youtube link"),gr.Checkbox(label='Use subtitles'),gr.Textbox(label="Write any Question")],
-        #     outputs=["text",
-        #             ],
-        #     # title="<h2>YouTube videos</h2>",
-        #     description="Videos length should be from one to two minutes",
-        #     examples=[
-        #         ["https://www.youtube.com/watch?v=8kyg5u6o21k", True, "What happens in this video?"],
-        #         ["https://www.youtube.com/watch?v=zWfX5jeF6k4", True, "what is the main idea in this video?"],
-        #         ["https://www.youtube.com/watch?v=W5PRZuaQ3VM", True, "Inspired by this video content suggest a creative advertisement about the same content."],
-        #         ["https://www.youtube.com/watch?v=W8jcenQDXYg", True, "Describe what happens in this video."],
-        #         ["https://www.youtube.com/watch?v=u3ybWiEUaUU", True, "what is creative in this video ?"],
-        #         ["https://www.youtube.com/watch?v=nEwfSZfz7pw", True, "What Monica did in this video ?"],
-        #     ],
-        #     css=custom_css,  # Apply custom CSS
-        #     allow_flagging='auto',
-        # )
         with gr.Row():
             with gr.Column():
                 youtube_link = gr.Textbox(label="Enter the youtube link", placeholder="Paste YouTube URL with this format 'https://www.youtube.com/watch?v=video_id'")
@@ -324,15 +300,6 @@ with gr.Blocks(title="MiniGPT4-video 🎞️🍿",css=text_css ) as demo :
                 answer=gr.Text("Answer will be here",label="MiniGPT4-video Answer")
         
         process_button.click(fn=gradio_demo_youtube, inputs=[youtube_link, has_subtitles, question], outputs=[answer])
-        ## Add examples to make the demo more interactive and user-friendly
-        # with gr.Row():
-        #     url_1=gr.Text("https://www.youtube.com/watch?v=8kyg5u6o21k")
-        #     has_sub_1=True
-        #     q_1=gr.Text("What happens in this video?")
-        #     # add button to change the youtube link and the question with the example values
-        #     use_example_1_btn=gr.Button("Use this example")
-        #     use_example_1_btn.click(use_example,inputs=[url_1,has_sub_1,q_1])
-            
         
 
 
