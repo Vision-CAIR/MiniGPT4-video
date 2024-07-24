@@ -264,7 +264,7 @@ dependencies:
       - python-multipart==0.0.6
       - python-slugify==8.0.1
       - python-utils==3.8.1
-      - pytubefix==6.0.0
+      - pytubefix==6.5.1
       - pytz==2023.3.post1
       - pyyaml==6.0.1
       - referencing==0.32.0
