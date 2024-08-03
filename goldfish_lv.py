@@ -10,7 +10,7 @@ import moviepy.editor as mp
 import webvtt
 import re
 
-from typing import Dict, Tuple, Optional, List
+from typing import Optional, List
 from tqdm import tqdm
 from PIL import Image
 from torchvision import transforms
@@ -28,7 +28,7 @@ else:
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import re
 from transformers import BitsAndBytesConfig
-from split_long_video_in_parallel import split_video
+# from split_long_video_in_parallel import split_video
 import transformers
 from vllm import LLM
 def time_to_seconds(subrip_time):
@@ -599,7 +599,7 @@ class GoldFish_LV:
         answers=self.model.generate(prepared_images_batch, prepared_instructions_batch, max_new_tokens=self.args.max_new_tokens, do_sample=False, lengths=lengths_batch, num_beams=1)
         return answers , videos_conversations
 
-    def run_images_features (self,img_embeds,prepared_instruction,return_embedding=False):        
+    def run_images_features (self,img_embeds,prepared_instruction):        
         lengths=[]
         prompts=[]
         for i in range(img_embeds.shape[0]):    
@@ -609,16 +609,11 @@ class GoldFish_LV:
             conv.append_message(conv.roles[1], None)
             prompts.append(conv.get_prompt())
             lengths.append(len(img_embeds[i]))
-        if return_embedding: 
-            answers,videos_embedding = self.model.generate(images=None,img_embeds=img_embeds,texts=prompts, max_new_tokens=300, do_sample=False, lengths=lengths,num_beams=1, 
-                                                       return_video_temporal_features=return_embedding)
-            return answers ,videos_embedding
-        else:
-            answers = self.model.generate(images=None,img_embeds=img_embeds,texts=prompts, max_new_tokens=300, do_sample=False, lengths=lengths,num_beams=1, 
-                                                       return_video_temporal_features=return_embedding)
-            return answers
         
-    def run_images (self,prepared_images,prepared_instruction,return_embedding=False):        
+        answers = self.model.generate(images=None,img_embeds=img_embeds,texts=prompts, max_new_tokens=300, do_sample=False, lengths=lengths,num_beams=1)
+        return answers
+        
+    def run_images (self,prepared_images,prepared_instruction):        
         lengths=[]
         prompts=[]
         for i in range(prepared_images.shape[0]):    
@@ -628,61 +623,7 @@ class GoldFish_LV:
             conv.append_message(conv.roles[1], None)
             prompts.append(conv.get_prompt())
             lengths.append(len(prepared_images[i]))
-        if return_embedding: 
-            answers,videos_embedding = self.model.generate(prepared_images, prompts, max_new_tokens=300, do_sample=False, lengths=lengths,num_beams=1, 
-                                                       return_video_temporal_features=return_embedding)
-            return answers ,videos_embedding
-        else:
-            answers = self.model.generate(prepared_images, prompts, max_new_tokens=300, do_sample=False, lengths=lengths,num_beams=1, 
-                                                       return_video_temporal_features=return_embedding)
-            return answers
-
-
-
-# def get_arguments():
-
-#     parser = argparse.ArgumentParser(description="Inference parameters")
-#     parser.add_argument("--cfg-path", default="test_configs/llama2_test_config.yaml")
-#     parser.add_argument("--ckpt", type=str, default="checkpoints/video_llama_checkpoint_last.pth")
-#     parser.add_argument("--neighbours", type=int, default=3)
-#     parser.add_argument("--start", default=0, type=int)
-#     parser.add_argument("--end", default=100000, type=int)
-#     parser.add_argument("--skill_path",default="/ibex/project/c2106/kirolos/Long_video_Bench/benchmark/final/concatenated/summarization.json")
-#     parser.add_argument("--add_subtitles", action='store_true')
-#     parser.add_argument("--use_openai_embedding", action="store_true")
-#     parser.add_argument("--eval_opt", type=str, default='all')
-#     parser.add_argument("--max_new_tokens", type=int, default=512)
-#     parser.add_argument("--batch_size", type=int, default=4)
-#     parser.add_argument("--lora_r", type=int, default=64)
-#     parser.add_argument("--lora_alpha", type=int, default=16)
-#     parser.add_argument("--video_path", type=str, help="Path to the video file")
-#     parser.add_argument("--options", nargs="+")
-#     return parser.parse_args()
-# args = get_arguments()  
-# if __name__ == "__main__":
-#     minigpt_lv = GoldFish_LV(args)
-#     # processed_video_path = minigpt_lv.process_video_url(args.video_path)
-#     # minigpt_lv.inference(video_path=processed_video_path)
-#     with open ('/home/ataallka/minigpt_video/minigpt_multi_img/workspace/eval/llama_vid_qa/ckpt_92/output.txt','r') as f:
-#         context=f.read()
-#     # print(clean_text(context))
-#     print("start inference")
-#     t1=time.time()
-#     bs=1
-#     contexts=[]
-#     questions=[]
-#     for i in range(1):
-#         contexts.append(context)
-#         questions.append("Summarize this movie")
-#         if len(contexts)==bs:
-#             print(minigpt_lv.inference_RAG(questions,contexts))
-#             contexts=[]
-#             questions=[]
-    
-#     if len(contexts)>0:
-#         print(minigpt_lv.inference_RAG(questions,contexts))
-    
-#     print("time for 18 clip",time.time()-t1)
-    
+        answers = self.model.generate(prepared_images, prompts, max_new_tokens=300, do_sample=False, lengths=lengths,num_beams=1)
+        return answers
             
     
