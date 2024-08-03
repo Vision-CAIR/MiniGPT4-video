@@ -1,16 +1,6 @@
 # [ECCV 2024 Accepted]Goldfish: Vision-Language Understanding of Arbitrarily Long Videos
-# [CVPR2024 workshop]MiniGPT4-Video: Advancing Multimodal LLMs for Video Understanding with Interleaved Visual-Textual Tokens
+# [CVPR2024W]MiniGPT4-Video: Advancing Multimodal LLMs for Video Understanding with Interleaved Visual-Textual Tokens
 **This repo contains the codes for MiniGPT4-video for short video understanding and Goldfish for long video understanding.**
-<!-- <h3>Online Demo </h3>
-<a href='https://huggingface.co/spaces/Vision-CAIR/MiniGPT4-video'><img src='repo_imgs/minigpt4_demo_icon.png' width=200 height=200></a>
-
-
-<font size=3><div> [[🎞️ Project Page]("https://vision-cair.github.io/MiniGPT4-video/")] [[📝 arXiv Paper]("https://arxiv.org/abs/2404.03413")] </div><font>
-<h3>Online Demo </h3>
-<a href='https://huggingface.co/spaces/Vision-CAIR/MiniGPT4-video'><img src='repo_imgs/golfishai.jpg' width=200 height=200></a>
-
-<font size=3><div> [[<img src="repo_imgs/golfishai.jpg" width=18> Project Page]()] [[📝 arXiv Paper]()] [[🤗 TVQA-Long Dataset](https://huggingface.co/datasets/Vision-CAIR/TVQA-Long/tree/main)]</div></font> -->
-
 <h3 style="text-align: center;">Online Demos</h3>
 <div style="display: flex; justify-content: center; gap: 40px;">
     <div style="text-align: center;">
@@ -42,7 +32,6 @@
         </div>
     </div>
 </div>
-
 
 
 ![Goldfish_teaser_fig](repo_imgs/teaser_fig_final_final.jpg)
@@ -208,7 +197,7 @@ set the cfg-path in the script to `train_configs/224_v2_mistral_video_stage_2.ya
 set the model name here `minigpt4/configs/datasets/cmd_video/default.yaml` and `minigpt4/configs/datasets/webvid/default.yaml` to mistral<br>
 
 ```bash
-bash jobs_video/train/stage_2.sh
+bash training_scripts/stage_2.sh
 ```
 You can download our trained weights for this stage from here [Llama2](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/blob/main/checkpoints/video_captioning_llama_checkpoint_last.pth) [Mistral](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/blob/main/checkpoints/video_captioning_mistral_checkpoint_last.pth)<br>
 
@@ -223,7 +212,7 @@ set the cfg-path in the script to `train_configs/224_v2_mistral_video_stage_3.ya
 set the model name here `minigpt4/configs/datasets/video_chatgpt/default.yaml` to mistral<br>
 
 ```bash
-bash jobs_video/train/stage_3.sh
+bash training_scripts/stage_3.sh
 ```
 You can download our trained weights for this stage from here [Llama2](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/blob/main/checkpoints/video_llama_checkpoint_last.pth) [Mistral](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/blob/main/checkpoints/video_mistral_checkpoint_last.pth)<br>
 
@@ -276,9 +265,9 @@ Set the each evaluation script parameters to include the path to the checkpoints
 
 ```bash
 # Llama2
-bash jobs_video/eval/llama2_evaluation.sh
+bash evaluation/minigpt4_video_eval/llama2_evalualtion.sh
 # Mistral
-bash jobs_video/eval/mistral_evalualtion.sh
+bash evaluation/minigpt4_video_eval/mistral_evalualtion.sh
 ```
 Then Use GPT3.5 turbo to compare the predictions with the ground truth and generate the accuracy and scores <br>
 Set these variables in both evaluate_benchmark.sh and evaluate_zeroshot.sh <br>
@@ -290,11 +279,11 @@ NUM_TASKS=128
 ```
 Then to evaluate [Video-ChatGPT benchmark] run the following script <br>
 ```bash
-bash test_benchmark/quantitative_evaluation/evaluate_benchmark.sh
+bash GPT_evaluation/evaluate_benchmark.sh
 ```
 To evaluate open ended questions run the following script <br>
 ```bash
-bash test_benchmark/quantitative_evaluation/evaluate_zeroshot.sh
+bash GPT_evaluation/evaluate_zeroshot.py
 ```
 
 ## :zap: Goldfish Evaluation
@@ -335,18 +324,18 @@ movienet_annotations_dir="path to the movienet annotations directory"
 NEIGHBOURS=3
 use_openai_embedding="whether to use openai embeddings or not"
 # then run the script
-bash jobs_video/long_video_eval/movies/eval_model_summary_llama_vid.sh
+bash evaluation/Goldfish_eval/movies/eval_model_summary_llama_vid.sh
 
 # MovieQA evaluation
 # same as above but set the parameters in the script to the MovieQA paths 
-bash jobs_video/long_video_eval/movies/eval_model_summary_movie_qa.sh
+bash evaluation/Goldfish_eval/movies/eval_model_summary_movie_qa.sh
 
 # MovieChat evaluation 
 # set these parameters in the script 
 dataset_path="path to the movies folder"
 annotation_json_folder="path to the jsons folder"
 # then run the script
-bash jobs_video/long_video_eval/movies/eval_model_summary_movie_chat.sh
+bash evaluation/Goldfish_eval/movies/eval_model_summary_movie_chat.sh
 ```
 ### TVQA-Long
 For Goldfish evaluation we can use the original separated clips from the original TVQA dataset <br>
@@ -360,7 +349,7 @@ annotation_path="path to the TVQA-Long annotation file"
 NEIGHBOURS= 3
 use_openai_embedding="whether to use openai embeddings or not"
 # then run the script
-bash jobs_video/long_video_eval/tvqa_eval/eval_model_summary.sh
+bash evaluation/Goldfish_eval/tvqa_eval/eval_model_summary.sh
 ````
 
 Then Use GPT3.5 turbo to compare the predictions with the ground truth and generate the accuracy and scores <br>
@@ -373,7 +362,7 @@ NUM_TASKS=128
 ```
 To evaluate open ended questions run the following script <br>
 ```bash
-bash test_benchmark/quantitative_evaluation/evaluate_zeroshot.sh
+bash GPT_evaluation/evaluate_zeroshot.sh
 ```
 
 ## Citation

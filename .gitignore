@@ -198,8 +198,11 @@ flagged/*
 jobs_video/eval/choose_best_ckpt/*
 datasets/*
 demo_job_new.sh
-test_benchmark/gemini_eval
+gemini_eval
 llama3.py
 evaluation_subtitles.zip
 minigpt4/models/transformers
 new_workspace
+minigpt4_video
+minigpt4_video_eval
+Infinibench
