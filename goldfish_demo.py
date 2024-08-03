@@ -34,7 +34,7 @@ def get_arguments():
     parser.add_argument("--neighbours", type=int, default=3)
     parser.add_argument("--eval_opt", type=str, default='all')
     parser.add_argument("--max_new_tokens", type=int, default=512)
-    parser.add_argument("--use_openai_embedding",type=str2bool, default=False)
+    parser.add_argument("--use_openai_embedding",type=str2bool, default=True)
     parser.add_argument("--batch_size", type=int, default=4)
     parser.add_argument("--lora_r", type=int, default=64)
     parser.add_argument("--lora_alpha", type=int, default=16)
@@ -123,10 +123,7 @@ def inference(video_path, use_subtitles=True, instruction="", number_of_neighbou
         pred=gradio_short_inference_video(video_path,instruction,use_subtitles)
     processing_time = time.time() - start_time
     print(f"Processing time: {processing_time:.2f} seconds")
-    return {
-        'video_name': os.path.splitext(os.path.basename(video_path))[0],
-        'pred': pred,
-    }
+    return pred
 
 
 def process_video(path_url, has_subtitles, instruction, number_of_neighbours):
@@ -134,10 +131,7 @@ def process_video(path_url, has_subtitles, instruction, number_of_neighbours):
         video_path = return_video_path(path_url)
     else:
         video_path = path_url
-    result = inference(video_path, has_subtitles, instruction, number_of_neighbours)    
-    pred = result["pred"]
-    video_name = result["video_name"]
-    # pred="mmmmm"
+    pred = inference(video_path, has_subtitles, instruction, number_of_neighbours)    
     return pred
 
 def return_video_path(youtube_url):
