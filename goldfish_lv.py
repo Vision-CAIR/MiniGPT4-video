@@ -28,7 +28,9 @@ else:
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import re
 from transformers import BitsAndBytesConfig
-
+from split_long_video_in_parallel import split_video
+import transformers
+from vllm import LLM
 def time_to_seconds(subrip_time):
     return subrip_time.hours * 3600 + subrip_time.minutes * 60 + subrip_time.seconds + subrip_time.milliseconds / 1000
 
@@ -73,12 +75,17 @@ class GoldFish_LV:
 
     def __init__(self, args: argparse.Namespace) -> None:
         self.args = args
-        self.model, self.vis_processor = init_model(args)
-        self.original_llama_model,self.original_llama_tokenizer=self.load_original_llama_model()
+        self.model, self.vis_processor,whisper_gpu_id,minigpt4_gpu_id,answer_module_gpu_id = init_model(args)
+        self.whisper_gpu_id=whisper_gpu_id
+        self.minigpt4_gpu_id=minigpt4_gpu_id
+        self.answer_module_gpu_id=answer_module_gpu_id
+        # self.original_llama_model,self.original_llama_tokenizer=self.load_original_llama_model()
+        # self.original_llama_model=self.load_original_llama_model_vllm()
+        self.llama_3_1_model=self.load_llama3_1_model()
         # self.summary_instruction="Generate a description of this video .Pay close attention to the objects, actions, emotions portrayed in the video,providing a vivid description of key moments.Specify any visual cues or elements that stand out."
         self.summary_instruction="I'm a blind person, please provide me with a detailed summary of the video content and try to be as descriptive as possible."
     def load_original_llama_model(self):
-        model_name="meta-llama/Llama-2-7b-chat-hf"
+        model_name="meta-llama/Meta-Llama-3-8B-Instruct"
         tokenizer = AutoTokenizer.from_pretrained(model_name)
         tokenizer.pad_token = "[PAD]"
         tokenizer.padding_side = "left"
@@ -92,11 +99,29 @@ class GoldFish_LV:
                 quantization_config=bnb_config,
             )
         return llama_model,tokenizer
+    def load_original_llama_model_vllm(self):
+        # "awq", "gptq", "squeezellm", and "fp8" 
+        llm = LLM(model="meta-llama/Meta-Llama-3.1-8B-Instruct",gpu_memory_utilization=0.6)  # Create an LLM.
+        return llm
+    
+    def load_llama3_1_model(self):
+        model_id = "meta-llama/Meta-Llama-3.1-8B-Instruct"
+
+        pipeline = transformers.pipeline(
+            "text-generation",
+            model=model_id,
+            model_kwargs={"torch_dtype": torch.bfloat16},
+            device_map=f"cuda:{self.answer_module_gpu_id}",
+        )
+        return pipeline
+
+        
 
     def _youtube_download(self, url: str) -> str:
         try:
             video_id = url.split('v=')[-1].split('&')[0]
             video_id = video_id.strip()
+            print(f"Downloading video with ID: {video_id}")
             youtube = YouTube(f"https://www.youtube.com/watch?v={video_id}")
             video_stream = youtube.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc().first()
             if not video_stream:
@@ -157,7 +182,7 @@ class GoldFish_LV:
         try:
             self.extract_audio(video_path, audio_path)
             print("Successfully extracted audio")
-            os.system(f"whisper {audio_path}  --language English --model medium --output_format vtt --output_dir {subtitle_dir}")
+            os.system(f"whisper {audio_path} --device cuda:{self.whisper_gpu_id}  --language English  --model medium --output_format vtt --output_dir {subtitle_dir}")
             os.system(f"rm {audio_path}")
             # os.system(f"rm -r {audio_dir}")
             print("Subtitle successfully generated")
@@ -290,6 +315,7 @@ class GoldFish_LV:
         if len(os.listdir(tmp_save_path)) == 0:
             print("Splitting Long video")
             os.system(f"python split_long_video_in_parallel.py --video_path {video_path} --output_folder {tmp_save_path}")
+            # split_video(video_path, tmp_save_path, clip_duration=90)
         videos_list = sorted(os.listdir(tmp_save_path))
         return videos_list,tmp_save_path
     def long_inference_video(self, videos_list,tmp_save_path,subtitle_paths) -> Optional[str]:
@@ -320,8 +346,10 @@ class GoldFish_LV:
                     for pred,subtitle in zip(batch_preds,videos_conversation):
                         video_number += 1
                         save_name=f"{video_number}".zfill(5)
-                        video_information[f'caption__{save_name}'] = pred
-                        video_information[f'subtitle__{save_name}'] = subtitle
+                        if pred != "":
+                            video_information[f'caption__{save_name}'] = pred
+                        if subtitle != "":
+                            video_information[f'subtitle__{save_name}'] = subtitle
                         video_captions.append(pred)
                     batch_video_paths, batch_instructions,batch_subtitles = [], [],[]
 
@@ -331,46 +359,75 @@ class GoldFish_LV:
                 for pred,subtitle in zip(batch_preds,videos_conversation):
                     video_number += 1
                     save_name=f"{video_number}".zfill(5)
-                    video_information[f'caption__{save_name}'] = pred
-                    video_information[f'subtitle__{save_name}'] = subtitle
+                    if pred != "":
+                            video_information[f'caption__{save_name}'] = pred
+                    if subtitle != "":
+                        video_information[f'subtitle__{save_name}'] = subtitle
                     video_captions.append(pred)    
             with open(file_path, 'w') as file:
                 json.dump(video_information, file, indent=4)
             print("Clips inference done")
         return video_information
+    # def inference_RAG(self, instructions, context_list):
+    #     context_promots=[]
+    #     questions_prompts=[]
+    #     try:
+    #         for instruction,context in zip(instructions,context_list):
+    #             context=clean_text(context)
+    #             context_prompt=f"<s>[INST] Your task is to answer questions for one long video which is split into multiple clips.\nGiven these related information from the most related clips: \n{context}\n"
+    #             question_prompt=f"\nAnswer this question :{instruction} \n your answer is: [/INST]"
+    #             context_promots.append(context_prompt)
+    #             questions_prompts.append(question_prompt)
+    #         context_inputs = self.original_llama_tokenizer(context_promots, return_tensors="pt", padding=True, truncation=True,max_length=3500)
+    #         # print(context_inputs.keys())
+    #         print("context_inputs shape",context_inputs['input_ids'].shape)
+    #         question_inputs = self.original_llama_tokenizer(questions_prompts, return_tensors="pt", padding=True, truncation=True,max_length=300)
+    #         print("question_inputs shape",question_inputs['input_ids'].shape)
+    #         # concate the context and the question together 
+    #         inputs_ids=torch.cat((context_inputs['input_ids'],question_inputs['input_ids']),dim=1).to('cuda')
+    #         print("inputs shape",inputs_ids.shape)
+    #     except Exception as e:
+    #         print("error while tokenization",e)
+    #         return self.inference_RAG_batch_size_1(instructions, context_list)
+    #     with torch.no_grad():
+    #         summary_ids = self.original_llama_model.generate(inputs_ids,max_new_tokens=512)
+    #     answers=[]
+    #     for i in range(len(summary_ids)):
+    #         output_text=self.original_llama_tokenizer.decode(summary_ids[i], skip_special_tokens=True)
+    #         output_text = output_text.split('</s>')[0]  # remove the stop sign </s>
+    #         output_text = output_text.replace("<s>", "")
+    #         output_text = output_text.split(r'[/INST]')[-1].strip()
+    #         answers.append(output_text)
+    #     return answers
     def inference_RAG(self, instructions, context_list):
-        context_promots=[]
-        questions_prompts=[]
-        try:
-            for instruction,context in zip(instructions,context_list):
-                context=clean_text(context)
-                context_prompt=f"<s>[INST] Your task is to answer questions for one long video which is split into multiple clips.\nGiven these related information from the most related clips: \n{context}\n"
-                question_prompt=f"\nAnswer this question :{instruction} \n your answer is: [/INST]"
-                context_promots.append(context_prompt)
-                questions_prompts.append(question_prompt)
-            context_inputs = self.original_llama_tokenizer(context_promots, return_tensors="pt", padding=True, truncation=True,max_length=3500)
-            # print(context_inputs.keys())
-            print("context_inputs shape",context_inputs['input_ids'].shape)
-            question_inputs = self.original_llama_tokenizer(questions_prompts, return_tensors="pt", padding=True, truncation=True,max_length=300)
-            print("question_inputs shape",question_inputs['input_ids'].shape)
-            # concate the context and the question together 
-            inputs_ids=torch.cat((context_inputs['input_ids'],question_inputs['input_ids']),dim=1).to('cuda')
-            print("inputs shape",inputs_ids.shape)
-        except Exception as e:
-            print("error while tokenization",e)
-            return self.inference_RAG_batch_size_1(instructions, context_list)
-        with torch.no_grad():
-            summary_ids = self.original_llama_model.generate(inputs_ids,max_new_tokens=512)
+        messages=[]
+        for instruction,context in zip(instructions,context_list):
+            context=clean_text(context)
+            context_prompt=f"Your task is to answer questions for one long video which is split into multiple clips.\nGiven these related information from the most related clips: \n{context}\n"
+            question_prompt=f"\nAnswer this question :{instruction} \n your answer is:"
+            messages.append([{"role": "user", "content": context_prompt+question_prompt}])
+        outputs=self.llama_3_1_model(messages, max_new_tokens=512)
         answers=[]
-        for i in range(len(summary_ids)):
-            output_text=self.original_llama_tokenizer.decode(summary_ids[i], skip_special_tokens=True)
-            output_text = output_text.split('</s>')[0]  # remove the stop sign </s>
-            output_text = output_text.replace("<s>", "")
-            output_text = output_text.split(r'[/INST]')[-1].strip()
-            answers.append(output_text)
-        return answers
-       
+        for out in outputs:
+            answers.append(out[0]["generated_text"][-1]['content'])
+        return answers 
+    # def inference_RAG(self, instructions, context_list):
+    #     prompts=[]
+    #     for instruction,context in zip(instructions,context_list):
+    #         context=clean_text(context)
+    #         context_prompt=f"Your task is to answer questions for one long video which is split into multiple clips.\nGiven these related information from the most related clips: \n{context}\n"
+    #         question_prompt=f"\nAnswer this question :{instruction} \n your answer is:"
+    #         prompts.append(context_prompt+question_prompt)
         
+    #     with open('prompts.txt','w') as f:
+    #         for prompt in prompts:
+    #             f.write(prompt+'\n')
+        
+    #     outputs=self.original_llama_model.generate(prompts)
+    #     answers=[]
+    #     for out in outputs:
+    #         answers.append(out.outputs[0].text)
+    #     return answers        
     def inference_RAG_batch_size_1(self, instructions, context_list):
         answers=[]
         for instruction,context in zip(instructions,context_list):
