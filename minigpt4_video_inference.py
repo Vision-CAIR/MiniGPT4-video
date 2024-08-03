@@ -98,7 +98,7 @@ def generate_subtitles(video_path):
     try:
         extract_audio(video_path,audio_path)
         print("successfully extracted")
-        os.system(f"whisper {audio_path}  --language English --model large --output_format vtt --output_dir workspace/inference_subtitles/")
+        os.system(f"whisper {audio_path} --device cuda:{whisper_gpu_id} --language English --model large --output_format vtt --output_dir workspace/inference_subtitles/")
         # remove the audio file
         os.system(f"rm {audio_path}")
         print("subtitle successfully generated")  
@@ -162,7 +162,7 @@ with open('test_configs/llama2_test_config.yaml') as file:
 seed=config['run']['seed']
 print("seed",seed)
 
-model, vis_processor = init_model(args)
+model, vis_processor,whisper_gpu_id,minigpt4_gpu_id,answer_module_gpu_id = init_model(args)
 conv = CONV_VISION.copy()
 conv.system = ""
 inference_subtitles_folder="workspace/inference_subtitles"

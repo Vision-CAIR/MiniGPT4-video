@@ -59,8 +59,11 @@ def init_model(args):
 
     model_config = cfg.model_cfg
     model_config.low_resource = True
+    minigpt4_gpu_id=model_config.minigpt4_gpu_id
+    whisper_gpu_id=model_config.whisper_gpu_id
+    answer_module_gpu_id=model_config.answer_module_gpu_id
     model_cls = registry.get_model_class(model_config.arch)
-    model = model_cls.from_config(model_config).to('cuda:0')
+    model = model_cls.from_config(model_config).to(f'cuda:{minigpt4_gpu_id}')
 
 #     import pudb; pudb.set_trace()
     key = list(cfg.datasets_cfg.keys())[0]
@@ -68,7 +71,7 @@ def init_model(args):
     print(vis_processor_cfg)
     vis_processor = registry.get_processor_class(vis_processor_cfg.name).from_config(vis_processor_cfg)
     print('Initialization Finished')
-    return model, vis_processor
+    return model, vis_processor,whisper_gpu_id,minigpt4_gpu_id,answer_module_gpu_id
 
 def computeIoU(bbox1, bbox2):
     x1, y1, x2, y2 = bbox1

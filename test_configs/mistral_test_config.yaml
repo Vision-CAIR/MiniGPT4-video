@@ -1,6 +1,5 @@
 model:
   arch: mini_gpt4_llama_v2
-  model_type: pretrain_vicuna
   freeze_vit: True
   freeze_qformer: True
   max_txt_len: 512
@@ -17,7 +16,7 @@ model:
   use_grad_checkpoint_llm: True
   max_context_len: 7200
   architectures: [
-    "minigpt4_video"
+    "MiniGPT4_Video"
   ]
   device: "cuda"
   drop_path_rate: 0 
@@ -34,6 +33,9 @@ model:
   lora_dropout: 0.05
   remove_template: false
   prompt_path: ""
+  minigpt4_gpu_id: 0
+  whisper_gpu_id: 0
+  answer_module_gpu_id: 0
   
 
 

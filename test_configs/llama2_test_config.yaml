@@ -33,6 +33,10 @@ model:
   lora_dropout: 0.05
   remove_template: false
   prompt_path: ""
+  minigpt4_gpu_id: 0
+  whisper_gpu_id: 0
+  answer_module_gpu_id: 0
+
   
 
 

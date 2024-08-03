@@ -126,8 +126,8 @@ class MiniGPT4_Video(Blip2Base, PreTrainedModel):
                 load_in_8bit=True,
                 # device_map = "balanced"
                 # device_map="auto",
-                device_map={'':torch.cuda.current_device()},token=token
-                # device_map={'':0}
+                # device_map={'':torch.cuda.current_device()},token=token
+                device_map={'':f"cuda:{self.minigpt4_gpu_id}"},token=token
                 
             )
         else:
