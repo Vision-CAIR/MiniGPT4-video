@@ -15,7 +15,6 @@ model:
   length: 50
   use_grad_checkpoint_llm: True
   max_context_len: 3600
-  token_pooling: True
   architectures: [
     "MiniGPT4_Video"
   ]
