@@ -115,8 +115,6 @@ class MiniGPT4_Video(Blip2Base, PreTrainedModel):
         token=os.environ.get("HF_TKN")
         self.llama_tokenizer = LlamaTokenizer.from_pretrained(self.llama_model,use_fast=False,token=token)  #
         self.llama_tokenizer.pad_token = "$$"
-        # use fastv 
-        self.use_fastv = False
         print("self.low_resource",self.low_resource)
         if self.low_resource:
             self.llama_model = llm_model.from_pretrained(
@@ -450,7 +448,6 @@ class MiniGPT4_Video(Blip2Base, PreTrainedModel):
                 return_dict=True,
                 labels=targets,
                 reduction=reduction,
-                use_fastv=self.use_fastv
             )
         loss = outputs.loss
 
@@ -472,7 +469,6 @@ class MiniGPT4_Video(Blip2Base, PreTrainedModel):
         do_sample=False,
         stop_words_ids=[2],
         lengths=None,
-        return_video_temporal_features=False,
         img_embeds=None,
     ):
         '''
@@ -505,7 +501,6 @@ class MiniGPT4_Video(Blip2Base, PreTrainedModel):
         emb_dim = batch_embs[0].shape[2]
         dtype = batch_embs[0].dtype
         device = batch_embs[0].device
-
         embs = torch.zeros([batch_size, max_len, emb_dim], dtype=dtype, device=device)
         attn_mask = torch.zeros([batch_size, max_len], dtype=torch.int, device=device)
         for i, emb in enumerate(batch_embs):
@@ -521,15 +516,6 @@ class MiniGPT4_Video(Blip2Base, PreTrainedModel):
             embs = embs[:, -context_window:]
             attn_mask = attn_mask[:, -context_window:]
         with self.maybe_autocast():
-            if return_video_temporal_features:
-                last_hidden_state = self.llama_model(
-                    inputs_embeds=embs,
-                    attention_mask=attn_mask,
-                    output_hidden_states=True,
-                ).hidden_states[-1]
-                video_temporal_features = last_hidden_state.mean(dim=1)
-                # normalize the temporal features using L2 norm
-                # video_temporal_features = video_temporal_features / video_temporal_features.norm(dim=-1, keepdim=True)
             outputs = self.llama_model.generate(
                 inputs_embeds=embs,
                 attention_mask=attn_mask,
@@ -539,9 +525,7 @@ class MiniGPT4_Video(Blip2Base, PreTrainedModel):
                 temperature=temperature,
                 repetition_penalty=repetition_penalty,
                 # stopping_criteria=stopping_criteria,
-                use_fastv=False,
             )
-
         answers = []
         for output_token in outputs:
             if output_token[0] == 0:
@@ -551,10 +535,7 @@ class MiniGPT4_Video(Blip2Base, PreTrainedModel):
             output_texts = output_texts.replace("<s>", "")
             output_texts = output_texts.split(r'[/INST]')[-1].strip()
             answers.append(output_texts)
-        if return_video_temporal_features:
-            return answers, video_temporal_features
-        else:
-            return answers
+        return answers
 
     @torch.no_grad()
     def generate_text_only(
