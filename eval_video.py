@@ -25,7 +25,7 @@ else:
     llm_name="llama2"
 print("using captions",args.add_subtitles)
 
-model, vis_processor = init_model(args)
+model, vis_processor,whisper_gpu_id,minigpt4_gpu_id,answer_module_gpu_id = init_model(args)
 conv_temp = CONV_VISION.copy()
 conv_temp.system = ""
 if args.dataset == 'video_chatgpt_generic':
