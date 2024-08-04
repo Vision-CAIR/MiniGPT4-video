@@ -18,7 +18,7 @@ from peft import (
     LoraConfig,
     get_peft_model,
     get_peft_model_state_dict,
-    prepare_model_for_int8_training,
+    prepare_model_for_kbit_training,
     set_peft_model_state_dict,
 )
 import time
@@ -135,7 +135,7 @@ class MiniGPT4_Video(Blip2Base, PreTrainedModel):
             )
             
         # self.llama_model.resize_token_embeddings(len(self.llama_tokenizer))
-        self.llama_model = prepare_model_for_int8_training(self.llama_model)
+        self.llama_model = prepare_model_for_kbit_training(self.llama_model)
         loraconfig = LoraConfig(
             r=self.lora_r,
             lora_alpha=self.lora_alpha,
@@ -701,7 +701,7 @@ class MiniGPT4_Video(Blip2Base, PreTrainedModel):
         ckpt_path = cfg.get("ckpt", "")  # load weights of MiniGPT-4
         if ckpt_path:
             print("Load Minigpt-4-LLM Checkpoint: {}".format(ckpt_path))
-            ckpt = torch.load(ckpt_path, map_location="cpu")
+            ckpt = torch.load(ckpt_path)
             msg = model.load_state_dict(ckpt['model'], strict=False)  
         # push the model to the hub with its metadata and config file
         # model.push_to_hub("MiniGPT4-video-v2")
