@@ -255,7 +255,7 @@ We used the same evaluation as [Video-ChatGPT](https://mbzuai-oryx.github.io/Vid
 + [MSRVTT](https://cove.thecvf.com/datasets/839) <br>
 + [TGIF](https://github.com/YunseokJANG/tgif-qa/blob/master/dataset/README.md) <br>
 + [ActivityNet](https://mbzuaiac-my.sharepoint.com/:u:/g/personal/hanoona_bangalath_mbzuai_ac_ae/ESa302OCJMNHsMk7wuBbQc8BZH5CqlcdCWiSpXynQZDfAQ?e=CrOPbm) <br>
-+ [TVQA](https://tvqa.cs.unc.edu/) <br>
++ [TVQA](https://nlp.cs.unc.edu/data/jielei/tvqa/tvqa_public_html/download_tvqa.html) <br>
 + [Video-ChatGPT benchmark](https://mbzuai-oryx.github.io/Video-ChatGPT/) <br>
 
 You can find the evaluation datasets annotation files [download](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/tree/main/datasets/evaluation_datasets) <br>
@@ -311,7 +311,8 @@ This will be the souce videos for LLama-vid and MovieQA <br>
 For **Moviechat** the only available videos while implementing this work is 10 % of the training data and this what we used for evalaution and can be found [here](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/blob/main/datasets/goldfish_eval_datasets/movie_chat/available_movies_list.txt) <br>
 Full dataset can be found [here](https://huggingface.co/datasets/Enxin/MovieChat-1K_train/tree/main) <br>
 For **TVQA-Long** <br>
-Both videos and annotations can be found here [TVQA-Long](https://huggingface.co/datasets/Vision-CAIR/TVQA-Long/tree/main)
+if you want to use TVQA-Long for another model (llama-vid),both videos and annotations can be found here [TVQA-Long](https://huggingface.co/datasets/Vision-CAIR/TVQA-Long/tree/main). 
+For Goldfish evalaution we will use the separated clips from the original TVQA dataset <br>
 ### Run the evaluation scripts 
 ``` bash 
 # Llama-vid evalauation 
@@ -339,13 +340,16 @@ bash evaluation/Goldfish_eval/movies/eval_model_summary_movie_chat.sh
 ```
 ### TVQA-Long
 For Goldfish evaluation we can use the original separated clips from the original TVQA dataset <br>
-Download the original TVQA videos for short videos from [here](https://tvqa.cs.unc.edu/download_tvqa.html)<br>
+Download the original TVQA videos and clips subtitles for short videos from [here](https://nlp.cs.unc.edu/data/jielei/tvqa/tvqa_public_html/download_tvqa.html)<br>
+tvqa_long_annotation [here](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/tree/main/datasets/goldfish_eval_datasets/tvqa/tvqa_val_edited.json) <br>
+tvqa_json_subtitles [here](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/tree/main/datasets/goldfish_eval_datasets/tvqa/tvqa_preprocessed_subtitles.json)<br>
+
 ```bash 
 # set these parameters in the script
 tvqa_json_subtitles="path to the tvqa json subtitles file"
 tvqa_clips_subtitles="path to the tvqa clips subtitles"
 videos_frames="path to the video frames"
-annotation_path="path to the TVQA-Long annotation file"
+tvqa_long_annotation="path to the TVQA-Long annotation file"
 NEIGHBOURS= 3
 use_openai_embedding="whether to use openai embeddings or not"
 # then run the script
