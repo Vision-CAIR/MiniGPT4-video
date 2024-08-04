@@ -40,8 +40,12 @@ def prepare_input(vis_processor,video_path,subtitle_path,instruction):
     else :
         # calculate the total number of frames in the video using opencv        
         total_num_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) 
-    max_images_length = 45
-    max_sub_len = 400
+    if "mistral" in args.ckpt :
+        max_images_length=90
+        max_sub_len = 800
+    else:
+        max_images_length = 45
+        max_sub_len = 400
     images = []
     frame_count = 0
     sampling_interval = int(total_num_frames / max_images_length)
