@@ -30,37 +30,12 @@ import re
 from transformers import BitsAndBytesConfig
 # from split_long_video_in_parallel import split_video
 import transformers
-from vllm import LLM
-def time_to_seconds(subrip_time):
-    return subrip_time.hours * 3600 + subrip_time.minutes * 60 + subrip_time.seconds + subrip_time.milliseconds / 1000
-
-def split_subtitles(subtitle_path, n):
-    # read the subtitle file and detect the encoding
-    with open(subtitle_path, 'rb') as f:
-        result = chardet.detect(f.read())
-    subs = pysrt.open(subtitle_path, encoding=result['encoding'])
-    total_subs = len(subs)
-
-    if n <= 0 or n > total_subs:
-        print("Invalid value for n. It should be a positive integer less than or equal to the total number of subtitles.")
-        return None
-    subs_per_paragraph = total_subs // n
-    remainder = total_subs % n
-
-    paragraphs = []
-
-    current_index = 0
-
-    for i in range(n):
-        num_subs_in_paragraph = subs_per_paragraph + (1 if i < remainder else 0)
-
-        paragraph_subs = subs[current_index:current_index + num_subs_in_paragraph]
-        current_index += num_subs_in_paragraph
-        # Join subtitles using pysrt's built-in method for efficient formatting
-        paragraph = pysrt.SubRipFile(items=paragraph_subs).text
-        paragraphs.append(paragraph)
-
-    return paragraphs
+import whisper
+from datetime import timedelta
+# Function to format timestamps for VTT
+def format_timestamp(seconds):
+    td = timedelta(seconds=seconds)
+    return str(td)
 
 def clean_text(subtitles_text):
     # Remove unwanted characters except for letters, digits, spaces, periods, commas, exclamation marks, and single quotes
@@ -82,6 +57,7 @@ class GoldFish_LV:
         # self.original_llama_model,self.original_llama_tokenizer=self.load_original_llama_model()
         # self.original_llama_model=self.load_original_llama_model_vllm()
         self.llama_3_1_model=self.load_llama3_1_model()
+        self.whisper_model=whisper.load_model("large",device=f"cuda:{self.whisper_gpu_id}")
         # self.summary_instruction="Generate a description of this video .Pay close attention to the objects, actions, emotions portrayed in the video,providing a vivid description of key moments.Specify any visual cues or elements that stand out."
         self.summary_instruction="I'm a blind person, please provide me with a detailed summary of the video content and try to be as descriptive as possible."
     def load_original_llama_model(self):
@@ -95,14 +71,10 @@ class GoldFish_LV:
         llama_model = AutoModelForCausalLM.from_pretrained(
                 model_name,
                 torch_dtype=torch.bfloat16,
-                device_map={'':torch.cuda.current_device()},
+                device_map={'': f"cuda:{self.answer_module_gpu_id}"},
                 quantization_config=bnb_config,
             )
         return llama_model,tokenizer
-    def load_original_llama_model_vllm(self):
-        # "awq", "gptq", "squeezellm", and "fp8" 
-        llm = LLM(model="meta-llama/Meta-Llama-3.1-8B-Instruct",gpu_memory_utilization=0.6)  # Create an LLM.
-        return llm
     
     def load_llama3_1_model(self):
         model_id = "meta-llama/Meta-Llama-3.1-8B-Instruct"
@@ -166,7 +138,31 @@ class GoldFish_LV:
         new_image.save(save_path)
         return new_image
 
-    def get_subtitles(self, video_path: str) -> Optional[str]:
+    # def get_subtitles(self, video_path: str) -> Optional[str]:
+    #     video_name=video_path.split('/')[-2]
+    #     video_id=video_path.split('/')[-1].split('.')[0]
+    #     audio_dir = f"workspace/audio/{video_name}"
+    #     subtitle_dir = f"workspace/subtitles/{video_name}"
+    #     os.makedirs(audio_dir, exist_ok=True)
+    #     os.makedirs(subtitle_dir, exist_ok=True)
+    #     # if the subtitles are already generated, return the path of the subtitles
+    #     subtitle_path = f"{subtitle_dir}/{video_id}"+'.vtt'
+    #     if os.path.exists(subtitle_path):
+    #         return f"{subtitle_dir}/{video_id}"+'.vtt'
+    #     audio_path = f"{audio_dir}/{video_id}"+'.mp3'
+    #     subtitle_path = f"{subtitle_dir}/{video_id}"+'.vtt'
+    #     try:
+    #         self.extract_audio(video_path, audio_path)
+    #         print("Successfully extracted audio")
+    #         os.system(f"whisper {audio_path} --device cuda:{self.whisper_gpu_id}  --language English  --model medium --output_format vtt --output_dir {subtitle_dir}")
+    #         os.system(f"rm {audio_path}")
+    #         # os.system(f"rm -r {audio_dir}")
+    #         print("Subtitle successfully generated")
+    #         return subtitle_path
+    #     except:
+    #         print(f"Error during subtitle generation for {video_path}")
+    #         return None
+    def get_subtitles(self, video_path) :
         video_name=video_path.split('/')[-2]
         video_id=video_path.split('/')[-1].split('.')[0]
         audio_dir = f"workspace/audio/{video_name}"
@@ -178,19 +174,26 @@ class GoldFish_LV:
         if os.path.exists(subtitle_path):
             return f"{subtitle_dir}/{video_id}"+'.vtt'
         audio_path = f"{audio_dir}/{video_id}"+'.mp3'
-        subtitle_path = f"{subtitle_dir}/{video_id}"+'.vtt'
         try:
             self.extract_audio(video_path, audio_path)
-            print("Successfully extracted audio")
-            os.system(f"whisper {audio_path} --device cuda:{self.whisper_gpu_id}  --language English  --model medium --output_format vtt --output_dir {subtitle_dir}")
-            os.system(f"rm {audio_path}")
-            # os.system(f"rm -r {audio_dir}")
-            print("Subtitle successfully generated")
+            subtitle_path = f"{subtitle_dir}/{video_id}"+'.vtt'
+            result = self.whisper_model.transcribe(audio_path,language="en") 
+            # Create VTT file
+            with open(subtitle_path, "w", encoding="utf-8") as vtt_file:
+                vtt_file.write("WEBVTT\n\n")
+                for segment in result['segments']:
+                    start = format_timestamp(segment['start'])
+                    end = format_timestamp(segment['end'])
+                    text = segment['text']
+                    vtt_file.write(f"{start} --> {end}\n{text}\n\n")
             return subtitle_path
-        except:
-            print(f"Error during subtitle generation for {video_path}")
+        except Exception as e:
+            print(f"Error during subtitle generation for {video_path}: {e}")
             return None
-            
+        
+        
+        
+              
     def prepare_input(self, 
                     video_path: str,
                     subtitle_path: Optional[str],
@@ -206,8 +209,12 @@ class GoldFish_LV:
                     conversation+=sub
             except:
                 pass
-        max_images_length = 45
-        max_sub_len = 400
+        if self.model.model_type == "Mistral":
+            max_images_length=90
+            max_sub_len = 800
+        else:
+            max_images_length = 45
+            max_sub_len = 400
         # Load the video file using moviepy and calculate the total number of frames
         clip = mp.VideoFileClip(video_path)
         total_num_frames = int(clip.duration * clip.fps)

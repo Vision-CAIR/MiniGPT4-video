@@ -17,6 +17,13 @@ from PIL import Image
 from moviepy.editor import VideoFileClip
 from theme import minigptlv_style, custom_css,text_css
 import re
+import transformers
+import whisper
+from datetime import timedelta
+# Function to format timestamps for VTT
+def format_timestamp(seconds):
+    td = timedelta(seconds=seconds)
+    return str(td)
 def create_video_grid(images, rows, cols,save_path):
     image_width, image_height = images[0].size
     grid_width = cols * image_width
@@ -109,29 +116,38 @@ def extract_audio(video_path, audio_path):
     audio_clip = video_clip.audio
     audio_clip.write_audiofile(audio_path, codec="libmp3lame", bitrate="320k")
     
-def generate_subtitles(video_path):
+def get_subtitles(video_path) :
+    audio_dir="workspace/inference_subtitles/mp3"
+    subtitle_dir="workspace/inference_subtitles"
+    os.makedirs(subtitle_dir, exist_ok=True)
+    os.makedirs(audio_dir, exist_ok=True)
     video_id=video_path.split('/')[-1].split('.')[0]
     audio_path = f"workspace/inference_subtitles/mp3/{video_id}"+'.mp3'
-    os.makedirs("workspace/inference_subtitles/mp3",exist_ok=True)
-    if os.path.exists(f"workspace/inference_subtitles/{video_id}"+'.vtt'):
-        return f"workspace/inference_subtitles/{video_id}"+'.vtt'
+    subtitle_path = f"{subtitle_dir}/{video_id}"+'.vtt'
+    # if the subtitles are already generated, return the path of the subtitles
+    if os.path.exists(subtitle_path):
+        return f"{subtitle_dir}/{video_id}"+'.vtt'
+    audio_path = f"{audio_dir}/{video_id}"+'.mp3'
     try:
-        extract_audio(video_path,audio_path)
-        print("successfully extracted")
-        os.system(f"whisper {audio_path} --device cuda:{whisper_gpu_id} --language English --model large --output_format vtt --output_dir workspace/inference_subtitles")
-        # remove the audio file
-        os.system(f"rm {audio_path}")
-        print("subtitle successfully generated")  
-        return f"workspace/inference_subtitles/{video_id}"+'.vtt'
+        extract_audio(video_path, audio_path)
+        result = whisper_model.transcribe(audio_path,language="en") 
+        # Create VTT file
+        with open(subtitle_path, "w", encoding="utf-8") as vtt_file:
+            vtt_file.write("WEBVTT\n\n")
+            for segment in result['segments']:
+                start = format_timestamp(segment['start'])
+                end = format_timestamp(segment['end'])
+                text = segment['text']
+                vtt_file.write(f"{start} --> {end}\n{text}\n\n")
+        return subtitle_path
     except Exception as e:
-        print("error",e)
-        print("error",video_path)
+        print(f"Error during subtitle generation for {video_path}: {e}")
         return None
     
 
 def run (video_path,instruction,model,vis_processor,gen_subtitles=True):
     if gen_subtitles:
-        subtitle_path=generate_subtitles(video_path)
+        subtitle_path=get_subtitles(video_path)
     else :
         subtitle_path=None
     prepared_images,prepared_instruction=prepare_input(vis_processor,video_path,subtitle_path,instruction)
@@ -229,6 +245,7 @@ def get_arguments():
     return parser.parse_args()
 args=get_arguments()
 model, vis_processor,whisper_gpu_id,minigpt4_gpu_id,answer_module_gpu_id = init_model(args)
+whisper_model=whisper.load_model("large").to(f"cuda:{whisper_gpu_id}")
 conv = CONV_VISION.copy()
 conv.system = ""
 inference_subtitles_folder="workspace/inference_subtitles"

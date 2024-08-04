@@ -30,6 +30,12 @@ from tqdm import tqdm
 import pysrt
 import chardet
 import re 
+import whisper
+from datetime import timedelta
+# Function to format timestamps for VTT
+def format_timestamp(seconds):
+    td = timedelta(seconds=seconds)
+    return str(td)
 
 def duration_to_seconds(duration_str):
     duration_str = duration_str[2:]  # Removing 'PT' prefix
@@ -52,20 +58,33 @@ def extract_audio(video_path, audio_path):
     audio_clip = video_clip.audio
     audio_clip.write_audiofile(audio_path, codec="libmp3lame", bitrate="320k")
     
-def generate_subtitles(video_path,existed_subtitles):
+def generate_subtitles(video_path,existed_subtitles,whisper_model):
     video_id=video_path.split('/')[-1].split('.')[0]
-    audio_path = f"workspace/misssing_eval_subtitles/mp3/{video_id}"+'.mp3'
+    subtitle_dir="workspace/misssing_eval_subtitles"
+    audio_dir="workspace/misssing_eval_subtitles/mp3"
+    os.makedirs(subtitle_dir,exist_ok=True)
+    os.makedirs(audio_dir,exist_ok=True)
+    audio_path = f"{audio_dir}/{video_id}"+'.mp3'
     if existed_subtitles.get(video_id,False):
         print("subtitle already generated")
-        return f"workspace/misssing_eval_subtitles/{video_id}"+'.vtt'
+        return f"{subtitle_dir}/{video_id}"+'.vtt'
     try:
         extract_audio(video_path,audio_path)
         print("successfully extracted")
-        os.system(f"whisper {audio_path}  --language English --model large --output_format vtt --output_dir workspace/misssing_eval_subtitles")
+        subtitle_path=f"{subtitle_dir}/{video_id}"+'.vtt'
+        result = whisper_model.transcribe(audio_path,language="en") 
+        # Create VTT file
+        with open(subtitle_path, "w", encoding="utf-8") as vtt_file:
+            vtt_file.write("WEBVTT\n\n")
+            for segment in result['segments']:
+                start = format_timestamp(segment['start'])
+                end = format_timestamp(segment['end'])
+                text = segment['text']
+                vtt_file.write(f"{start} --> {end}\n{text}\n\n")
         # remove the audio file
         os.system(f"rm {audio_path}")
         print("subtitle successfully generated")  
-        return f"workspace/misssing_eval_subtitles/{video_id}"+'.vtt'
+        return subtitle_path
     except Exception as e:
         print("error",video_path ,e)
         return None
@@ -137,6 +156,7 @@ class CMDVideoDataset(BaseDataset, __DisplMixin):
         self.transform = transforms.Compose([
                 transforms.ToPILImage(),
             ])
+        
 
     def __getitem__(self, index):
         ann = self.annotation[index]
@@ -628,6 +648,7 @@ class VideoChatGPTEvalDataset(torch.utils.data.Dataset):
         self.transform = transforms.Compose([
                 transforms.ToPILImage(),
             ])
+        self.whisper_model=whisper.load_model("large").to(f"cuda:0")
         
     def __len__(self):
         return len(self.annotation)
@@ -649,7 +670,7 @@ class VideoChatGPTEvalDataset(torch.utils.data.Dataset):
             sampling_interval = 1
         subtitle_path=None
         if self.add_subtitles :
-            subtitle_path = generate_subtitles(video_path,self.videos_has_subtitles)
+            subtitle_path = generate_subtitles(video_path,self.videos_has_subtitles,self.whisper_model)
             if  subtitle_path is not None:
                 # Load the VTT subtitle file
                 vtt_file = webvtt.read(subtitle_path)
@@ -723,6 +744,7 @@ class Video_validation_Dataset(torch.utils.data.Dataset):
         self.transform = transforms.Compose([
                 transforms.ToPILImage(),
             ])
+        self.whisper_model=whisper.load_model("large").to(f"cuda:0")
         
     def __len__(self):
         return len(self.annotation)
@@ -744,7 +766,7 @@ class Video_validation_Dataset(torch.utils.data.Dataset):
             sampling_interval = 1
         subtitle_path=None
         if self.add_subtitles :
-            subtitle_path = generate_subtitles(video_path,self.videos_has_subtitles)
+            subtitle_path = generate_subtitles(video_path,self.videos_has_subtitles,self.whisper_model)
             if  subtitle_path is not None:
                 # Load the VTT subtitle file
                 vtt_file = webvtt.read(subtitle_path)
@@ -820,6 +842,7 @@ class VideoChatGPTEval_consistancy(torch.utils.data.Dataset):
         self.transform = transforms.Compose([
                 transforms.ToPILImage(),
             ])
+        self.whisper_model=whisper.load_model("large").to(f"cuda:0")
     def __len__(self):
         return len(self.annotation)
     def __getitem__(self, index):
@@ -840,7 +863,7 @@ class VideoChatGPTEval_consistancy(torch.utils.data.Dataset):
             sampling_interval = 1
         subtitle_path=None
         if self.add_subtitles :
-            subtitle_path = generate_subtitles(video_path,self.videos_has_subtitles)
+            subtitle_path = generate_subtitles(video_path,self.videos_has_subtitles,self.whisper_model)
             if  subtitle_path is not None:
                 # Load the VTT subtitle file
                 vtt_file = webvtt.read(subtitle_path)
