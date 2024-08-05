@@ -230,7 +230,7 @@ def get_video_url(url,has_subtitles):
   
 def get_arguments():
     parser = argparse.ArgumentParser(description="Inference parameters")
-    parser.add_argument("--cfg-path", help="path to configuration file.",default="test_configs/llama_test_config.yaml")
+    parser.add_argument("--cfg-path", help="path to configuration file.",default="test_configs/llama2_test_config.yaml")
     parser.add_argument("--ckpt", type=str,default='checkpoints/video_llama_checkpoint_last.pth', help="path to checkpoint")
     parser.add_argument("--max_new_tokens", type=int, default=512, help="max number of generated tokens")
     parser.add_argument("--lora_r", type=int, default=64, help="lora rank of the model")
