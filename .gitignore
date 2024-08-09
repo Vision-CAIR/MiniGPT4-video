@@ -206,3 +206,6 @@ new_workspace
 minigpt4_video
 minigpt4_video_eval
 Infinibench
+goldfish_inference_latency.py
+run.py
+evaluation/eval_infinibench.py
