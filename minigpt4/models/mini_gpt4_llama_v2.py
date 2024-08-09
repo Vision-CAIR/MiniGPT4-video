@@ -11,7 +11,7 @@ from minigpt4.models.blip2 import Blip2Base, disabled_train
 # minigpt4.models.modeling_mistral import MistralForCausalLM as llm_model
 from minigpt4.conversation.conversation import Conversation, SeparatorStyle, StoppingCriteriaList, StoppingCriteriaSub
 
-from transformers import LlamaTokenizer
+from transformers import LlamaTokenizer,AutoTokenizer,AutoModel
 from transformers import BitsAndBytesConfig
 from transformers import AutoConfig, AutoTokenizer
 from peft import (
@@ -117,15 +117,15 @@ class MiniGPT4_Video(Blip2Base, PreTrainedModel):
         self.llama_tokenizer.pad_token = "$$"
         print("self.low_resource",self.low_resource)
         if self.low_resource:
+            bnb_config = BitsAndBytesConfig(
+                    load_in_8bit=True,
+                )
             self.llama_model = llm_model.from_pretrained(
                 self.llama_model,
                 torch_dtype=torch.float16,
-                # torch_dtype = torch.bfloat16,
-                load_in_8bit=True,
-                # device_map = "balanced"
-                # device_map="auto",
-                # device_map={'':torch.cuda.current_device()},token=token
-                device_map={'':f"cuda:{self.minigpt4_gpu_id}"},token=token
+                quantization_config=bnb_config,
+                device_map={'':f"cuda:{self.minigpt4_gpu_id}"},
+                token=token
                 
             )
         else:
