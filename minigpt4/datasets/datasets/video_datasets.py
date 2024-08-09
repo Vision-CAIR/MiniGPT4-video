@@ -648,7 +648,7 @@ class VideoChatGPTEvalDataset(torch.utils.data.Dataset):
         self.transform = transforms.Compose([
                 transforms.ToPILImage(),
             ])
-        self.whisper_model=whisper.load_model("large").to(f"cuda:0")
+        self.whisper_model=whisper.load_model("large",device=f"cuda:0")
         
     def __len__(self):
         return len(self.annotation)
@@ -744,7 +744,7 @@ class Video_validation_Dataset(torch.utils.data.Dataset):
         self.transform = transforms.Compose([
                 transforms.ToPILImage(),
             ])
-        self.whisper_model=whisper.load_model("large").to(f"cuda:0")
+        self.whisper_model=whisper.load_model("large",device=f"cuda:0")
         
     def __len__(self):
         return len(self.annotation)
@@ -842,7 +842,7 @@ class VideoChatGPTEval_consistancy(torch.utils.data.Dataset):
         self.transform = transforms.Compose([
                 transforms.ToPILImage(),
             ])
-        self.whisper_model=whisper.load_model("large").to(f"cuda:0")
+        self.whisper_model=whisper.load_model("large",device=f"cuda:0")
     def __len__(self):
         return len(self.annotation)
     def __getitem__(self, index):

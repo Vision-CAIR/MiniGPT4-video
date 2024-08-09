@@ -184,7 +184,7 @@ seed=config['run']['seed']
 print("seed",seed)
 
 model, vis_processor,whisper_gpu_id,minigpt4_gpu_id,answer_module_gpu_id = init_model(args)
-whisper_model=whisper.load_model("large").to(f"cuda:{whisper_gpu_id}")
+whisper_model=whisper.load_model("large",device=f"cuda:{whisper_gpu_id}")
 conv = CONV_VISION.copy()
 conv.system = ""
 inference_subtitles_folder="workspace/inference_subtitles"
