@@ -4,7 +4,7 @@
 <h3 style="text-align: center;">Online Demos</h3>
 <div style="display: flex; justify-content: center; gap: 40px;">
     <div style="text-align: center;">
-        <a href='https://goldfish.loophole.site/'>
+        <a href='https://a0cf79d5c482838ab8.gradio.live'>
             <img src='repo_imgs/goldfishai_png.png' width=200 height=200>
         </a>
         <div>
@@ -260,14 +260,26 @@ We used the same evaluation as [Video-ChatGPT](https://mbzuai-oryx.github.io/Vid
 
 You can find the evaluation datasets annotation files [download](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/tree/main/datasets/evaluation_datasets) <br>
 
+Subtitles for MSR-VTT,and ActivityNet are availabe here  [download](https://huggingface.co/Vision-CAIR/MiniGPT4-Video/resolve/main/datasets/evaluation_subtitles.zip)
+note these subtitles are generated using <a href="https://github.com/openai/whisper">whisper model<br>
+TVQA subtitles can be downloaded from [here](https://nlp.cs.unc.edu/data/jielei/tvqa/tvqa_public_html/download_tvqa.html)
 ### Run evaluation script
-Set the each evaluation script parameters to include the path to the checkpoints, the dataset name and whether to use subtitles or not <br> 
+Set the each evaluation script parameters in the script <br>
+```
+NAME="" # Name of the experiment
+BATCH_SIZE=8 # batch size 
+CKPT_PATH="" # path to the checkpoint
+DATASET="msvd" # dataset name, available datasets: tvqa, msrvtt, msvd, activitynet,tgif ,video_chatgpt_generic,video_chatgpt_temporal,video_chatgpt_consistency
+# set the paths to the dataset files
+videos_path="" # path to the videos file
+subtitles_path="" # path to the subtitles file if the dataset is msrvtt, activitynet or tvqa else set it to ""
+ann_path="" # path to the annotations file
+cfg_path="" # path to the config file
+```
+<br> 
 
 ```bash
-# Llama2
-bash evaluation/minigpt4_video_eval/llama2_evalualtion.sh
-# Mistral
-bash evaluation/minigpt4_video_eval/mistral_evalualtion.sh
+bash evaluation/minigpt4_video_eval/minigpt4_video_evalualtion.sh
 ```
 Then Use GPT3.5 turbo to compare the predictions with the ground truth and generate the accuracy and scores <br>
 Set these variables in both evaluate_benchmark.sh and evaluate_zeroshot.sh <br>

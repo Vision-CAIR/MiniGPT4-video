@@ -13,7 +13,11 @@ from minigpt4.datasets.datasets.video_datasets import VideoChatGPTEvalDataset,Vi
 parser = eval_parser()
 parser.add_argument("--dataset", type=str, default='msvd', help="dataset to evaluate")
 parser.add_argument("--add_subtitles",action='store_true',help="whether to add subtitles to the video")
-parser.add_argument("--name", type=str, default='3_datasets', help="evaluation name")
+parser.add_argument("--name", type=str, default='test', help="evaluation name")
+parser.add_argument("--videos_path", type=str, default='videos path', help="path to videos")
+parser.add_argument("--subtitles_path", type=str, default='subtitles path', help="path to subtitles")
+parser.add_argument("--ann_path", type=str, default='annotations path', help="path to annotations")
+
 parser.add_argument("--batch_size", type=int, default=1, help="batch size")
 parser.add_argument("--start", type=int, default=0, help="start from video number")
 parser.add_argument("--end", type=int, default=10000000, help="end at video number")
@@ -27,59 +31,58 @@ if "test_configs/mistral_test_config.yaml" == args.cfg_path:
 else:   
     llm_name="llama2"
 print("using captions",args.add_subtitles)
-
 model, vis_processor,whisper_gpu_id,minigpt4_gpu_id,answer_module_gpu_id = init_model(args)
 conv_temp = CONV_VISION.copy()
 conv_temp.system = ""
 if args.dataset == 'video_chatgpt_generic':
-    ann_path="datasets/evaluation_datasets/videochatgpt_benchmark/generic_qa.json"
-    videos_path= "videos path"
-    subtitles_path="whisper_generated_subtitles"
+    ann_path=args.ann_path
+    videos_path= args.videos_path
+    subtitles_path=args.subtitles_path
     annotations_keys=['Q','A','video_name']
     data = VideoChatGPTEvalDataset(vis_processor, videos_path, ann_path,subtitles_path,annotations_keys, add_subtitles=args.add_subtitles,llm_name=llm_name)
 elif args.dataset == 'video_chatgpt_temporal':
-    ann_path="datasets/evaluation_datasets/videochatgpt_benchmark/temporal_qa.json"
-    videos_path= "videos path"
-    subtitles_path="whisper_generated_subtitles"
+    ann_path=args.ann_path
+    videos_path= args.videos_path
+    subtitles_path=args.subtitles_path
     annotations_keys=['Q','A','video_name']
     data = VideoChatGPTEvalDataset(vis_processor, videos_path, ann_path,subtitles_path,annotations_keys, add_subtitles=args.add_subtitles,llm_name=llm_name)
 elif args.dataset == 'video_chatgpt_consistency':
-    ann_path="datasets/evaluation_datasets/videochatgpt_benchmark/consistency_qa.json"
-    videos_path= "videos path"
-    subtitles_path="whisper_generated_subtitles"
+    ann_path=args.ann_path
+    videos_path= args.videos_path
+    subtitles_path=args.subtitles_path
     annotations_keys=[['Q1','Q2'],'A','video_name']
     data = VideoChatGPTEval_consistancy(vis_processor, videos_path, ann_path,subtitles_path,annotations_keys, add_subtitles=args.add_subtitles,llm_name=llm_name)
     
 elif args.dataset == 'msrvtt':
-    ann_path="datasets/evaluation_datasets/msrvtt/val_qa_edited.json"
-    videos_path= "videos path"
-    subtitles_path="whisper_generated_subtitles"
+    ann_path=args.ann_path
+    videos_path= args.videos_path
+    subtitles_path=args.subtitles_path
     annotations_keys=['question','answer','video_id']
     data = VideoChatGPTEvalDataset(vis_processor, videos_path, ann_path,subtitles_path,annotations_keys, add_subtitles=args.add_subtitles,llm_name=llm_name)
 
 elif args.dataset == 'msvd':
-    ann_path="datasets/evaluation_datasets/msvd/val_qa_edited.json"
-    videos_path= "videos path"
+    ann_path=args.ann_path
+    videos_path= args.videos_path
     subtitles_path="" # no subtitles for msvd as these videos don't have audio 
     annotations_keys=['question','answer','video_id']
     data = VideoChatGPTEvalDataset(vis_processor, videos_path, ann_path,subtitles_path,annotations_keys, add_subtitles=args.add_subtitles,llm_name=llm_name)
 elif args.dataset == 'activitynet':
-    ann_path="datasets/evaluation_datasets/activityNet/test_qa.json"
-    videos_path= "videos path"
-    subtitles_path="whisper_generated_subtitles"
+    ann_path=args.ann_path
+    videos_path= args.videos_path
+    subtitles_path=args.subtitles_path
     annotations_keys=['question','answer','video_id']
     data = VideoChatGPTEvalDataset(vis_processor, videos_path, ann_path,subtitles_path,annotations_keys, add_subtitles=args.add_subtitles,llm_name=llm_name)
 elif args.dataset == 'tgif':
     ann_path="datasets/evaluation_datasets/tgif/Test_frameqa_question.json"
-    videos_path= "videos path"
+    videos_path= args.videos_path
     subtitles_path="" # no subtitles for TGIF as these videos don't have audio
     annotations_keys=['question','answer','gif_name']
     data = VideoChatGPTEvalDataset(vis_processor, videos_path, ann_path,subtitles_path,annotations_keys, add_subtitles=False,llm_name=llm_name)
 elif args.dataset == 'tvqa':
     # TVQA dataset
     ann_path="datasets/evaluation_datasets/tvqa_short/tvqa_val.json"
-    videos_path= "videos path"
-    subtitles_path="tvqa subtitles"
+    videos_path= args.videos_path
+    subtitles_path=args.subtitles_path
     data = TVQAEVAL(vis_processor, videos_path, ann_path,subtitles_path,add_subtitles=args.add_subtitles,llm_name=llm_name)
 
 eval_dataloader = DataLoader(data, batch_size=args.batch_size, shuffle=False)
