@@ -4,7 +4,7 @@
 <h3 style="text-align: center;">Online Demos</h3>
 <div style="display: flex; justify-content: center; gap: 40px;">
     <div style="text-align: center;">
-        <a href='https://a0cf79d5c482838ab8.gradio.live'>
+        <a href='https://goldfish.loophole.site'>
             <img src='repo_imgs/goldfishai_png.png' width=200 height=200>
         </a>
         <div>
