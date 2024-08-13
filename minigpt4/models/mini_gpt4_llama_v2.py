@@ -11,14 +11,14 @@ from minigpt4.models.blip2 import Blip2Base, disabled_train
 # minigpt4.models.modeling_mistral import MistralForCausalLM as llm_model
 from minigpt4.conversation.conversation import Conversation, SeparatorStyle, StoppingCriteriaList, StoppingCriteriaSub
 
-from transformers import LlamaTokenizer,AutoTokenizer,AutoModel
+from transformers import LlamaTokenizer
 from transformers import BitsAndBytesConfig
 from transformers import AutoConfig, AutoTokenizer
 from peft import (
     LoraConfig,
     get_peft_model,
     get_peft_model_state_dict,
-    prepare_model_for_kbit_training,
+    prepare_model_for_int8_training,
     set_peft_model_state_dict,
 )
 import time
@@ -117,15 +117,15 @@ class MiniGPT4_Video(Blip2Base, PreTrainedModel):
         self.llama_tokenizer.pad_token = "$$"
         print("self.low_resource",self.low_resource)
         if self.low_resource:
-            bnb_config = BitsAndBytesConfig(
-                    load_in_8bit=True,
-                )
             self.llama_model = llm_model.from_pretrained(
                 self.llama_model,
                 torch_dtype=torch.float16,
-                quantization_config=bnb_config,
-                device_map={'':f"cuda:{self.minigpt4_gpu_id}"},
-                token=token
+                # torch_dtype = torch.bfloat16,
+                load_in_8bit=True,
+                # device_map = "balanced"
+                # device_map="auto",
+                # device_map={'':torch.cuda.current_device()},token=token
+                device_map={'':f"cuda:{self.minigpt4_gpu_id}"},token=token
                 
             )
         else:
@@ -135,7 +135,7 @@ class MiniGPT4_Video(Blip2Base, PreTrainedModel):
             )
             
         # self.llama_model.resize_token_embeddings(len(self.llama_tokenizer))
-        self.llama_model = prepare_model_for_kbit_training(self.llama_model)
+        self.llama_model = prepare_model_for_int8_training(self.llama_model)
         loraconfig = LoraConfig(
             r=self.lora_r,
             lora_alpha=self.lora_alpha,
@@ -537,6 +537,78 @@ class MiniGPT4_Video(Blip2Base, PreTrainedModel):
             answers.append(output_texts)
         return answers
 
+    @torch.no_grad()
+    def answer_prepare_for_streaming(
+        self,
+        images,
+        texts,
+        num_beams=1,
+        max_new_tokens=20,
+        min_length=1,
+        top_p=0.9,
+        repetition_penalty=1.5,
+        length_penalty=1,
+        temperature=1,
+        do_sample=False,
+        stop_words_ids=[2],
+        lengths=None,
+        img_embeds=None,
+    ):
+        '''
+            function for generate test use
+        '''
+        stopping_criteria = StoppingCriteriaList([StoppingCriteriaSub(
+            stops=[torch.tensor([i]).to(self.device) for i in stop_words_ids])])
+        if img_embeds is None:
+            img_embeds, atts_img = self.encode_img(images.to(self.device))
+        else:
+            # Use images features from the input(4,45,64,5632)
+            img_embeds = img_embeds.reshape(-1, *img_embeds.shape[-2:])
+            img_embeds= img_embeds.to(self.device)
+            img_embeds = self.llama_proj(img_embeds) # project to llama input size (200,64,5632) -> (200,64,4096)
+            atts_img = torch.ones(img_embeds.size()[:-1], dtype=torch.long).to(self.device)
+            
+        if lengths is not None:
+            image_lists = []
+            img_embeds = img_embeds.reshape(len(lengths), -1, img_embeds.shape[-2], img_embeds.shape[-1])
+            for idx, img_embed in enumerate(img_embeds):
+                image_lists.append([img_embed[i][None] for i in range(lengths[idx])])
+        else:
+            image_lists = [[image_emb[None]] for image_emb in img_embeds]
+        assert len(texts) == len(image_lists)
+        batch_embs = [self.get_context_emb(text, img_list) for text, img_list in zip(texts, image_lists)]
+
+        batch_size = len(batch_embs)
+        max_len = max([emb.shape[1] for emb in batch_embs])
+        emb_dim = batch_embs[0].shape[2]
+        dtype = batch_embs[0].dtype
+        device = batch_embs[0].device
+
+        embs = torch.zeros([batch_size, max_len, emb_dim], dtype=dtype, device=device)
+        attn_mask = torch.zeros([batch_size, max_len], dtype=torch.int, device=device)
+        for i, emb in enumerate(batch_embs):
+            emb_len = emb.shape[1]
+            embs[i, -emb_len:] = emb[0]
+            attn_mask[i, -emb_len:] = 1
+        # check if the input embedding tokens are in the range of the model cotext window (4096) and if it is not, then truncate it to the max context window
+        if self.model_type == "Llama":
+            context_window = 3700
+        else:
+            context_window = 7500
+        if embs.shape[1] > context_window:
+            embs = embs[:, -context_window:]
+            attn_mask = attn_mask[:, -context_window:]
+            
+        generation_kwargs = dict(
+            inputs_embeds=embs,
+            attention_mask=attn_mask,
+            max_new_tokens=max_new_tokens,
+            num_beams=num_beams,
+            do_sample=do_sample,
+            temperature=float(temperature),
+            repetition_penalty=repetition_penalty,            
+        )
+        return generation_kwargs
     @torch.no_grad()
     def generate_text_only(
         self,
