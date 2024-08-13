@@ -35,7 +35,11 @@ from datetime import timedelta
 # Function to format timestamps for VTT
 def format_timestamp(seconds):
     td = timedelta(seconds=seconds)
-    return str(td)
+    total_seconds = int(td.total_seconds())
+    milliseconds = int(td.microseconds / 1000)
+    hours, remainder = divmod(total_seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    return f"{hours:02}:{minutes:02}:{seconds:02}.{milliseconds:03}"
 
 def duration_to_seconds(duration_str):
     duration_str = duration_str[2:]  # Removing 'PT' prefix
