@@ -35,7 +35,11 @@ from datetime import timedelta
 # Function to format timestamps for VTT
 def format_timestamp(seconds):
     td = timedelta(seconds=seconds)
-    return str(td)
+    total_seconds = int(td.total_seconds())
+    milliseconds = int(td.microseconds / 1000)
+    hours, remainder = divmod(total_seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    return f"{hours:02}:{minutes:02}:{seconds:02}.{milliseconds:03}"
 
 def clean_text(subtitles_text):
     # Remove unwanted characters except for letters, digits, spaces, periods, commas, exclamation marks, and single quotes
@@ -78,10 +82,20 @@ class GoldFish_LV:
     
     def load_llama3_1_model(self):
         model_id = "meta-llama/Meta-Llama-3.1-8B-Instruct"
-
+        bnb_config = BitsAndBytesConfig(
+                    load_in_8bit=True,
+                )
+        self.llama3_tokenizer = AutoTokenizer.from_pretrained(model_id)
+        llama3_model = AutoModelForCausalLM.from_pretrained(
+                model_id,
+                torch_dtype=torch.bfloat16,
+                device_map={'': f"cuda:{self.answer_module_gpu_id}"},
+                quantization_config=bnb_config,
+            )
         pipeline = transformers.pipeline(
             "text-generation",
-            model=model_id,
+            model=llama3_model,
+            tokenizer=self.llama3_tokenizer,
             model_kwargs={"torch_dtype": torch.bfloat16},
             device_map=f"cuda:{self.answer_module_gpu_id}",
         )
@@ -336,7 +350,7 @@ class GoldFish_LV:
                 video_information = json.load(file)
         else:
             video_number = 0
-            batch_size = 4
+            batch_size = self.args.batch_size
             batch_video_paths, batch_instructions ,batch_subtitles= [], [],[]
             video_information = {}
             video_captions = []
@@ -410,9 +424,13 @@ class GoldFish_LV:
         messages=[]
         for instruction,context in zip(instructions,context_list):
             context=clean_text(context)
-            context_prompt=f"Your task is to answer questions for one long video which is split into multiple clips.\nGiven these related information from the most related clips: \n{context}\n"
-            question_prompt=f"\nAnswer this question :{instruction} \n your answer is:"
-            messages.append([{"role": "user", "content": context_prompt+question_prompt}])
+            context_prompt=f"Your task is to answer a specific question based on one long video. While you cannot view the video yourself, I will supply you with the most relevant text information from the most pertinent clips. \n{context}\n"
+            question_prompt=f"\nPlease provide a detailed and accurate answer to the following question:{instruction} \n Your answer should be:"
+            # limit the context words to 10000 word duo to hardware limitation
+            context_words=context_prompt.split(' ')
+            truncated_context=' '.join(context_words[:10000])
+            print("Number of words",len((truncated_context+question_prompt).split(' ')))
+            messages.append([{"role": "user", "content": truncated_context+question_prompt}])
         outputs=self.llama_3_1_model(messages, max_new_tokens=512)
         answers=[]
         for out in outputs:
@@ -497,14 +515,14 @@ class GoldFish_LV:
         return batch_preds
      
     def get_most_related_clips(self,related_context_keys):
-        most_related_clips=[]
+        most_related_clips=set()
         for context_key in related_context_keys:
             if len(context_key.split('__'))>1:
-                most_related_clips.append(context_key.split('__')[1])
+                most_related_clips.add(context_key.split('__')[1])
             if len(most_related_clips)==self.args.neighbours:
                 break
         assert len(most_related_clips)!=0, f"No related clips found {related_context_keys}"
-        return most_related_clips   
+        return list(most_related_clips)  
     def get_related_context(self, external_memory,related_context_keys):
         related_information=""
         most_related_clips=self.get_most_related_clips(related_context_keys)
@@ -516,7 +534,7 @@ class GoldFish_LV:
                     general_sum="Clip Summary: "+external_memory.documents[key]
                 if clip_name in key and 'subtitle' in key:
                     clip_conversation="Clip Subtitles: "+external_memory.documents[key]
-                related_information+=f"{general_sum},{clip_conversation}\n"
+            related_information+=f"{general_sum},{clip_conversation}\n"
         return related_information              
     def inference(self,video_path, use_subtitles=True, instruction="", number_of_neighbours=3):
         start_time = time.time()
@@ -559,11 +577,6 @@ class GoldFish_LV:
             related_context_documents,related_context_keys = external_memory.search_by_similarity(instruction)
             related_information=self.get_related_context(external_memory,related_context_keys)
             pred=self.inference_RAG([instruction],[related_information])
-            # remove stored data 
-            # os.remove(file_path)
-            # os.system(f"rm -r workspace/tmp/{self.video_name}")
-            # os.system(f"rm -r workspace/subtitles/{self.video_name}")
-            # os.system(f"rm workspace/tmp/{self.video_id}.mp4") 
         else:
             print("Short video")
             self.video_name=video_path.split('/')[-1].split('.')[0]

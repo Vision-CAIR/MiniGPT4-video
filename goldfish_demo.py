@@ -34,8 +34,8 @@ def get_arguments():
     parser.add_argument("--neighbours", type=int, default=3)
     parser.add_argument("--eval_opt", type=str, default='all')
     parser.add_argument("--max_new_tokens", type=int, default=512)
-    parser.add_argument("--use_openai_embedding",type=str2bool, default=True)
-    parser.add_argument("--batch_size", type=int, default=4)
+    parser.add_argument("--use_openai_embedding",type=str2bool, default=False)
+    parser.add_argument("--batch_size", type=int, default=2, help="Batch size for short video clips")
     parser.add_argument("--lora_r", type=int, default=64)
     parser.add_argument("--lora_alpha", type=int, default=16)
     parser.add_argument("--video_path", type=str, help="Path to the video file")
@@ -190,7 +190,7 @@ def run_gradio():
                     local_answer = gr.Textbox(label="Answer of the question", lines=8, interactive=True, placeholder="Answer of the question will show up here.")
                 local_process_button.click(fn=process_video, inputs=[local_video_player, local_has_subtitles, local_question,local_number_of_neighbours], outputs=[local_answer])
                  
-    demo.queue(max_size=10).launch(share=True,show_error=True, show_api=False)
+    demo.queue(max_size=10).launch(show_error=True,share=True, show_api=False,server_port=5000)
 
 if __name__ == "__main__":
     args=get_arguments()

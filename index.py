@@ -13,6 +13,8 @@ from openai import OpenAI
 import os
 import torch
 import time
+import yaml 
+
 class MemoryIndex:
     def __init__(self,number_of_neighbours,use_openai=False):
         self.documents = {}
@@ -21,10 +23,13 @@ class MemoryIndex:
         if use_openai:
             api_key = os.getenv("OPENAI_API_KEY")
             self.client = OpenAI(api_key=api_key)
-        self.model = SentenceTransformer('sentence-transformers/all-mpnet-base-v2')\
+        self.model = SentenceTransformer('sentence-transformers/all-mpnet-base-v2')
         # self.model = SentenceTransformer('sentence-transformers/paraphrase-MiniLM-L6-v2')
-        self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        self.number_of_neighbours=number_of_neighbours
+        with open('test_configs/llama2_test_config.yaml') as file:
+            config = yaml.load(file, Loader=yaml.FullLoader)
+        embedding_gpu_id=config['model']['minigpt4_gpu_id']
+        self.device = f"cuda:{embedding_gpu_id}" if torch.cuda.is_available() else "cpu"
+        self.number_of_neighbours=int(number_of_neighbours)
         
     def load_documents_from_json(self, file_path,emdedding_path=""):
 
@@ -87,6 +92,7 @@ class MemoryIndex:
         # if the retrieved document is the summary, return the summary and the next document to grauntee that always retieve clip name.
         if self.number_of_neighbours==1 and sorted_doc_ids[0]=='summary': 
             return sorted_documents[0:2], sorted_doc_ids[:2]
+        print("Number of neighbours",self.number_of_neighbours)
         return sorted_documents[:self.number_of_neighbours], sorted_doc_ids[:self.number_of_neighbours]
 
 # # main function

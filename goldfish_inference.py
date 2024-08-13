@@ -25,6 +25,7 @@ def get_arguments():
     parser.add_argument("--add_subtitles", action='store_true')
     parser.add_argument("--max_new_tokens", type=int, default=512)
     parser.add_argument("--use_openai_embedding",type=str2bool, default=False)
+    parser.add_argument("--batch_size", type=int, default=2, help="Batch size for short video clips")
     parser.add_argument("--lora_r", type=int, default=64)
     parser.add_argument("--lora_alpha", type=int, default=16)
     parser.add_argument("--video_path", type=str,default="path for video.mp4", help="Path to the video file or youtube url")
@@ -36,7 +37,7 @@ def download_video(youtube_url):
     processed_video_path = goldfish_lv.process_video_url(youtube_url)
     return processed_video_path
 
-def process_video(video_path, has_subtitles, instruction="", number_of_neighbours=3):
+def process_video(video_path, has_subtitles, instruction="",number_of_neighbours=-1):
     result = goldfish_lv.inference(video_path, has_subtitles, instruction,number_of_neighbours)
     pred = result["pred"]
     return pred
@@ -56,6 +57,6 @@ if __name__ == "__main__":
     t2=time.time()
     print("Time taken to load model: ", t2-t1)
     processed_video_path = goldfish_lv.process_video_url(args.video_path)
-    pred=process_video(processed_video_path, args.add_subtitles, args.question)      
+    pred=process_video(processed_video_path, args.add_subtitles, args.question,args.neighbours)      
     print("Question answer: ", pred)
     print(f"Time taken for inference: ", time.time()-t2)
