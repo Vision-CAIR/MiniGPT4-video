@@ -47,6 +47,39 @@ def clean_text(subtitles_text):
     # Replace multiple spaces with a single space
     subtitles_text = re.sub(r'\s+', ' ', subtitles_text)
     return subtitles_text.strip()
+def time_to_seconds(subrip_time):
+    return subrip_time.hours * 3600 + subrip_time.minutes * 60 + subrip_time.seconds + subrip_time.milliseconds / 1000
+
+def split_subtitles(subtitle_path, n):
+    # read the subtitle file and detect the encoding
+    with open(subtitle_path, 'rb') as f:
+        result = chardet.detect(f.read())
+    subs = pysrt.open(subtitle_path, encoding=result['encoding'])
+
+    total_subs = len(subs)
+
+    if n <= 0 or n > total_subs:
+        print("Invalid value for n. It should be a positive integer less than or equal to the total number of subtitles.")
+        return None
+
+    subs_per_paragraph = total_subs // n
+    remainder = total_subs % n
+
+    paragraphs = []
+
+    current_index = 0
+
+    for i in range(n):
+        num_subs_in_paragraph = subs_per_paragraph + (1 if i < remainder else 0)
+
+        paragraph_subs = subs[current_index:current_index + num_subs_in_paragraph]
+        current_index += num_subs_in_paragraph
+
+        # Join subtitles using pysrt's built-in method for efficient formatting
+        paragraph = pysrt.SubRipFile(items=paragraph_subs).text
+        paragraphs.append(paragraph)
+
+    return paragraphs
 class GoldFish_LV:
     """
     'GoldFish_LV' class is to handle long video processing and subtitle management with MiniGPT4_video base model.
@@ -151,31 +184,6 @@ class GoldFish_LV:
 
         new_image.save(save_path)
         return new_image
-
-    # def get_subtitles(self, video_path: str) -> Optional[str]:
-    #     video_name=video_path.split('/')[-2]
-    #     video_id=video_path.split('/')[-1].split('.')[0]
-    #     audio_dir = f"workspace/audio/{video_name}"
-    #     subtitle_dir = f"workspace/subtitles/{video_name}"
-    #     os.makedirs(audio_dir, exist_ok=True)
-    #     os.makedirs(subtitle_dir, exist_ok=True)
-    #     # if the subtitles are already generated, return the path of the subtitles
-    #     subtitle_path = f"{subtitle_dir}/{video_id}"+'.vtt'
-    #     if os.path.exists(subtitle_path):
-    #         return f"{subtitle_dir}/{video_id}"+'.vtt'
-    #     audio_path = f"{audio_dir}/{video_id}"+'.mp3'
-    #     subtitle_path = f"{subtitle_dir}/{video_id}"+'.vtt'
-    #     try:
-    #         self.extract_audio(video_path, audio_path)
-    #         print("Successfully extracted audio")
-    #         os.system(f"whisper {audio_path} --device cuda:{self.whisper_gpu_id}  --language English  --model medium --output_format vtt --output_dir {subtitle_dir}")
-    #         os.system(f"rm {audio_path}")
-    #         # os.system(f"rm -r {audio_dir}")
-    #         print("Subtitle successfully generated")
-    #         return subtitle_path
-    #     except:
-    #         print(f"Error during subtitle generation for {video_path}")
-    #         return None
     def get_subtitles(self, video_path) :
         video_name=video_path.split('/')[-2]
         video_id=video_path.split('/')[-1].split('.')[0]
@@ -204,10 +212,7 @@ class GoldFish_LV:
         except Exception as e:
             print(f"Error during subtitle generation for {video_path}: {e}")
             return None
-        
-        
-        
-              
+                  
     def prepare_input(self, 
                     video_path: str,
                     subtitle_path: Optional[str],

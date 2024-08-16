@@ -77,8 +77,6 @@ def get_arguments():
     parser.add_argument("--annotation_json_folder", type=str, help="path to the annotation folder")
     parser.add_argument("--options", nargs="+")
     return parser.parse_args()
-def time_to_seconds(subrip_time):
-    return subrip_time.hours * 3600 + subrip_time.minutes * 60 + subrip_time.seconds + subrip_time.milliseconds / 1000
 
 def get_movie_time(subtitle_path):
     # read the subtitle file and detect the encoding
